@@ -1,0 +1,23 @@
+# Templates #########################################################
+- platform: template
+  sensors:
+    solar_angle:
+      friendly_name: "Sonnenwinkel"
+      unit_of_measurement: "°"
+      value_template: "{{ states.sun.sun.attributes.elevation }}"
+
+    sunrise:
+      friendly_name: "Sonnenaufgang"
+      value_template: "{{ states.sun.sun.attributes.next_rising }}"
+# Text ##############################################################
+    only_text:
+      friendly_name: " "
+      value_template: ""
+
+# Date Time #########################################################
+- platform: time_date
+  display_options:
+      - 'time'
+      - 'date'
+      - 'date_time'
+#      - 'time_date'

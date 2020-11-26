@@ -1,0 +1,116 @@
+# Sonoff 4CH Pro R2
+# Tasmota
+#
+# Irrigation
+#
+
+# Switch ############################################################
+switch:
+  - platform: mqtt
+    name: "Zone1 Valve"
+    state_topic: "sonoff4ch/stat/RESULT"
+    value_template: "{{ value_json.POWER1 }}"
+    command_topic: "sonoff4ch/cmnd/POWER1"
+    payload_on: "ON"
+    payload_off: "OFF"
+    availability_topic: "sonoff4ch/tele/LWT"
+    payload_available: "Online"
+    payload_not_available: "Offline"
+    qos: 1
+    retain: false
+    icon: mdi:engine
+
+  - platform: mqtt
+    name: "Zone2 Valve"
+    state_topic: "sonoff4ch/stat/RESULT"
+    value_template: "{{ value_json.POWER2 }}"
+    command_topic: "sonoff4ch/cmnd/POWER2"
+    payload_on: "ON"
+    payload_off: "OFF"
+    availability_topic: "sonoff4ch/tele/LWT"
+    payload_available: "Online"
+    payload_not_available: "Offline"
+    qos: 1
+    retain: false
+    icon: mdi:engine
+
+  - platform: mqtt
+    name: "Zone3 Valve"
+    state_topic: "sonoff4ch/stat/RESULT"
+    value_template: "{{ value_json.POWER3 }}"
+    command_topic: "sonoff4ch/cmnd/POWER3"
+    payload_on: "ON"
+    payload_off: "OFF"
+    availability_topic: "sonoff4ch/tele/LWT"
+    payload_available: "Online"
+    payload_not_available: "Offline"
+    qos: 1
+    retain: false
+    icon: mdi:engine
+
+  - platform: mqtt
+    name: "Pump"
+    state_topic: "sonoff4ch/stat/RESULT"
+    value_template: "{{ value_json.POWER4 }}"
+    command_topic: "sonoff4ch/cmnd/POWER4"
+    payload_on: "ON"
+    payload_off: "OFF"
+    availability_topic: "sonoff4ch/tele/LWT"
+    payload_available: "Online"
+    payload_not_available: "Offline"
+    qos: 1
+    retain: false
+    icon: mdi:water-pump
+
+# Sensor ############################################################
+sensor:
+  - platform: mqtt
+    name: "Irrigation WiFi Quality"
+    state_topic: "sonoff4ch/tele/STATE"
+    unit_of_measurement: "%"
+    value_template: "{{value_json['Wifi'].RSSI }}"
+    availability_topic: "sonoff4ch/tele/LWT"
+    payload_available: "Online"
+    payload_not_available: "Offline"
+    device_class: signal_strength
+
+  - platform: template
+    sensors:
+      irrigation_wifi:
+        friendly_name: "Irrigation Wifi"
+        unit_of_measurement: '%'
+        value_template: "{{ states('sensor.irrigation_wifi_quality') }}"
+        icon_template: >-
+          {% if states('sensor.irrigation_wifi_quality')|float > 80 -%}mdi:wifi-strength-4
+          {% elif states('sensor.irrigation_wifi_quality')|float > 60 -%}mdi:wifi-strength-3
+          {% elif states('sensor.irrigation_wifi_quality')|float > 40 -%}mdi:wifi-strength-2
+          {% elif states('sensor.irrigation_wifi_quality')|float > 20 -%}mdi:wifi-strength-1
+          {%- else -%}mdi:wifi-strength-outline
+          {%- endif %}
+
+homeassistant:
+  customize:
+
+# Switch ##############################
+    switch.zone1_valve:
+      friendly_name: "Hinten Ventil"
+      icon: mdi:engine
+
+    switch.zone2_valve:
+      friendly_name: "Vorne Ventil"
+      icon: mdi:engine
+
+    switch.zone3_valve:
+      friendly_name: "Hahn"
+      icon: mdi:shower-head
+
+    switch.pump:
+      friendly_name: "Pumpe"
+      icon: mdi:water-pump
+
+# Switch ##############################
+    sensor.irrigation_wifi_quality:
+      friendly_name: "Bewässerung WLAN-Qualität"
+
+    sensor.irrigation_wifi:
+      friendly_name: "Bewässerung WLAN"

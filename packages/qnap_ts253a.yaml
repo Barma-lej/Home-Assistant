@@ -1,0 +1,109 @@
+# QNAP TS-253A-8G
+
+# Sensor ############################################################
+sensor:
+  - platform: qnap
+    host: !secret qnap_host
+    port: !secret qnap_port
+    ssl: true
+    verify_ssl: false
+    username: !secret qnap_user
+    password: !secret qnap_pass
+    scan_interval: 60
+#    timeout (Optional): How long (in seconds) to wait for a response from the QNAP device before giving up. Defaults to 10.
+    timeout: 60
+#    drives (Optional): Array of drives to monitor (ex: 0:1). Defaults to all drives.
+#    volumes (Optional): Array of volumes to monitor (ex: DataVol1). Defaults to all volumes.
+#    nics (Optional): Array of network interfaces to monitor (ex: eth0). Defaults to all NICs.
+    monitored_conditions:
+      - status
+      - cpu_usage
+      - cpu_temp
+      - system_temp
+      - memory_percent_used
+      - memory_used
+      - memory_free
+      - network_link_status
+      - network_tx
+      - network_rx
+      - volume_percentage_used
+      - drive_smart_status
+      - drive_temp
+      - volume_size_free
+      - volume_size_used
+      - volume_percentage_used
+
+# Groups ############################################################
+group:
+# Sensors #########
+  qnap:
+    name: Schick-NAS
+    entities:
+      - sensor.schick_nas_status
+      - sensor.schick_nas_cpu_usage
+      - sensor.schick_nas_cpu_temperature
+      - sensor.schick_nas_system_temperature
+      - sensor.schick_nas_memory_available
+      - sensor.schick_nas_memory_used
+      - sensor.schick_nas_memory_usage
+      - sensor.schick_nas_free_space_volume1
+      - sensor.schick_nas_used_space_volume1
+      - sensor.schick_nas_volume_used_volume1
+#      - sensor.schick_nas_volume_used_volume1_2
+      - sensor.schick_nas_smart_status_drive_0_1
+      - sensor.schick_nas_temperature_drive_0_1
+      - sensor.schick_nas_smart_status_drive_0_2
+      - sensor.schick_nas_temperature_drive_0_2
+      - sensor.schick_nas_network_link_eth0
+      - sensor.schick_nas_network_up_eth0
+      - sensor.schick_nas_network_down_eth0
+      - sensor.schick_nas_network_link_eth1
+      - sensor.schick_nas_network_up_eth1
+      - sensor.schick_nas_network_down_eth1
+
+
+# Customize #########################################################
+homeassistant:
+  customize:
+    sensor.schick_nas_status:
+      friendly_name: Status
+    sensor.schick_nas_cpu_usage:
+      friendly_name: CPU Usage
+    sensor.schick_nas_cpu_temperature:
+      friendly_name: CPU Temperature
+    sensor.schick_nas_system_temperature:
+      friendly_name: System Temperature
+    sensor.schick_nas_memory_available:
+      friendly_name: Memory Available
+    sensor.schick_nas_memory_used:
+      friendly_name: Memory Used
+    sensor.schick_nas_memory_usage:
+      friendly_name: Memory Usage
+    sensor.schick_nas_free_space_volume1:
+      friendly_name: Free Space (Volume1)
+    sensor.schick_nas_used_space_volume1:
+      friendly_name: Used Space (Volume1)
+    sensor.schick_nas_volume_used_volume1:
+      friendly_name: Volume Used (Volume1)
+#    sensor.schick_nas_volume_used_volume1_2:
+#      friendly_name: Volume Used (Volume1)
+    sensor.schick_nas_smart_status_drive_01:
+      friendly_name: SMART Status (Drive 0:1)
+    sensor.schick_nas_temperature_drive_01:
+      friendly_name: Temperature (Drive 0:1)
+    sensor.schick_nas_smart_status_drive_02:
+      friendly_name: SMART Status (Drive 0:2)
+    sensor.schick_nas_temperature_drive_02:
+      friendly_name: Temperature (Drive 0:2)
+    sensor.schick_nas_network_link_eth0:
+      friendly_name: Network Link (eth0)
+    sensor.schick_nas_network_up_eth0:
+      friendly_name: Network Up (eth0)
+    sensor.schick_nas_network_down_eth0:
+      friendly_name: Network Down (eth0)
+    sensor.schick_nas_network_link_eth1:
+      friendly_name: Network Link (eth1)
+    sensor.schick_nas_network_up_eth1:
+      friendly_name: Network Up (eth1)
+    sensor.schick_nas_network_down_eth1:
+      friendly_name: Network Down (eth1)

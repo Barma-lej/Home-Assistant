@@ -1,0 +1,63 @@
+# Alfawise PE1004T
+# Tasmota
+
+# Switch ############################################################
+switch:
+  - platform: mqtt
+    name: "Alfa02"
+    state_topic: "alfa02/stat/RESULT"
+    value_template: "{{ value_json.POWER }}"
+    command_topic: "alfa02/cmnd/POWER"
+    availability_topic: "alfa02/tele/LWT"
+    qos: 1
+    payload_on: "ON"
+    payload_off: "OFF"
+    payload_available: "Online"
+    payload_not_available: "Offline"
+    retain: false
+    json_attributes_topic: "alfa02/tele/STATE"
+
+# Sensor ############################################################
+#sensor:
+#  - platform: mqtt
+#    name: "Alfa02 Status"
+#    state_topic: "alfa02/tele/STATE"
+#    value_template: '{{ value_json["Wifi"]["RSSI"] }}'
+#    unit_of_measurement: "%"
+#    json_attributes_topic: "alfa02/tele/STATE"
+##    json_attributes_template: "{{ value_json | tojson }}"
+##    json_attributes:
+##      - Uptime
+##      - Heap
+##      - LoadAvg
+##      - SleepMode
+##      - Sleep
+##      - POWER
+##      - Wifi
+
+# Automations #######################################################
+#automation:
+#  - id: tv_board_off
+#    alias: 'TV Board OFF'
+#  #  initial_state: 'off'
+#    trigger:
+#      platform: state
+#      entity_id: group.familie_wlan
+#      to: 'not_home'
+#    action:
+#      service: switch.turn_off
+#      entity_id: switch.alfa02
+
+# Customize #########################################################
+homeassistant:
+  customize:
+# Switch ##########
+    switch.alfa02:
+      friendly_name: "Garage Reset"
+      icon: mdi:garage-alert
+
+# Sensor ##########
+#    sensor.alfa02_status:
+#      friendly_name: "Garage Reset Status"
+#      icon: mdi:information
+#      unit_of_measurement: "%"

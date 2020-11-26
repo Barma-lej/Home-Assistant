@@ -1,0 +1,55 @@
+# Automations #######################################################
+automation:
+# Отключение насоса, при отключении автоматизации полива
+  - id: irrigation_failsafe_pump_master_control_switch
+    alias: Irrigation Failsafe - Pump Master Control Switch
+    description: 'Отключение насоса, при отключении автоматизации полива'
+
+    trigger:
+    - platform: state
+      entity_id: input_boolean.irrigation_master_control_switch
+      to: 'off'
+
+    action:
+    - service: switch.turn_off
+      entity_id: switch.pump
+
+# Включение насоса, если открылся один из клапанов
+  - id: irrigation_pump_on
+    alias: Irrigation - Pump ON
+    description: 'Включение насоса, если открылся один из клапанов'
+
+    trigger:
+    - platform: state
+      entity_id: group.irrigation_switches
+      to: 'on'
+      for: '00:00:01'
+
+    condition:
+    - condition: state
+      entity_id: switch.pump
+      state: 'off'
+
+    action:
+    - service: switch.turn_on
+      entity_id:  switch.pump
+
+# Выключение насоса, если закрыты все клапаны с задержкой для смены зоны полива
+  - id: irrigation_pump_off
+    alias: Irrigation - Pump OFF
+    description: 'Выключение насоса, если закрыты все клапаны с задержкой для смены зоны полива'
+
+    trigger:
+    - platform: state
+      entity_id: group.irrigation_switches
+      to: 'off'
+      for: '00:00:04'
+
+#    condition:
+#    - condition: state
+#      entity_id: switch.pump
+#      state: 'on'
+
+    action:
+    - service: switch.turn_off
+      entity_id:  switch.pump

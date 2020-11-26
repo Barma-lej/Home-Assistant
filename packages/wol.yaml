@@ -1,0 +1,10 @@
+switch:
+  - platform: wake_on_lan
+    name: !secret pc1_name
+    mac: !secret pc1_mac
+    host: !secret pc1_host
+    turn_off: 
+      service: shell_command.turn_off_pc1
+
+shell_command:
+  turn_off_pc1: !secret pc1_shutdown

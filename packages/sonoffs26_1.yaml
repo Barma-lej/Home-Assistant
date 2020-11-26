@@ -1,0 +1,77 @@
+# Sonoff S26 1
+# Tasmota
+
+# Recorder ##########################################################
+recorder:
+  exclude:
+    entities:
+      - automation.tv_board_off
+
+# Logbook ###########################################################
+logbook:
+  exclude:
+    entities:
+      - automation.tv_board_off
+
+# Switch ############################################################
+switch:
+  - platform: mqtt
+    name: "Sonoffs26 1"
+    state_topic: "sonoffs26-1/stat/RESULT"
+    value_template: "{{ value_json.POWER }}"
+    command_topic: "sonoffs26-1/cmnd/POWER"
+    availability_topic: "sonoffs26-1/tele/LWT"
+    qos: 1
+    payload_on: "ON"
+    payload_off: "OFF"
+    payload_available: "Online"
+    payload_not_available: "Offline"
+    retain: false
+    json_attributes_topic: "sonoffs26-1/tele/STATE"
+
+# Sensor ############################################################
+#sensor:
+#  - platform: mqtt
+#    name: "Sonoffs26 1 Status"
+#    state_topic: "sonoffs26-1/tele/STATE"
+#    value_template: '{{ value_json["Wifi"]["RSSI"] }}'
+#    unit_of_measurement: "%"
+#    json_attributes_topic: "sonoffs26-1/tele/STATE"
+
+## Light #############################################################
+#light:
+#  - platform: switch
+#    name: "SonoffS26 1"
+#    entity_id: switch.sonoffs26_1
+
+# Automations #######################################################
+automation:
+  - id: tv_board_off
+    alias: 'TV Board OFF'
+  #  initial_state: 'off'
+    trigger:
+      platform: state
+      entity_id: group.familie_wlan
+      to: 'not_home'
+    action:
+      service: switch.turn_off
+      entity_id: switch.sonoffs26_1
+
+# Customize #########################################################
+homeassistant:
+  customize:
+# Switch ##########
+    switch.sonoffs26_1:
+      friendly_name: "TV-Board"
+      icon: mdi:desktop-classic
+#      icon: mdi:track-light
+
+# Light ###########
+#    light.sonoffs26_1:
+#      friendly_name: Wandlicht
+#      icon: mdi:track-light
+# Sensor ##########
+#    sensor.sonoffs26_1_status:
+#      friendly_name: Sonoff S26 1 Status
+#      icon: mdi:information
+#      unit_of_measurement: "%"

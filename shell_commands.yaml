@@ -1,0 +1,8 @@
+# Shell commands ####################################################
+reboot: !secret cmd_reboot
+restart: !secret cmd_restart
+shutdown: !secret cmd_shutdown
+update: !secret cmd_update
+delete_file: "rm '{{ file_path }}'"
+esphome_run: !secret cmd_esphome_run
+esphome_stop: "pkill esphome"

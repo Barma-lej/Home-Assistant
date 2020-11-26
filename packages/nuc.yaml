@@ -1,0 +1,90 @@
+# Raspberry PI Monitor
+
+# Recorder ##########################################################
+recorder:
+  exclude:
+    entities:
+      - sensor.load_15m
+      - sensor.last_boot_local
+
+# Logbook ###########################################################
+logbook:
+  exclude:
+    entities:
+      - sensor.load_15m
+      - sensor.last_boot_local
+
+sensor:
+## Command Line
+#  - platform: command_line
+#    name: CPU Temp
+#    command: "/bin/cat /sys/class/thermal/thermal_zone0/temp"
+#    unit_of_measurement: "°C"
+#    value_template: '{{ value | multiply(0.001) | round(1) }}'
+#
+##  - platform: cpuspeed
+#
+## Raspberry Pi Power Supply Checker
+#  - platform: rpi_power
+#    text_state: true
+
+# System Monitor
+  - platform: systemmonitor
+    resources:
+    - type: disk_use_percent
+      arg: /
+    - type: disk_free
+      arg: /
+    - type: memory_free
+    - type: memory_use_percent
+    - type: swap_free
+    - type: swap_use_percent
+    - type: processor_use
+    - type: last_boot
+#    - type: load_1m
+    - type: load_15m
+    - type: network_in
+      arg: ens33
+    - type: network_out
+      arg: ens33
+
+  - platform: template
+    sensors:
+      cpu_load:
+        friendly_name: "CPU Load 15m"
+        icon_template: mdi:memory
+        value_template: "{{ (states('sensor.load_15m') | float ) | round(2) }}"
+        unit_of_measurement: " "
+
+      last_boot_local:
+        friendly_name: "Letzter Start"
+        device_class: timestamp
+        icon_template: mdi:clock
+        value_template: "{{ as_timestamp(states('sensor.last_boot')) | timestamp_custom('%d.%m.%Y %H:%M') }}"
+
+#automation:
+## Netzteilproblem #
+#  - id: 'rpi_power_issue'
+#    alias: Netzteilproblem Notification
+#    trigger:
+#    - platform: numeric_state
+#      entity_id: sensor.rpi_power_status
+#      value_template: '{{ state.attributes.value }}'
+#      above: 0
+#      for:
+#        minutes: 1
+#    condition:
+#    action:
+#      service: persistent_notification.create
+#      data:
+#        message: "Raspberry Netzteil: {{ states('sensor.rpi_power_status') }}. Status hat von {{ trigger.from_state.state }} geändert"
+#        title: "Netzteilproblem"
+
+# Customize #########################################################
+homeassistant:
+  customize:
+# Sensor ##########
+    sensor.processor_use:
+      friendly_name: "CPU use"
+    sensor.load_1m:
+      unit_of_measurement: ""

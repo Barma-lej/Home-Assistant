@@ -1,0 +1,84 @@
+# Input_Booleans ####################################################
+input_boolean:
+  irrigation_view_cycle1:
+    name: View Cycle1
+
+  irrigation_view_cycle2:
+    name: View Cycle2
+
+  irrigation_view_stat:
+    name: View Statistics
+
+# Scripts ###########################################################
+
+# Select view
+# To Select view add button in Lovelace
+#############################
+#  entity: input_boolean.irrigation_view_cycle1
+# hold_action:
+#   action: more-info
+# show_icon: false
+# show_name: true
+# tap_action:
+#   action: call-service
+#   service: script.irrigation_views_toggle
+#   service_data:
+#     entity_id: input_boolean.irrigation_view_cycle1
+# type: buttonentity: input_boolean.irrigation_view_cycle1
+# hold_action:
+#   action: more-info
+# show_icon: false
+# show_name: true
+# tap_action:
+#   action: call-service
+#   service: script.irrigation_views_toggle
+#   service_data:
+#     entity_id: input_boolean.irrigation_view_cycle1
+# type: button
+#############################
+# And than add Condition card
+#############################
+# card:
+#   entities:
+#     - entity: ...
+#   show_header_toggle: false
+#   title: ...
+#   type: entities
+# conditions:
+#   - entity: input_boolean.irrigation_view_cycle1
+#     state: 'on'
+# type: conditional
+#############################
+
+script:
+  irrigation_views_toggle:
+    sequence:
+      - service: input_boolean.turn_off
+        data:
+          entity_id: >
+            {% for item in states['input_boolean'] if item.object_id.startswith('irrigation_view_') and
+                                                      item.entity_id != entity_id -%}
+              {% if not loop.first %},{% endif %}{{ item.entity_id }}
+            {%- endfor %}
+      - service: input_boolean.turn_on
+        data:
+          entity_id: "{{ entity_id }}"
+
+homeassistant:
+  customize:
+
+    input_boolean.irrigation_view_cycle1:
+      friendly_name: "Morgen"
+      icon: mdi:weather-sunset-up
+
+    input_boolean.irrigation_view_cycle2:
+      friendly_name: "Abend"
+      icon: mdi:weather-sunset-down
+
+    input_boolean.irrigation_view_stat:
+      friendly_name: "Verlauf"
+      icon: mdi:history
+
+    script.irrigation_views_toggle:
+      friendly_name: "Tabs umschalten"
+      icon: mdi:tab

@@ -1,0 +1,12 @@
+media_player:
+  - platform: braviatv_psk
+    host: !secret sonytv_host
+    psk: !secret sonytv_psk
+    mac: !secret sonytv_mac
+    name: Sony Bravia KD55X8505B
+#    amp: True
+#    android: True
+#    sourcefilter:
+#      - ' HD'
+#      - HDMI
+#    name: SonyTV

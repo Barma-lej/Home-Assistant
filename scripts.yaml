@@ -1,0 +1,25 @@
+'update_ha':
+  alias: Update HA
+  sequence:
+  - data: {}
+    service: shell_command.update
+'raspi_reboot':
+  alias: Raspi Reboot
+  sequence:
+  - data: {}
+    service: shell_command.reboot
+'raspi_restart':
+  alias: Raspi Restart
+  sequence:
+  - data: {}
+    service: shell_command.restart
+'esphome_run':
+  alias: ESPHome Run
+  sequence:
+  - data: {}
+    service: shell_command.esphome_run
+'esphome_stop':
+  alias: ESPHome Stop
+  sequence:
+  - data: {}
+    service: shell_command.esphome_stop

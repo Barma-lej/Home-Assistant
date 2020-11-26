@@ -1,0 +1,19 @@
+# HACS (Home Assistant Community Store) #############################
+# https://github.com/hacs/integration
+
+#hacs:
+#  token: !secret hacs_github_access_token
+
+## Automation ########################################################
+automation:
+  - id: 'hacs_updates'
+    alias: Hacs Update Available Notifications
+    trigger:
+    - platform: numeric_state
+      entity_id: sensor.hacs
+      above: 0
+    action:
+    - service: persistent_notification.create
+      data:
+        title: Aktualisierung verfügbar
+        message: '{{ states("sensor.hacs") }} HACS Updates verfügbar'

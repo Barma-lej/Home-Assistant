@@ -1,0 +1,4 @@
+# sensor.connected_clients
+
+sensor:
+  platform: websocket_api

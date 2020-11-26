@@ -1,0 +1,62 @@
+- id: updateavailable
+  alias: Update Available Notifications
+  trigger:
+  - entity_id: binary_sensor.updater
+    platform: state
+    to: 'on'
+  action:
+  - data:
+      title: Aktualisierung verfügbar
+      message: Home Assistant {{ state_attr('binary_sensor.updater', 'newest_version')
+        }} is available. [See releases](https://github.com/home-assistant/home-assistant/releases)
+    service: persistent_notification.create
+- id: tasmota_state_on_startup
+  alias: Power state on HA start-up
+  trigger:
+  - event: start
+    platform: homeassistant
+  action:
+  - data:
+      payload: '1'
+      topic: sonoffs/cmnd/state
+    service: mqtt.publish
+  - data:
+      payload: '1'
+      topic: sonoffs/tele/STATE
+    service: mqtt.publish
+- id: rolladen_auf
+  alias: Rolladen auf
+  description: ''
+  trigger:
+  - event: sunrise
+    offset: 03:00:00
+    platform: sun
+  condition: []
+  action:
+  - data:
+      entity_id: cover.rolladen
+      position: 100
+    service: cover.set_cover_position
+  - data:
+      message: Rolladen geöffnet
+      title: 🔼 Rolladen
+    service: notify.telegram_schick_home
+  mode: single
+- id: rolladen_zu
+  alias: Rolladen zu
+  description: ''
+  trigger:
+  - event: sunset
+    offset: 01:30:00
+    platform: sun
+  condition: []
+  action:
+  - data:
+      entity_id: cover.rolladen
+      position: 0
+    service: cover.set_cover_position
+  - data:
+      message: Rolladen geschlossen
+      title: 🔽 Rolladen
+    service: notify.telegram_schick_home
+  mode: single

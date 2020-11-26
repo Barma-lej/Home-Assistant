@@ -1,0 +1,9 @@
+my_default:
+  # Background image
+  lovelace-background: 'center / cover no-repeat url("/local/images/abstract-background-png-7.png") fixed'
+
+happy:
+  primary-color: pink
+
+sad:
+  primary-color: blue

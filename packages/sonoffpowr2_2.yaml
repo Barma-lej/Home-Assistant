@@ -1,0 +1,203 @@
+# Sonoff POW R2
+# Sonoff-Tasmota 6.6.0
+
+# Switch ############################################################
+switch:
+  - platform: mqtt
+    name: "SonoffPow 02"
+    state_topic: "sonoffpow-02/stat/RESULT"
+    value_template: "{{ value_json.POWER }}"
+    command_topic: "sonoffpow-02/cmnd/POWER"
+    availability_topic: "sonoffpow-02/tele/LWT"
+    qos: 1
+    payload_on: "ON"
+    payload_off: "OFF"
+    payload_available: "Online"
+    payload_not_available: "Offline"
+    retain: false
+
+# Light #############################################################
+light:
+  - platform: switch
+    name: "SonoffPow 02"
+    entity_id: switch.sonoffpow_02
+
+# Sensor ############################################################
+sensor:
+  - platform: mqtt
+    name: "SonoffPow 02 Energy TotalStartTime"
+    state_topic: "sonoffpow-02/tele/SENSOR"
+    value_template: '{{ value_json["ENERGY"]["TotalStartTime"] }}'
+  - platform: mqtt
+    name: "SonoffPow 02 Energy Total"
+    state_topic: "sonoffpow-02/tele/SENSOR"
+    value_template: '{{ value_json["ENERGY"]["Total"] }}'
+#  - platform: mqtt
+#    name: "SonoffPow 02 Energy Yesterday"
+#    state_topic: "sonoffpow-02/tele/SENSOR"
+#    value_template: '{{ value_json["ENERGY"]["Yesterday"] }}'
+  - platform: mqtt
+    name: "SonoffPow 02 Energy Today"
+    state_topic: "sonoffpow-02/tele/SENSOR"
+    value_template: '{{ value_json["ENERGY"]["Today"] }}'
+#  - platform: mqtt
+#    name: "SonoffPow 02 Energy Period"
+#    state_topic: "sonoffpow-02/tele/SENSOR"
+#    value_template: '{{ value_json["ENERGY"]["Period"] }}'
+  - platform: mqtt
+    name: "SonoffPow 02 Energy Power"
+    state_topic: "sonoffpow-02/tele/SENSOR"
+    value_template: '{{ value_json["ENERGY"]["Power"] }}'
+#  - platform: mqtt
+#    name: "SonoffPow 02 Energy ApparentPower"
+#    state_topic: "sonoffpow-02/tele/SENSOR"
+#    value_template: '{{ value_json["ENERGY"]["ApparentPower"] }}'
+#  - platform: mqtt
+#    name: "SonoffPow 02 Energy ReactivePower"
+#    state_topic: "sonoffpow-02/tele/SENSOR"
+#    value_template: '{{ value_json["ENERGY"]["ReactivePower"] }}'
+#  - platform: mqtt
+#    name: "SonoffPow 02 Energy Factor"
+#    state_topic: "sonoffpow-02/tele/SENSOR"
+#    value_template: '{{ value_json["ENERGY"]["Factor"] }}'
+#  - platform: mqtt
+#    name: "SonoffPow 02 Energy Voltage"
+#    state_topic: "sonoffpow-02/tele/SENSOR"
+#    value_template: '{{ value_json["ENERGY"]["Voltage"] }}'
+#  - platform: mqtt
+#    name: "SonoffPow 02 Energy Current"
+#    state_topic: "sonoffpow-02/tele/SENSOR"
+#    value_template: '{{ value_json["ENERGY"]["Current"] }}'
+
+  - platform: mqtt
+    name: "SonoffPow 02 Status"
+    state_topic: "sonoffpow-02/tele/STATE"
+    value_template: '{{ value_json["Wifi"]["RSSI"] }}'
+    unit_of_measurement: "%"
+    json_attributes_topic: "sonoffpow-02/tele/STATE"
+
+utility_meter:
+  sonoffpow_02_energy_d:
+    source: sensor.sonoffpow_02_energy_total
+    cycle: daily
+
+  sonoffpow_02_energy_m:
+    source: sensor.sonoffpow_02_energy_total
+    cycle: monthly
+
+  sonoffpow_02_energy_y:
+    source: sensor.sonoffpow_02_energy_total
+    cycle: yearly
+
+# Group #############################################################
+#group:
+#  sonoffpow_02:
+#    name: "Ambiente Wohnen"
+#    entities:
+#      - switch.sonoffpow_02
+#      - light.sonoffpow_02
+#      - sensor.sonoffpow_02_status
+#      - sensor.sonoffpow_02_energy_voltage
+#      - sensor.sonoffpow_02_energy_current
+#      - sensor.sonoffpow_02_energy_power
+#      - sensor.sonoffpow_02_energy_apparentpower
+#      - sensor.sonoffpow_02_energy_reactivepower
+#      - sensor.sonoffpow_02_energy_factor
+#      - sensor.sonoffpow_02_energy_totalstarttime
+#      - sensor.sonoffpow_02_energy_total
+#      - sensor.sonoffpow_02_energy_today
+#      - sensor.sonoffpow_02_energy_yesterday
+
+automation:
+- id: telegram_sonoffpow_02
+  alias: "Telegram sonoffpow_02"
+  mode: parallel
+  trigger:
+    platform: event
+    event_type: telegram_command
+    event_data:
+      command: "/ambiente_wohnen"
+
+  action:
+    - service: light.toggle
+      data:
+        entity_id: light.sonoffpow_02
+
+    - wait_for_trigger:
+      - platform: state
+        entity_id: light.sonoffpow_02
+      timeout: 5
+      continue_on_timeout: true
+
+    - service: telegram_bot.send_message
+      data:
+        target: "{{ trigger.event.data.user_id }}"
+        message: "{{ state_attr('light.sonoffpow_02', 'friendly_name') }} ist {{ states('light.sonoffpow_02') }}"
+
+# Customize #########################################################
+homeassistant:
+  customize:
+# Switch ##########
+    switch.sonoffpow_02:
+      friendly_name: Ambiente Wohnen
+      icon: mdi:led-strip-variant
+# Light ###########
+    light.sonoffpow_02:
+      friendly_name: Ambiente Wohnen
+      icon: mdi:led-strip-variant
+# Sensor ##########
+#    sensor.sonoffpow_02_energy_voltage:
+#      friendly_name: Spannung (Ambiente Wohnen)
+#      icon: mdi:power-plug
+#      unit_of_measurement: "V"
+#    sensor.sonoffpow_02_energy_current:
+#      friendly_name: Stromstärke (Ambiente Wohnen)
+#      icon: mdi:current-ac
+#      unit_of_measurement: "A"
+#    sensor.sonoffpow_02_energy_factor:
+#      friendly_name: Leistungsfaktor (Ambiente Wohnen)
+#      icon: mdi:margin
+#      unit_of_measurement: "%"
+    sensor.sonoffpow_02_energy_power:
+      friendly_name: Leistung (Ambiente Wohnen)
+      icon: mdi:gauge
+      unit_of_measurement: "W"
+#    sensor.sonoffpow_02_energy_apparentpower:
+#      friendly_name: Scheinleistung (Ambiente Wohnen)
+#      icon: mdi:resistor
+#      unit_of_measurement: "VA"
+#    sensor.sonoffpow_02_energy_reactivepower:
+#      friendly_name: Blindleistung (Ambiente Wohnen)
+#      icon: mdi:chart-bell-curve
+#      unit_of_measurement: "VAr"
+
+    sensor.sonoffpow_02_energy_today:
+      friendly_name: Verbrauch Heute (Ambiente Wohnen)
+      icon: mdi:chart-areaspline
+      unit_of_measurement: "kWh"
+    sensor.sonoffpow_02_energy_total:
+      friendly_name: Verbrauch Total (Ambiente Wohnen)
+      icon: mdi:chart-areaspline
+      unit_of_measurement: "kWh"
+#    sensor.sonoffpow_02_energy_yesterday:
+#      friendly_name: Verbrauch Gestern (Ambiente Wohnen)
+#      icon: mdi:chart-areaspline
+#      unit_of_measurement: "kWh"
+    sensor.sonoffpow_02_energy_totalstarttime:
+      friendly_name: "Seit"
+      icon: mdi:calendar-clock
+      device_class: "timestamp"
+
+    sensor.sonoffpow_02_status:
+      friendly_name: Status (Ambiente Wohnen)
+      icon: mdi:information
+      unit_of_measurement: "%"
+
+    sensor.sonoffpow_02_energy_d:
+      friendly_name: Verbrauch pro Tag (Ambiente Wohnen)
+
+    sensor.sonoffpow_02_energy_m:
+      friendly_name: Verbrauch pro Monat (Ambiente Wohnen)
+
+    sensor.sonoffpow_02_energy_y:
+      friendly_name: Verbrauch pro Jahr (Ambiente Wohnen)

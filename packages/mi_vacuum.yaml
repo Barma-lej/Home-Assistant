@@ -1,0 +1,617 @@
+# Xiaomi Roborock S50
+
+# Integration #######################################################
+vacuum:
+  - platform: xiaomi_miio
+    name: "Robi"
+    host: !secret robi_ip
+    token: !secret robi_token
+
+# Recorder ##########################################################
+recorder:
+  exclude:
+    entities:
+      - sensor.robi_start_time_weekdays
+      - sensor.robi_start_time_weekend
+      - sensor.robi_ip
+      - sensor.robi_fan_speed
+      - sensor.robi_fan_speed_list
+      - sensor.robi_main_brush_pct
+      - sensor.robi_side_brush_pct
+      - sensor.robi_filter_pct
+      - sensor.robi_sensor_pct
+      - input_select.robi_fan_speed_list
+      - input_select.robi_zone
+      - input_boolean.robi_zone_settings
+      - input_number.robi_passes
+      - input_number.robi_start_minutes_weekend
+      - input_number.robi_start_hour_weekend
+      - input_number.robi_start_minutes_weekdays
+      - input_number.robi_start_hour_weekdays
+
+# Logbook ###########################################################
+logbook:
+  exclude:
+    entities:
+      - sensor.robi_start_time_weekdays
+      - sensor.robi_start_time_weekend
+      - sensor.robi_ip
+      - sensor.robi_fan_speed
+      - sensor.robi_fan_speed_list
+      - sensor.robi_main_brush_pct
+      - sensor.robi_side_brush_pct
+      - sensor.robi_filter_pct
+      - sensor.robi_sensor_pct
+      - input_select.robi_fan_speed_list
+      - input_select.robi_zone
+      - input_boolean.robi_zone_settings
+      - input_number.robi_passes
+      - input_number.robi_start_minutes_weekend
+      - input_number.robi_start_hour_weekend
+      - input_number.robi_start_minutes_weekdays
+      - input_number.robi_start_hour_weekdays
+
+# Sensor  ###########################################################
+sensor:
+  - platform: template
+    sensors:
+      robi_start_time_weekdays:
+        friendly_name: 'Startzeit (Wochentage)'
+        value_template: "{{ '%0.02d:%0.02d' | format(states('input_number.robi_start_hour_weekdays') | int, states('input_number.robi_start_minutes_weekdays') | int) }}"
+        icon_template: mdi:clock-start
+      robi_start_time_weekend:
+        friendly_name: 'Startzeit (Wochenende)'
+        value_template: "{{ '%0.02d:%0.02d' | format(states('input_number.robi_start_hour_weekend') | int, states('input_number.robi_start_minutes_weekend') | int) }}"
+        icon_template: mdi:clock-start
+# States ####################
+      robi_ip:
+        friendly_name: "Robi - IP Adresse"
+        value_template: !secret robi_ip
+        icon_template: mdi:ip-network
+      robi_status:
+        friendly_name: "Robi - Status"
+        value_template: "{{ state_attr('vacuum.robi','status') }}"
+        icon_template: mdi:information
+      robi_battery:
+        friendly_name: "Robi - Akku"
+        value_template: "{{ state_attr('vacuum.robi','battery_level') | int }}"
+        icon_template: "{{ state_attr('vacuum.robi','battery_icon') }}"
+        device_class: battery
+        unit_of_measurement: '%'
+      robi_fan_speed:
+        friendly_name: "Robi - Modus"
+        value_template: "{{ state_attr('vacuum.robi','fan_speed') }}"
+        icon_template: mdi:fan
+      robi_fan_speed_list:
+        friendly_name: "Robi - Modusliste"
+        value_template: "{{ state_attr('vacuum.robi','fan_speed_list') }}"
+        icon_template: mdi:pinwheel
+
+# Accesories ################
+      robi_main_brush:
+        friendly_name: "Robi - Hauptbürste"
+        value_template: "{{ state_attr('vacuum.robi','main_brush_left') }}"
+        icon_template: mdi:broom
+        unit_of_measurement: "Std"
+      robi_main_brush_pct:
+        friendly_name: "Robi - Hauptbürste (percent)"
+        value_template: "{{ (state_attr('vacuum.robi','main_brush_left') / 3) | round(0) }}"
+        icon_template: mdi:broom
+        unit_of_measurement: '%'
+      robi_side_brush:
+        friendly_name: "Robi - Seitenbürste"
+        value_template: "{{ state_attr('vacuum.robi','side_brush_left') }}"
+        icon_template: mdi:multiplication
+        unit_of_measurement: "Std"
+      robi_side_brush_pct:
+        friendly_name: "Robi - Seitenbürste (percent)"
+        value_template: "{{ (state_attr('vacuum.robi','side_brush_left') / 2) | round(0) }}"
+        icon_template: mdi:multiplication
+        unit_of_measurement: '%'
+      robi_filter:
+        friendly_name: "Robi - Filter"
+        value_template: "{{ state_attr('vacuum.robi','filter_left') }}"
+        icon_template: mdi:blur-linear
+        unit_of_measurement: "Std"
+      robi_filter_pct:
+        friendly_name: "Robi - Filter (percent)"
+        value_template: "{{ (state_attr('vacuum.robi','filter_left') / 1.5) | round(0) }}"
+        icon_template: mdi:blur-linear
+        unit_of_measurement: '%'
+      robi_sensor:
+        friendly_name: "Robi - Sensoren"
+        value_template: "{{ state_attr('vacuum.robi','sensor_dirty_left') }}"
+        icon_template: mdi:signal-variant
+        unit_of_measurement: "Std"
+      robi_sensor_pct:
+        friendly_name: "Robi - Sensoren (percent)"
+        value_template: "{{ (state_attr('vacuum.robi','sensor_dirty_left') / 0.3) | round(0) }}"
+        icon_template: mdi:signal-variant
+        unit_of_measurement: '%'
+
+# Statistik #################
+      robi_clean_start:
+        friendly_name: "Reinigungsstart"
+        value_template: >
+          {%- set date = as_timestamp(state_attr('vacuum.robi','clean_start')) %}
+          {% set weekdays_short = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] -%}
+          {{ weekdays_short[(date | timestamp_custom("%w")) | int] }}, {{ date | timestamp_custom("%d.%m.%Y %H:%M:%S") }}
+        icon_template: mdi:clock-start
+      robi_clean_stop:
+        friendly_name: "Reinigungsstop"
+        value_template: >
+          {%- set date = as_timestamp(state_attr('vacuum.robi','clean_stop')) %}
+          {% set weekdays_short = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] -%}
+          {{ weekdays_short[(date | timestamp_custom("%w")) | int] }}, {{ date | timestamp_custom("%d.%m.%Y %H:%M:%S") }}
+        icon_template: mdi:clock-end
+
+      robi_cleaning_time:
+        friendly_name: "Dauer"
+        value_template: "{{ state_attr('vacuum.robi','cleaning_time') }}"
+        icon_template: mdi:clock-fast
+        unit_of_measurement: 'min'
+      robi_cleaned_area:
+        friendly_name: "Fläche"
+        value_template: "{{ state_attr('vacuum.robi','cleaned_area') }}"
+        icon_template: mdi:floor-plan
+        unit_of_measurement: 'm²'
+
+      robi_total_cleaned_area:
+        friendly_name: "Fläche (insg.)"
+        value_template: "{{ state_attr('vacuum.robi','total_cleaned_area') }}"
+        icon_template: mdi:floor-plan
+        unit_of_measurement: 'm²'
+      robi_total_cleaned_time:
+        friendly_name: "Dauer (insg.)"
+        value_template: "{{ (state_attr('vacuum.robi','total_cleaning_time') // 60) }}:{{ state_attr('vacuum.robi','total_cleaning_time') % 60 }}"
+        icon_template: mdi:clock-fast
+        unit_of_measurement: 'Std'
+      robi_cleaning_count:
+        friendly_name: "Reinigungen (insg.)"
+        value_template: "{{ state_attr('vacuum.robi','cleaning_count') }}"
+        icon_template: "mdi:calculator"
+        unit_of_measurement: " "
+
+#   - platform: rest
+#     resource: !secret robi_resource_map
+#     name: Vacuum Map url
+#     value_template: "http://{{states('sensor.robi_ip')}}{{value_json.mapsrc}}"
+
+# Switch ############################################################
+switch:
+  - platform: template
+    switches:
+      vacuum:
+        friendly_name: "Robi"
+        value_template: "{% if is_state('vacuum.robi', 'cleaning') %}On{% else %}Off{% endif %}"
+        turn_on:
+          service: input_select.select_option
+          entity_id: input_select.robi_zone
+          data:
+            option: "EG"
+        turn_off:
+          service: vacuum.return_to_base
+          data:
+            entity_id: vacuum.robi
+        icon_template: mdi:robot-vacuum
+
+# input Select ######################################################
+input_select:
+  robi_fan_speed_list:
+    name: Reinigungsmodus
+    icon: mdi:fan
+    options:
+    - Wischen
+    - Leise
+    - Standart
+    - Turbo
+    - Maximum
+
+  robi_zone:
+    name: Was muss reinigen?
+    icon: mdi:map-marker
+    options:
+      - Raumauswahl
+      - EG
+      - Küche
+      - Wohnzimmer
+      - Stube
+      - Schlafzimmer
+      - Flur
+      - HWR
+      - WC
+
+# input Boolean #####################################################
+input_boolean:
+  robi_zone_settings:
+    name: zone settings
+    initial: false
+
+# input Number ######################################################
+input_number:
+  robi_passes:
+    name: Wie oft?
+    initial: 1
+    min: 1
+    max: 3
+    step: 1
+    icon: mdi:shuffle-disabled
+  robi_start_minutes_weekend:
+    name: Start Minute
+    initial: 0
+    min: 0
+    max: 59
+    step: 1
+    mode: slider
+  robi_start_hour_weekend:
+    name: Start Stunde
+    initial: 13
+    min: 0
+    max: 23
+    step: 1
+    mode: slider
+  robi_start_minutes_weekdays:
+    name: Start Minute
+    initial: 0
+    min: 0
+    max: 59
+    step: 1
+    mode: slider
+  robi_start_hour_weekdays:
+    name: Start Stunde
+    initial: 15
+    min: 0
+    max: 23
+    step: 1
+    mode: slider
+
+# Automation ########################################################
+automation:
+
+# If you want to set the vacuum to mop mode, just like the app, here is a script for that:
+#   aspirador_set_mop:
+#    sequence:
+#      service: vacuum.set_fan_speed
+#      data:
+#        entity_id: vacuum.aspirador
+#        fan_speed: 105
+# Fan speed 105… Very odd. You will see in the app that mop mode is selected.
+  - id: robi_modus
+    alias: Robi - Modus
+    initial_state: true
+    trigger:
+      platform: state
+      entity_id: input_select.robi_fan_speed_list
+    action:
+      - service: vacuum.set_fan_speed
+        data:
+          entity_id: vacuum.robi
+          fan_speed: >
+            {% if trigger.to_state.state == 'Leise' %}
+              Quiet
+            {% elif trigger.to_state.state == 'Standart' %}
+              Standart
+            {% elif trigger.to_state.state == 'Turbo' %}
+              Turbo
+            {% elif trigger.to_state.state == 'Maximum' %}
+              Max
+            {% elif trigger.to_state.state == 'Wischen' %}
+              105
+            {% endif %}
+
+  - id: robi_raumauswahl
+    alias: Robi - Raumauswahl
+    initial_state: true
+    trigger:
+      platform: state
+      entity_id: input_select.robi_zone
+      from: 'Raumauswahl'
+
+    action:
+      - service: >
+          {% if is_state('input_select.robi_zone','EG') %}
+            script.robi_home
+          {% elif is_state('input_select.robi_zone','Küche') %}
+            script.robi_kitchen
+          {% elif is_state('input_select.robi_zone','Wohnzimmer') %}
+            script.robi_living_room
+          {% elif is_state('input_select.robi_zone','Stube') %}
+            script.robi_stube
+          {% elif is_state('input_select.robi_zone','Schlafzimmer') %}
+            script.robi_bedroom
+          {% elif is_state('input_select.robi_zone','Flur') %}
+            script.robi_flur
+          {% elif is_state('input_select.robi_zone','HWR') %}
+            script.robi_hwr
+          {% elif is_state('input_select.robi_zone','WC') %}
+            script.robi_wc
+          {% else %}
+          {% endif %}
+
+      - wait_template: "{{is_state('vacuum.robi', 'docked')}}"
+
+      - delay: 00:00:15
+
+      - service: input_select.select_option
+        entity_id: input_select.robi_zone
+        data:
+          option: "Raumauswahl"
+
+      - service: input_select.select_option
+        entity_id: input_select.robi_fan_speed_list
+        data:
+          option: "Standart"
+
+# Планировка запуска в рабочие дни
+  - id: robi_schedule_cleaning_on_weekdays
+    alias: Robi Schedule cleaning on weekdays
+    initial_state: false
+    trigger:
+    - platform: template
+      value_template: "{{ states('sensor.robi_start_time_weekdays') == states('sensor.time') }}"
+
+    condition:
+    - condition: time
+      weekday:
+      - mon
+      - tue
+      - wed
+      - thu
+      - fri
+
+    action:
+    - service: vacuum.start
+      data:
+        entity_id: vacuum.robi
+
+# Планировка запуска в выходные
+  - id: robi_schedule_cleaning_on_weekends
+    alias: Robi Schedule cleaning on weekends
+    initial_state: false
+    trigger:
+    - platform: template
+      value_template: "{{ states('sensor.robi_start_time_weekend') == states('sensor.time') }}"
+
+    condition:
+    - condition: time
+      weekday:
+      - sat
+      - sun
+
+    action:
+    - service: vacuum.start
+      data:
+        entity_id: vacuum.robi
+
+# Notifictaion ##############
+  - id: robi__notify
+    alias: Robi Notify
+    trigger:
+    - platform: state
+      entity_id: vacuum.robi
+
+    condition:
+    - condition: template
+      value_template: "{{ trigger.to_state.state != trigger.from_state.state }}"
+
+    action:
+    - service: notify.telegram_schick_home
+      data:
+        title: 🐁 Robi
+        message: "{{ states('vacuum.robi') }}, {{ state_attr('vacuum.robi','status') }}"
+
+# ZONE ##############################################################
+# Küche oben links - Area: Süd, Ost, Nord, West [left, bottom, right, top]
+# Ladestation 25500, 25500
+# ===================================================================
+# Küche: {"entity_id": "vacuum.robi", "command": "app_zoned_clean","params": [[21000, 29500, 23200, 33100, 1]]}
+# Wohnzimmer: {"entity_id": "vacuum.robi", "command": "app_zoned_clean","params": [[23000, 29300, 30000, 34200, 1]]}
+# Stube: {"entity_id": "vacuum.robi", "command": "app_zoned_clean","params": [[20000, 29300, 30000, 35000, 1]]}
+# Schlafzimmer: {"entity_id": "vacuum.robi", "command": "app_zoned_clean","params": [[26500, 24500, 30000, 29300, 1]]}
+# Flur: {"entity_id": "vacuum.robi", "command": "app_zoned_clean","params": [[23100, 24500, 26000, 29200, 1]]}
+# HWR: {"entity_id": "vacuum.robi", "command": "app_zoned_clean","params": [[20000, 26500, 22500, 29200, 1]]}
+# WC: {"entity_id": "vacuum.robi", "command": "app_zoned_clean","params": [[20000, 24500, 23000, 26500, 1]]}
+
+# Küche unten rechts - Area: Nord, West, Süd, Ost [left, bottom, right, top]
+# Ladestation 25500, 25500
+# ===================================================================
+# EG: {"entity_id": "vacuum.robi", "command": "app_zoned_clean","params": [[20800, 16000, 31000, 26500, 1]]}
+# Küche: {"entity_id": "vacuum.robi", "command": "app_zoned_clean","params": [[28000, 16800, 31000, 21950, 1]]}
+# Wohnzimmer: {"entity_id": "vacuum.robi", "command": "app_zoned_clean","params": [[20800, 16000, 28100, 21950, 1]]}
+# Stube: {"entity_id": "vacuum.robi", "command": "app_zoned_clean","params": [[20800, 16000, 31000, 21950, 1]]}
+# Schlafzimmer: {"entity_id": "vacuum.robi", "command": "app_zoned_clean","params": [[20800, 22000, 25100, 26500, 1]]}
+# Flur: {"entity_id": "vacuum.robi", "command": "app_zoned_clean","params": [[25100, 21940, 27850, 26500, 1]]}
+# HWR: {"entity_id": "vacuum.robi", "command": "app_zoned_clean","params": [[27830, 21940, 31000, 24400, 1]]}
+# WC: {"entity_id": "vacuum.robi", "command": "app_zoned_clean","params": [[27820, 24500, 31000, 26500, 1]]}
+# ===================================================================
+# service: vacuum.send_command
+#   entity_id: vacuum.robi
+#   command: app_goto_target
+#   params: [24500,29500]
+#   params: [(север->юг) слева направо - убывает, (восток->запад) сверху вниз - возрастает]
+#
+
+# Script ############################################################
+script:
+#  robi_home:
+#    sequence:
+#    - service: vacuum.start
+#      data:
+#        entity_id: vacuum.robi
+#    - service: script.robi_alert_start
+
+  robi_home:
+    alias: Robi - Reinigen
+    icon: mdi:floor-plan
+    sequence:
+    - service: xiaomi_miio.vacuum_clean_zone
+      data:
+        entity_id: vacuum.robi
+        repeats: "{{states('input_number.robi_passes')|int}}"
+        zone: [[5000, 5000, 50000, 50000]]
+#        zone: [[20800, 16000, 31000, 26500]]
+#    - service: script.robi_alert_start
+
+  robi_kitchen:
+    alias: Robi - Küche reinigen
+    icon: mdi:silverware-fork-knife
+    sequence:
+    - service: xiaomi_miio.vacuum_clean_zone
+      data:
+        entity_id: vacuum.robi
+        repeats: "{{states('input_number.robi_passes')|int}}"
+        zone: [[28000, 16800, 31000, 21700]]
+#        zone: [[20000, 29500, 23200, 34200]]
+#    - service: script.robi_alert_start
+
+  robi_living_room:
+    alias: Robi - Wohnzimmer reinigen
+    icon: mdi:sofa
+    sequence:
+    - service: xiaomi_miio.vacuum_clean_zone
+      data:
+        entity_id: vacuum.robi
+        repeats: "{{states('input_number.robi_passes')|int}}"
+        zone: [[20800, 16000, 28100, 21950]]
+#        zone: [[23000, 29300, 30000, 35000]]
+#    - service: script.robi_alert_start
+
+  robi_stube:
+    alias: Robi - Stube reinigen
+    icon: mdi:broom
+    sequence:
+    - service: xiaomi_miio.vacuum_clean_zone
+      data:
+        entity_id: vacuum.robi
+        repeats: "{{states('input_number.robi_passes')|int}}"
+        zone: [[20800, 16000, 31000, 21700]]
+#        zone: [[20000, 29300, 30000, 35000]]
+#    - service: script.robi_alert_start
+
+  robi_bedroom:
+    alias: Robi - Schlafzimmer reinigen
+    icon: mdi:bed-empty
+    sequence:
+    - service: xiaomi_miio.vacuum_clean_zone
+      data:
+        entity_id: vacuum.robi
+        repeats: "{{states('input_number.robi_passes')|int}}"
+        zone: [[20800, 22000, 25100, 26500]]
+#        zone: [[26500, 23500, 30000, 29300]]
+#    - service: script.robi_alert_start
+
+  robi_flur:
+    alias: Robi - Flur reinigen
+    icon: mdi:broom
+    sequence:
+    - service: xiaomi_miio.vacuum_clean_zone
+      data:
+        entity_id: vacuum.robi
+        repeats: "{{states('input_number.robi_passes')|int}}"
+        zone: [[25100, 21940, 27850, 26500]]
+#        zone: [[23100, 23500, 26000, 29200]]
+#    - service: script.robi_alert_start
+
+  robi_hwr:
+    alias: Robi - HWR reinigen
+    icon: mdi:broom
+    sequence:
+    - service: xiaomi_miio.vacuum_clean_zone
+      data:
+        entity_id: vacuum.robi
+        repeats: "{{states('input_number.robi_passes')|int}}"
+        params: [[27830, 21940, 31000, 24400]]
+#        params: [[20000, 26500, 22500, 29200]]
+#    - service: script.robi_alert_start
+
+  robi_wc:
+    alias: Robi - WC reinigen
+    icon: mdi:broom
+    sequence:
+    - service: xiaomi_miio.vacuum_clean_zone
+      data:
+        entity_id: vacuum.robi
+        repeats: "{{states('input_number.robi_passes')|int}}"
+        zone: [[27820, 24500, 31000, 26500]]
+#        zone: [[20000, 23500, 23000, 26500]]
+#    - service: script.robi_alert_start
+
+  robi_ort:
+    alias: Robi - Komm mal her
+    icon: mdi:shoe-print
+    sequence:
+    - service: vacuum.send_command
+      data:
+        entity_id: vacuum.robi
+        command: app_goto_target
+        zone:  [24500, 20300]
+#        zone:  [26500,30700]
+#    - service: script.robi_alert_start
+
+#  robi_kitchen:
+#    sequence:
+#    - service: vacuum.send_command
+#      data:
+#        entity_id: vacuum.robi
+#        command: app_zoned_clean
+#        params: [[28000, 16800, 31000, 21700, 1]]
+
+# Alerts ############################################################
+#  robi_alert_start:
+#    alias: Vacuum alert start
+#    sequence:
+#    - service: notify.avitelegram
+#      data:
+#        title: "House alert"
+#        message: "The robot has started cleaning the area: {{ states('input_select.robi_zone') | lower }}."
+#    - service: notify.avitelegram
+#      data:
+#        title: "House alert ({{now().strftime('%H:%M')}})"
+#        message: "The robot has started cleaning the area: {{ states('input_select.robi_zone') | lower }}"
+#
+#  robi_alert_pause:
+#    alias: Vacuum alert pausa
+#    sequence:
+#    - service: notify.avitelegram
+#      data:
+#        title: "House alert"
+#        message: "The vacuum cleaner has stopped cleaning the area: {{ states('input_select.robi_zone') | lower }}. {% if 'error' in states('vacuum.robi') %}Error code: {{ state_attr('vacuum.robi','error') }}.{% else %}{% endif %}"
+#    - service: notify.avitelegram
+#      data:
+#        title: "House alert ({{now().strftime('%H:%M')}})"
+#        message: "The vacuum cleaner has stopped cleaning the area: {{ states('input_select.robi_zone') | lower }}. {% if 'error' in states('vacuum.robi') %}Error code: {{ state_attr('vacuum.robi','error') }}.{% else %}{% endif %}"
+#
+#  robi_alert_back_to_home:
+#    alias: Vacuum alert back to home
+#    sequence:
+#    - condition: template
+#      value_template: "{% if is_state('input_select.robi_zone', 'Choose the area') %}False{% else %}True{% endif %}"
+#    - service: notify.avitelegram
+#      data:
+#        title: "House alert"
+#        message: "The robot has finished cleaning the area {{ states('input_select.robi_zone') | lower }}. cleaned {{ state_attr('vacuum.robi','cleaned_area') }} square meters in {{ state_attr('vacuum.robi','cleaning_time') }} minutes and now it is loading"
+#    - service: notify.avitelegram
+#      data:
+#        title: "House alert ({{now().strftime('%H:%M')}})"
+#        message: "The robot has finished cleaning the area {{ states('input_select.robi_zone') | lower }}. cleaned {{ state_attr('vacuum.robi','cleaned_area') }} square meters in {{ state_attr('vacuum.robi','cleaning_time') }} minutes and now it is loading."
+#
+#  robi_alert_error:
+#    alias: Vacuum alert error
+#    sequence:
+#    - service: notify.avitelegram
+#      data:
+#        title: "House alert"
+#        message: "The vacuum cleaner stopped and reported an error while cleaning the area {{ states('input_select.robi_zone') | lower }}."
+#    - service: notify.avitelegram
+#      data:
+#        title: "House alert ({{now().strftime('%H:%M')}})"
+#        message: "The vacuum cleaner stopped and reported an error while cleaning the area {{ states('input_select.robi_zone') | lower }}."
+#
+# Camera ############################################################
+#camera:
+#  - platform: generic
+#    name: Vacuum map
+#    still_image_url: "{{ states('sensor.robi_map_url') }}"
+#    verify_ssl: false
+#    content_type: image/png
+#    framerate: 1

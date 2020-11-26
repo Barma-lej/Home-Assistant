@@ -1,0 +1,9 @@
+conversation:
+  intents:
+    LivingRoomTemperature:
+     - Привет
+
+intent_script:
+  LivingRoomTemperature:
+    speech:
+      text: Привет, я рада слышать тебя

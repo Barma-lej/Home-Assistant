@@ -1,0 +1,126 @@
+# Sonoff RF Bridge
+# Sonoff-Tasmota 6.4.1 DO NOT UPDATE!!!
+
+# Recorder ##########################################################
+recorder:
+  exclude:
+    entities:
+      - input_boolean.dummy_switch
+
+# Logbook ###########################################################
+logbook:
+  exclude:
+    entities:
+      - input_boolean.dummy_switch
+
+# Sensor ############################################################
+sensor:
+  - name: "SonoffRFBridge"
+    platform: mqtt
+    state_topic: "sonoffrfbridge/tele/RESULT"
+    value_template: "{{ value_json.RfReceived.Data }}"
+    qos: 1
+    json_attributes_topic: "sonoffrfbridge/tele/STATE"
+
+# sonoffrfbridge/tele/STATE = {"Time":"2019-07-16T22:07:53","Uptime":"0T01:10:15","SleepMode":"Dynamic","Sleep":50,"LoadAvg":19,"Wifi":{"AP":1,"SSId":"Pluto","BSSId":"5C:49:79:41:57:D9","Channel":8,"RSSI":100}}
+
+# Input_boolean #######################################################
+input_boolean:
+  dummy_switch:
+    name: Dummy Switch
+    initial: off
+
+# Automations #######################################################
+automation:
+  - id: rf_commands
+    alias: 'RF Commands'
+    trigger:
+      platform: state
+      entity_id: sensor.sonoffrfbridge
+    action:
+      service: >
+        {% if (states("sensor.sonoffrfbridge") | float % 2) > 0 -%} homeassistant.turn_on
+        {%- else -%} homeassistant.turn_off
+        {%- endif %}
+      data:
+        entity_id: >
+          {% if is_state("sensor.sonoffrfbridge","20500") or
+                is_state("sensor.sonoffrfbridge","20501") %} switch.alfa01
+          {% elif is_state("sensor.sonoffrfbridge","17684") or
+                  is_state("sensor.sonoffrfbridge","17685") %} switch.alfa02
+          {% elif is_state("sensor.sonoffrfbridge","5396") or
+                  is_state("sensor.sonoffrfbridge","5397") %} switch.alfa03
+          {% elif is_state("sensor.sonoffrfbridge","20") or
+                is_state("sensor.sonoffrfbridge","21") %} switch.sonoffpow_01
+          {% elif is_state("sensor.sonoffrfbridge","16404") or
+                  is_state("sensor.sonoffrfbridge","16405") %} switch.sonoffpow_03
+          {% elif is_state("sensor.sonoffrfbridge","4116") or
+                  is_state("sensor.sonoffrfbridge","4117") %} group.ambientelight
+          {% elif is_state("sensor.sonoffrfbridge","1044") or
+                  is_state("sensor.sonoffrfbridge","1045") %} switch.sonoffpow_02
+          {% elif is_state("sensor.sonoffrfbridge","17428") or
+                  is_state("sensor.sonoffrfbridge","17429") %} switch.sonoffpow_04
+          {% else %}
+                  input_boolean.dummy_switch
+          {% endif %}
+#================================================
+#- id: rf_commands_lights
+#  alias: 'RF Commands Lights'
+#  trigger:
+#    platform: state
+#    entity_id: sensor.sonoffrfbridge
+#  action:
+#    service: >
+#      {% if (states("sensor.sonoffrfbridge") | float % 2) > 0 -%} switch.turn_on
+#      {%- else -%} switch.turn_off
+#      {%- endif %}
+#    data:
+#      entity_id: >
+#        {% if is_state("sensor.sonoffrfbridge","20") or
+#              is_state("sensor.sonoffrfbridge","21") %} switch.sonoffpow_01
+#        {% elif is_state("sensor.sonoffrfbridge","16404") or
+#                is_state("sensor.sonoffrfbridge","16405") %} switch.sonoffpow_03
+#        {% elif is_state("sensor.sonoffrfbridge","4116") or
+#                is_state("sensor.sonoffrfbridge","4117") %} switch.ambientlicht
+#        {% elif is_state("sensor.sonoffrfbridge","1044") or
+#                is_state("sensor.sonoffrfbridge","1045") %} switch.sonoffpow_02
+#        {% elif is_state("sensor.sonoffrfbridge","17428") or
+#                is_state("sensor.sonoffrfbridge","17429") %} switch.sonoffpow_04
+#        {% endif %}
+#================================================
+# 1 Gruppe
+#        {% if is_state("sensor.sonoffrfbridge","20") or
+#              is_state("sensor.sonoffrfbridge","21") %} switch.sonoffpow_01
+#        {% elif is_state("sensor.sonoffrfbridge","16404") or
+#                is_state("sensor.sonoffrfbridge","16405") %} switch.sonoffpow_03
+#        {% elif is_state("sensor.sonoffrfbridge","4116") or
+#                is_state("sensor.sonoffrfbridge","4117") %} switch.sonoffpow_02
+#        {% elif is_state("sensor.sonoffrfbridge","20500") or
+#                is_state("sensor.sonoffrfbridge","20501") %} switch.sonoffpow_04
+# 2 Gruppe
+#        {% elif is_state("sensor.sonoffrfbridge","1044") or
+#                is_state("sensor.sonoffrfbridge","1045") %} switch.sonoffpow_02
+#        {% elif is_state("sensor.sonoffrfbridge","17428") or
+#                is_state("sensor.sonoffrfbridge","17429") %} switch.sonoffpow_04
+#        {% elif is_state("sensor.sonoffrfbridge","5140") or
+#                is_state("sensor.sonoffrfbridge","5141") %} switch.sonoffpow_04
+#        {% elif is_state("sensor.sonoffrfbridge","21524") or
+#                is_state("sensor.sonoffrfbridge","21525") %} switch.sonoffpow_04
+# 3 Gruppe
+#        {% elif is_state("sensor.sonoffrfbridge","276") or
+#                is_state("sensor.sonoffrfbridge","277") %} switch.sonoffpow_04
+#        {% elif is_state("sensor.sonoffrfbridge","16660") or
+#                is_state("sensor.sonoffrfbridge","16661") %} switch.sonoffpow_04
+#        {% elif is_state("sensor.sonoffrfbridge","4372") or
+#                is_state("sensor.sonoffrfbridge","4373") %} switch.sonoffpow_04
+#        {% elif is_state("sensor.sonoffrfbridge","20756") or
+#                is_state("sensor.sonoffrfbridge","20757") %} switch.sonoffpow_04
+# 4 Gruppe
+#        {% elif is_state("sensor.sonoffrfbridge","1300") or
+#                is_state("sensor.sonoffrfbridge","1301") %} switch.sonoffpow_04
+#        {% elif is_state("sensor.sonoffrfbridge","17684") or
+#                is_state("sensor.sonoffrfbridge","17685") %} switch.sonoffpow_04
+#        {% elif is_state("sensor.sonoffrfbridge","5396") or
+#                is_state("sensor.sonoffrfbridge","5397") %} switch.sonoffpow_04
+#        {% elif is_state("sensor.sonoffrfbridge","21780") or
+#                is_state("sensor.sonoffrfbridge","21781") %} switch.sonoffpow_04

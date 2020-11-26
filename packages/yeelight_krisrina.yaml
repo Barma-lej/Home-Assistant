@@ -1,0 +1,7 @@
+# Yeelink Light Ceiling1
+
+yeelight:
+  devices:
+    192.168.2.239:
+      name: Kristinas Licht
+      model: ceiling1

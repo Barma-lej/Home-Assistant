@@ -1,0 +1,260 @@
+# Example configuration.yaml entry for the Telegram Bot
+telegram_bot:
+  - platform: polling
+#  - platform: broadcast
+    api_key: !secret telegram_api_key
+    allowed_chat_ids:
+      - !secret telegram_channel
+      - !secret telegram_bot_familie
+      - !secret telegram_bot_anatolij
+      - !secret telegram_bot_natalja
+      - !secret telegram_bot_veronika
+
+# Notify ############################################################
+notify:
+  - name: telegram_schick_home
+    platform: telegram
+    chat_id: !secret telegram_channel
+
+  - name: telegram_bot_familie
+    platform: telegram
+    chat_id: !secret telegram_bot_familie
+
+  - name: telegram_bot_anatolij
+    platform: telegram
+    chat_id: !secret telegram_bot_anatolij
+
+  - name: telegram_bot_natalja
+    platform: telegram
+    chat_id: !secret telegram_bot_natalja
+
+  - name: telegram_bot_kristina
+    platform: telegram
+    chat_id: !secret telegram_bot_familie
+
+  - name: telegram_bot_veronika
+    platform: telegram
+    chat_id: !secret telegram_bot_veronika
+
+# Automation ########################################################
+automation:
+# Start
+- id: telegram_start
+  alias: 'Telegram start'
+  trigger:
+  - platform: event
+    event_type: telegram_command
+    event_data:
+      command: '/start'
+
+  action:
+  - service: >
+      {% if trigger.event.data['from_first'] == 'Barmalej' %}
+        notify.telegram_bot_anatolij
+      {% elif trigger.event.data['from_first'] =='Natalja' %}
+        notify.telegram_bot_natalja
+      {% elif trigger.event.data['from_first'] =='Kristina' %}
+        notify.telegram_bot_kristina
+      {% elif trigger.event.data['from_first'] =='Veronika' %}
+        notify.telegram_bot_veronika
+      {% else %}
+        notify.telegram_schick_home
+      {% endif %}
+
+    data:
+      message: |
+        Hallo, hier kannst du unser Zuhause verwalten.
+        Wähle das Symbol [/] unten und dann eine Aktion aus.
+        /start - Zeigt diese Nachricht
+        /commands - Zeigt Control Panel
+        /help - Zeigt eine Nachricht mit Befehlen an
+      data:
+        keyboard:
+          - '/wandlicht, /wohnlicht, /ambiente_wohnen'
+          - '/kuechenlicht, /ambiente_kueche, /rollade_hinten'
+          - '/rollade_1, /rollade_2, /rollade_3'
+          - '/start, /commands, /help, /tor'
+
+# Commands
+- id: telegram_commands
+  alias: 'Telegram commands'
+  trigger:
+  - platform: event
+    event_type: telegram_command
+    event_data:
+      command: '/commands'
+
+  action:
+  - service: >
+      {% if trigger.event.data['from_first'] == 'Barmalej' %}
+        notify.telegram_bot_anatolij
+      {% elif trigger.event.data['from_first'] =='Natalja' %}
+        notify.telegram_bot_natalja
+      {% elif trigger.event.data['from_first'] =='Kristina' %}
+        notify.telegram_bot_kristina
+      {% elif trigger.event.data['from_first'] =='Veronika' %}
+        notify.telegram_bot_veronika
+      {% else %}
+        notify.telegram_schick_home
+      {% endif %}
+
+    data:
+      message: Wähle eine Aktion aus
+      data:
+        inline_keyboard:
+          - 'Tor:/tor, Home:/start, Hilfe:/help'
+          - 'Wandlicht:/wandlicht, Wohnlicht:/wohnlicht, Ambiente Wohnzimmer:/ambiente_wohnen'
+          - 'Küchenlicht:/kuechenlicht, Ambiente Küche:/ambiente_kueche, Rollade Hinten:/rollade_hinten'
+          - 'Rollade 1:/rollade_1, Rollade 2:/rollade_2, Rollade 3:/rollade_3'
+
+# Help
+- id: telegram_help
+  alias: 'Telegram help'
+  trigger:
+  - platform: event
+    event_type: telegram_command
+    event_data:
+      command: '/help'
+
+  action:
+  - service: >
+      {% if trigger.event.data['from_first'] == 'Barmalej' %}
+        notify.telegram_bot_anatolij
+      {% elif trigger.event.data['from_first'] =='Natalja' %}
+        notify.telegram_bot_natalja
+      {% elif trigger.event.data['from_first'] =='Kristina' %}
+        notify.telegram_bot_kristina
+      {% elif trigger.event.data['from_first'] =='Veronika' %}
+        notify.telegram_bot_veronika
+      {% else %}
+        notify.telegram_schick_home
+      {% endif %}
+
+    data:
+      message: |-
+        *Tor öffnen/schliessen:*
+        - /tor - Garage öffnen/schliessen
+        
+        *Licht ein/aus:*
+        - /wandlicht - Wandlicht
+        - /wohnlicht - Wohnlicht
+        - /ambiente\_wohnen - Ambiente Wohnzimmer
+        - /kuechenlicht - Küchenlicht
+        - /ambiente\_kueche - Ambiente Küche
+        
+        *Rollade öffnen/schliessen:*
+        - /rollade\_hinten - Rollade Hinten
+        - /rollade\_1 - Rollade 1
+        - /rollade\_2 - Rollade 2
+        - /rollade\_3 - Rollade 3
+        
+        *Allgemein:*
+        - /start - Zeigt die Begrüßungsnachricht
+        - /commands - Zeigt Control Panel
+        - /help - Zeigt eine Nachricht mit Befehlen an
+
+#     data:
+#        keyboard:
+#          - '/tor, /start, /help'
+#          - '/wandlicht, /wohnlicht, /ambiente_wohnen'
+#          - '/kuechenlicht, /ambiente_kueche, /rollade_hinten'
+#          - '/rollade_1, /rollade_2, /rollade_3'
+#        inline_keyboard:
+#          - 'Tor:/tor, Home:/start, Hilfe:/help'
+#          - 'Wandlicht:/wandlicht, Wohnlicht:/wohnlicht, Ambiente Wohnzimmer:/ambiente_wohnen'
+#          - 'Küchenlicht:/kuechenlicht, Ambiente Küche:/ambiente_kueche, Rollade Hinten:/rollade_hinten'
+#          - 'Rollade 1:/rollade_1, Rollade 2:/rollade_2, Rollade 3:/rollade_3'
+
+#
+#- id: telegram_test
+#  alias: 'Telegram test'
+#  trigger:
+#    platform: event
+#    event_type: telegram_command
+#    event_data:
+#      command: '/test'
+#
+#  action:
+#  - service: script.telegram_run_command
+#    data:
+#      user: "{{ trigger.event.data['from_first'] }}"
+#      service: light.toggle
+#      entity_id: light.sonoffpow_01
+#      data.entity_id_state: light.sonoffpow_01
+
+# Scripts ###########################################################
+script:
+#######################################
+# Script to run command
+# is passed:
+#   {{ cycle }}
+#######################################
+  telegram_run_command:
+    mode: parallel
+    fields:
+      user:
+        description: 'The user who executed the command'
+        example: "{{ trigger.event.data['from_first'] }}"
+      service:
+        description: 'The service to run'
+        example: switch.toggle
+      entity_id:
+        description: 'The entity to run'
+        example: switch.tor
+      entity_id_state:
+        description: 'The entity to check the state entity'
+        example: cover.tor
+    sequence:
+
+      - service: "{{ service }}"
+        data:
+          entity_id: "{{ entity_id }}"
+
+      - wait_for_trigger:
+          - platform: event
+            event_type: state_changed
+            event_data:
+              entity_id: entity_id_state
+        timeout: '5'
+        continue_on_timeout: true
+
+#      - wait_for_trigger:
+#        - platform: event
+#          event_type: state_changed
+#          event_data:
+#            entity_id: '{{ entity_id_state }}'
+##        - platform: state
+##          entity_id: entity_id_state
+#        timeout: 5
+#        continue_on_timeout: true
+
+      - service: >
+          {% if user == 'Barmalej' %}
+            notify.telegram_bot_anatolij
+          {% elif user =='Natalja' %}
+            notify.telegram_bot_natalja
+          {% elif user =='Kristina' %}
+            notify.telegram_bot_kristina
+          {% elif user =='Veronika' %}
+            notify.telegram_bot_veronika
+          {% else %}
+            notify.telegram_schick_home
+          {% endif %}
+
+        data:
+          message: >
+            {{ state_attr(entity_id, 'friendly_name') }} ist {{ states(entity_id_state) }}
+
+
+#tor - Garage öffnen/schliessen
+#wandlicht - Wandlicht ein/aus
+#wohnlicht - Wohnlicht ein/aus
+#ambiente_wohnen - Ambiente Wohnzimmer ein/aus
+#kuechenlicht - Küchenlicht ein/aus
+#ambiente_kueche - Ambiente Küche ein/aus
+#rollade_hinten - Rollade Hinten öffnen/schliessen
+#rollade_1 - Rollade 1 öffnen/schliessen
+#rollade_2 - Rollade 2 öffnen/schliessen
+#rollade_3 - Rollade 3 öffnen/schliessen
+#start - Zeigt die Begrüßungsnachricht
+#help - Zeigt eine Nachricht mit Befehlen an

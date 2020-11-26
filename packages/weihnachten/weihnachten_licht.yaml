@@ -1,0 +1,33 @@
+# group.weihnachten_licht
+group:
+  weihnachten_licht:
+    name: Weihnachten Licht
+    entities:
+      - switch.alfa01
+      - switch.alfa03
+      - switch.sonoffs20_1
+#      - switch.sonoffs20_2
+#      - switch.sonoffs26_1
+#      - switch.sonoffs26_2
+
+# Automations #######################################################
+automation:
+  - id: weihnachten_licht_an
+    alias: Weihnachten Licht An
+    trigger:
+    - platform: sun
+      event: sunset
+      offset: -00:15:00
+    action:
+    - service: switch.turn_on
+      data:
+        entity_id: group.weihnachten_licht
+  - id: weihnachten_licht_aus
+    alias: Weihnachten Licht Aus
+    trigger:
+    - at: 00:15:00
+      platform: time
+    action:
+    - data:
+        entity_id: group.weihnachten_licht
+      service: switch.turn_off

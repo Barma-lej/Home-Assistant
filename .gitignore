@@ -1,0 +1,58 @@
+# Example .gitignore file for your config dir.
+# An * ensures that everything will be ignored.
+*
+
+# You can whitelist files/folders with !, these will not be ignored.
+!*.yaml
+!.gitignore
+!*.md
+!*.jpg
+!*.png
+!*.webp
+!lovelace/
+!packages/
+!packages/garagentor/
+!packages/irrigation/
+!packages/weather/
+!packages/weihnachten/
+!themes/
+!www/
+!www/images/
+!www/irrigation/
+!www/mower/
+!www/vacuum/
+
+# Ignore folders.
+.storage
+.cloud
+addons
+custom_components
+deps
+manuals
+script
+tts
+community
+
+# Ensure these YAML files are ignored, otherwise your secret data/credentials will leak.
+.HA_VERSION
+.uuid
+.google_maps_location_sharing.cookies
+.google_maps_location_sharing.cookies.schick_a_gmail_com
+.google.token
+google_sevice_account.json
+home-assistant_v2.db
+home-assistant.log
+customize.yaml
+google_calendars.yaml
+groups.yaml
+ip_bans.yaml
+known_devices.yaml
+secrets.yaml
+ui-lovelace.yaml
+zones.yaml
+
+haus_022019_eg.png
+haus_022019_og.png
+
+person.yaml
+meteostat.yaml

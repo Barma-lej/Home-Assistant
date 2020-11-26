@@ -1,0 +1,213 @@
+homeassistant:
+  name: !secret ha_name
+  latitude: !secret ha_latitude
+  longitude: !secret ha_longitude
+  elevation: !secret ha_elevation
+  time_zone: !secret ha_time_zone
+  unit_system: metric
+  external_url: !secret ha_external_url
+  internal_url: !secret ha_internal_url
+  packages: !include_dir_named packages
+  customize: !include customize.yaml
+  allowlist_external_dirs:
+    - /mnt/sdb1/cam1
+    - /mnt/sdb1/cam2
+    - /mnt/sdb1/cam3
+  media_dirs:
+    local: /home/barma/.homeassistant/media
+    recording: /mnt/sdb1
+
+media_source:
+
+panel_iframe: !include panel_iframe.yaml
+
+folder_watcher:
+  - folder: /mnt/sdb1/cam1
+  - folder: /mnt/sdb1/cam2
+  - folder: /mnt/sdb1/cam3
+##    patterns:
+##      - '*.mkv'
+
+# Show links to resources in log and frontend
+#introduction:
+
+# Enables the frontend ##############################################
+frontend:
+   themes: !include_dir_merge_named themes
+# Enables configuration UI ##########################################
+
+# HTTP ##############################################################
+http:
+  ssl_certificate: !secret http_ssl_certificate
+  ssl_key: !secret http_ssl_key
+#  api_password: !secret api_pass
+  ip_ban_enabled: true
+#  - platform: rest 
+#    resource: !secret url
+#    headers: 
+#      authorization: !secret along_token
+
+websocket_api:
+
+mobile_app:
+
+logger:
+#  default: critical
+  default: warning
+  logs:
+    homeassistant.components.http.ban: warning
+    homeassistant.components.device_tracker: warn
+    homeassistant.components.camera: warn
+#    homeassistant.core: debug
+#    homeassistant.components: warn
+#    homeassistant.components.syncthru: debug
+#    homeassistant.components.rfxtrx: warn
+#    homeassistant.components.websocket_api: debug
+#    homeassistant.components.ezviz.camera: debug
+    custom_components.xiaomi_miio_fan.fan: fatal
+    miio.miioprotocol: fatal
+
+# Recorder ##########################################################
+recorder:
+#  purge_interval: 1
+  purge_keep_days: 30
+#  db_url: !secret db_url
+  exclude:
+    domains:
+#      - automation
+      - calendar
+      - script
+      - updater
+      - weblink
+    entity_globs:
+      - sensor.weather_*
+    entities:
+      - sun.sun
+      - sensor.date
+      - sensor.time
+      - sensor.date_time
+      - sensor.solar_angle
+      - sensor.sunrise
+      - sensor.only_text
+
+# Logbook ###########################################################
+logbook:
+  exclude:
+    domains:
+#      - automation
+      - calendar
+      - script
+      - updater
+      - weblink
+    entities:
+      - sun.sun
+      - sensor.date
+      - sensor.time
+      - sensor.date_time
+      - sensor.solar_angle
+      - sensor.sunrise
+      - sensor.only_text
+#      - sensor.last_boot # Comes from 'systemmonitor' sensor platform
+#      - sensor.fb_uptime
+#      - sensor.fb_sent_mb
+#      - sensor.fb_received_mb
+#      - sensor.fb_uptime
+
+notify:
+
+# Checks for available updates
+# Note: This component will send some information about your system to
+# the developers to assist with development of Home Assistant.
+# For more information, please see:
+# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
+updater:
+#  include_used_components: true # Optional, allows Home Assistant developers to focus on popular components.
+
+# Discover some devices automatically ###############################
+discovery:
+  ignore:
+    - songpal
+    - yeelight
+
+# Enables support for tracking state changes over time
+history:
+  exclude:
+    domains:
+      - group
+      - calendar
+      - sun
+
+# Enables ###########################################################
+api:
+#cloud:
+config:
+conversation: # Allows you to issue voice commands from the frontend in enabled browsers
+#map: # A map on the frontend to display the location of tracked devices.
+sun: # Track the sun
+system_health: # System Health integration data can be viewed in Developer Tools on the “Info” tab.
+
+# Lovelace ##########################################################
+#lovelace:
+#  mode: yaml
+
+# TTS ###############################################################
+tts:
+  - platform: yandextts
+    api_key: !secret yandex_api_key
+    language: 'ru-RU'
+    codec: mp3
+    voice: oksana
+    emotion: good
+    speed: 0.9
+#  - platform: google
+
+## FFMPEG ############################################################
+#ffmpeg:
+##  ffmpeg_bin: /usr/bin/ffmpeg
+
+stream:
+
+# MQTT ##############################################################
+mqtt:
+  broker: !secret mqtt_brocker
+  port: 8883
+  client_id: hass-nuc
+  username: !secret mqtt_user
+  password: !secret mqtt_pass
+  tls_insecure: true
+  discovery: true
+  discovery_prefix: homeassistant
+  certificate: auto
+#  certificate: !secret http_ssl_cert
+
+# Google ############################################################
+google:
+  client_id: !secret google_client_id
+  client_secret: !secret google_client_secret
+  track_new_calendar: true
+
+# Device Tracker ####################################################
+device_tracker:
+  - platform: fritz
+    host: !secret fritz_ip
+    password: !secret fritz_pass
+    consider_home: 180
+    interval_seconds: 60
+    new_device_defaults:
+      track_new_devices: False
+# Deprecated      hide_if_away: False
+
+  - platform: google_maps
+    username: !secret my_email
+#    password: !secret google_pass
+
+#ifttt:
+#  key: !secret ifttt_key
+
+automation: !include automations.yaml
+google_assistant: !include google_assistant.yaml
+group: !include groups.yaml
+script: !include scripts.yaml
+sensor: !include sensors.yaml
+shell_command: !include shell_commands.yaml
+#zone: !include zones.yaml

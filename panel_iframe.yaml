@@ -1,0 +1,24 @@
+#configurator:
+#  title: Configurator
+#  icon: mdi:file-edit
+#  url: !secret configurator_url
+
+#nodered:
+#  title: Node-RED
+#  icon: mdi:sitemap
+#  url: !secret nodered_url
+
+#blynk:
+#  title: Blynk
+#  icon: mdi:blogger
+#  url: !secret blynk_url
+
+#pihole:
+#  title: pi-hole
+#  icon: mdi:pi-hole
+#  url: !secret pihole_url
+
+#  tasmoadmin:
+#    title: TasmoAdmin
+#    icon: mdi:lightbulb-on
+#    url: !secret tasmoadmin_url

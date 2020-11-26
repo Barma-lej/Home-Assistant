@@ -1,0 +1,50 @@
+# Sonoff S26 2
+# Tasmota
+
+# Switch ############################################################
+switch:
+  - platform: mqtt
+    name: "Sonoffs26 2"
+    state_topic: "sonoffs26-2/stat/RESULT"
+    value_template: "{{ value_json.POWER }}"
+    command_topic: "sonoffs26-2/cmnd/POWER"
+    availability_topic: "sonoffs26-2/tele/LWT"
+    qos: 1
+    payload_on: "ON"
+    payload_off: "OFF"
+    payload_available: "Online"
+    payload_not_available: "Offline"
+    retain: false
+    json_attributes_topic: "sonoffs26-2/tele/STATE"
+
+# Sensor ############################################################
+sensor:
+  - platform: mqtt
+    name: "Sonoffs26 2 Status"
+    state_topic: "sonoffs26-2/tele/STATE"
+    value_template: '{{ value_json["Wifi"]["RSSI"] }}'
+    unit_of_measurement: "%"
+    json_attributes_topic: "sonoffs26-2/tele/STATE"
+
+## Light #############################################################
+#light:
+#  - platform: switch
+#    name: "SonoffS26 2"
+#    entity_id: switch.sonoffs26_2
+
+# Customize #########################################################
+homeassistant:
+  customize:
+# Switch ##########
+    switch.sonoffs26_2:
+      friendly_name: Sonoff S26 2
+#      icon: mdi:track-light
+## Light ###########
+#    light.sonoffs26_2:
+#      friendly_name: Wandlicht
+#      icon: mdi:track-light
+# Sensor ##########
+    sensor.sonoffs26_2_status:
+      friendly_name: Sonoff S26 2 Status
+      icon: mdi:information
+      unit_of_measurement: "%"
