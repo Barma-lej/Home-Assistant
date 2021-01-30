@@ -8,6 +8,7 @@ telegram_bot:
       - !secret telegram_bot_familie
       - !secret telegram_bot_anatolij
       - !secret telegram_bot_natalja
+      - !secret telegram_bot_kristina
       - !secret telegram_bot_veronika
 
 # Notify ############################################################
@@ -30,7 +31,7 @@ notify:
 
   - name: telegram_bot_kristina
     platform: telegram
-    chat_id: !secret telegram_bot_familie
+    chat_id: !secret telegram_bot_kristina
 
   - name: telegram_bot_veronika
     platform: telegram
@@ -47,21 +48,15 @@ automation:
     event_data:
       command: '/start'
 
-  action:
-  - service: >
-      {% if trigger.event.data['from_first'] == 'Barmalej' %}
-        notify.telegram_bot_anatolij
-      {% elif trigger.event.data['from_first'] =='Natalja' %}
-        notify.telegram_bot_natalja
-      {% elif trigger.event.data['from_first'] =='Kristina' %}
-        notify.telegram_bot_kristina
-      {% elif trigger.event.data['from_first'] =='Veronika' %}
-        notify.telegram_bot_veronika
-      {% else %}
-        notify.telegram_schick_home
-      {% endif %}
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      command: '/start'
 
+  action:
+  - service: telegram_bot.send_message
     data:
+      target: "{{ trigger.event.data.user_id }}"
       message: |
         Hallo, hier kannst du unser Zuhause verwalten.
         Wähle das Symbol [/] unten und dann eine Aktion aus.
@@ -84,21 +79,15 @@ automation:
     event_data:
       command: '/commands'
 
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      command: '/commands'
+  
   action:
-  - service: >
-      {% if trigger.event.data['from_first'] == 'Barmalej' %}
-        notify.telegram_bot_anatolij
-      {% elif trigger.event.data['from_first'] =='Natalja' %}
-        notify.telegram_bot_natalja
-      {% elif trigger.event.data['from_first'] =='Kristina' %}
-        notify.telegram_bot_kristina
-      {% elif trigger.event.data['from_first'] =='Veronika' %}
-        notify.telegram_bot_veronika
-      {% else %}
-        notify.telegram_schick_home
-      {% endif %}
-
+  - service: telegram_bot.send_message
     data:
+      target: "{{ trigger.event.data.user_id }}"
       message: Wähle eine Aktion aus
       data:
         inline_keyboard:
@@ -116,21 +105,20 @@ automation:
     event_data:
       command: '/help'
 
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      command: '/help'
+  
   action:
-  - service: >
-      {% if trigger.event.data['from_first'] == 'Barmalej' %}
-        notify.telegram_bot_anatolij
-      {% elif trigger.event.data['from_first'] =='Natalja' %}
-        notify.telegram_bot_natalja
-      {% elif trigger.event.data['from_first'] =='Kristina' %}
-        notify.telegram_bot_kristina
-      {% elif trigger.event.data['from_first'] =='Veronika' %}
-        notify.telegram_bot_veronika
-      {% else %}
-        notify.telegram_schick_home
-      {% endif %}
-
+  - service: telegram_bot.answer_callback_query
     data:
+      callback_query_id: '{{ trigger.event.data.id }}'
+      message: 'Bitte schön'
+
+  - service: telegram_bot.send_message
+    data:
+      target: "{{ trigger.event.data.user_id }}"
       message: |-
         *Tor öffnen/schliessen:*
         - /tor - Garage öffnen/schliessen
@@ -181,6 +169,19 @@ automation:
 #      service: light.toggle
 #      entity_id: light.sonoffpow_01
 #      data.entity_id_state: light.sonoffpow_01
+#  - service: >
+#      {% if trigger.event.data['from_first'] == 'Barmalej' %}
+#        notify.telegram_bot_anatolij
+#      {% elif trigger.event.data['from_first'] =='Natalja' %}
+#        notify.telegram_bot_natalja
+#      {% elif trigger.event.data['from_first'] =='Kristina' %}
+#        notify.telegram_bot_kristina
+#      {% elif trigger.event.data['from_first'] =='Veronika' %}
+#        notify.telegram_bot_veronika
+#      {% else %}
+#        notify.telegram_schick_home
+#      {% endif %}
+
 
 # Scripts ###########################################################
 script:

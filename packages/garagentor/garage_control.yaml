@@ -86,7 +86,7 @@ automation:
     - service: telegram_bot.send_message
       data:
         target: "{{ trigger.event.data.user_id }}"
-        message: "{{ state_attr('switch.tor', 'friendly_name') }} ist {{ states('cover.tor') }}"
+        message: "{{ state_attr('switch.tor', 'friendly_name') }} ist auf {{ state_attr('cover.tor', 'current_position') }}% geöffnet "
 
 # Customize #########################################################
 homeassistant:
@@ -94,3 +94,6 @@ homeassistant:
 # Sensor ##########
     sensor.tor_wifi_signal:
       unit_of_measurement: "dBm"
+    cover.tor:
+      icon: mdi:garage
+

@@ -1,0 +1,87 @@
+# Shelly Wohnlicht
+# https://www.home-assistant.io/integrations/shelly/
+
+light:
+  - platform: switch
+    name: shellyswitch25_10c7c3_channel_1
+    entity_id: switch.shellyswitch25_10c7c3_channel_1
+
+utility_meter:
+  shelly_wohnlicht_d:
+    source: sensor.shellyswitch25_10c7c3_channel_1_energy
+    cycle: daily
+
+  shelly_wohnlicht_m:
+    source: sensor.shellyswitch25_10c7c3_channel_1_energy
+    cycle: monthly
+
+  shelly_wohnlicht_y:
+    source: sensor.shellyswitch25_10c7c3_channel_1_energy
+    cycle: yearly
+
+
+# Automation ########################################################
+automation:
+- id: telegram_wohnlicht
+  alias: "Telegram Wohnlicht"
+  mode: parallel
+  trigger:
+  - platform: event
+    event_type: telegram_command
+    event_data:
+      command: "/wohnlicht"
+
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      command: '/wohnlicht'
+
+  action:
+  - service: light.toggle
+    data:
+      entity_id: light.shellyswitch25_10c7c3_channel_1
+
+  - wait_for_trigger:
+    - platform: state
+      entity_id: light.shellyswitch25_10c7c3_channel_1
+    timeout: 5
+    continue_on_timeout: true
+
+  - service: telegram_bot.send_message
+    data:
+      target: "{{ trigger.event.data.user_id }}"
+      message: "💡 {{ state_attr('light.shellyswitch25_10c7c3_channel_1', 'friendly_name') }} ist {{ states('light.shellyswitch25_10c7c3_channel_1') }}"
+
+# Customize #########################################################
+homeassistant:
+  customize:
+    light.shellyswitch25_10c7c3_channel_1:
+      friendly_name: Wohnlicht
+      icon: mdi:vanity-light
+    sensor.shellyswitch25_10c7c3_channel_1_power:
+      friendly_name: Leistung (Wohnlicht)
+      icon: mdi:gauge
+    sensor.shellyswitch25_10c7c3_channel_1_energy:
+      friendly_name: Verbrauch Total (Wohnlicht)
+    sensor.shelly_wohnlicht_d:
+      friendly_name: Verbrauch pro Tag (Wohnlicht)
+    sensor.shelly_wohnlicht_m:
+      friendly_name: Verbrauch pro Monat (Wohnlicht)
+    sensor.shelly_wohnlicht_y:
+      friendly_name: Verbrauch pro Jahr (Wohnlicht)
+    binary_sensor.shellyswitch25_10c7c3_channel_1_overpowering:
+      friendly_name: Überspannung (Wohnlicht)
+      icon: mdi:flash-alert
+    binary_sensor.shellyswitch25_10c7c3_overheating:
+      friendly_name: Überhitzen (Wohnlicht)
+      icon: mdi:thermometer-alert
+
+#    switch.shellyswitch25_10c7c3_2:
+#      friendly_name: Flur Licht
+#    sensor.shellyswitch25_10c7c3_channel_2_power:
+#      friendly_name: Flur Energie
+#    sensor.shellyswitch25_10c7c3_channel_2_energy:
+#      friendly_name: Verbrauch Total (Flur)
+    binary_sensor.shellyswitch25_10c7c3_channel_2_overpowering:
+      friendly_name: Überspannung (Wohnlicht 2)
+      icon: mdi:flash-alert

@@ -1,0 +1,108 @@
+# Shelly Rollade 1
+# https://www.home-assistant.io/integrations/shelly/
+
+
+utility_meter:
+  shelly_rollade_1_d:
+    source: sensor.shellyswitch25_f37a8c_energy
+    cycle: daily
+
+  shelly_rollade_1_m:
+    source: sensor.shellyswitch25_f37a8c_energy
+    cycle: monthly
+
+  shelly_rollade_1_y:
+    source: sensor.shellyswitch25_f37a8c_energy
+    cycle: yearly
+
+# Input Text ########################################################
+input_text:
+  rollade_1_last_state:
+
+# Automation ########################################################
+automation:
+- id: set_rollade_1_state
+  alias: Set rollade 1 state
+  mode: single
+  trigger:
+  - platform: state
+    entity_id: cover.shellyswitch25_f37a8c
+
+  action:
+  - service: input_text.set_value
+    entity_id: input_text.rollade_1_last_state
+    data:
+      value: "{{ trigger.from_state.state }}"
+
+- id: telegram_rollade_1
+  alias: "Telegram Rollade 1"
+  mode: parallel
+  trigger:
+  - platform: event
+    event_type: telegram_command
+    event_data:
+      command: "/rollade_1"
+
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      command: '/rollade_1'
+
+  action:
+  - service: input_text.set_value
+    entity_id: input_text.rollade_1_last_state
+    data:
+      value: >
+        {% if not states('input_text.rollade_1_last_state') -%}
+          {%- if is_state('cover.shellyswitch25_f37a8c', 'open') -%}
+            'opening'
+          {%- else -%}
+            'closing'
+          {%- endif -%}
+        {%- else -%}
+          {{ states('input_text.rollade_1_last_state') }}
+        {%- endif %}
+
+  - choose:
+    - conditions:
+        - condition: state
+          entity_id: input_text.rollade_1_last_state
+          state: closing
+      sequence:
+        - service: cover.open_cover
+          entity_id: cover.shellyswitch25_f37a8c
+    - conditions:
+        - condition: state
+          entity_id: input_text.rollade_1_last_state
+          state: opening
+      sequence:
+        - service: cover.close_cover
+          entity_id: cover.shellyswitch25_f37a8c
+    default:
+      - service: cover.stop_cover
+        entity_id: cover.shellyswitch25_f37a8c
+
+  - wait_for_trigger:
+    - platform: state
+      entity_id: cover.shellyswitch25_f37a8c
+    timeout: 5
+    continue_on_timeout: true
+
+  - service: telegram_bot.send_message
+    data:
+      target: "{{ trigger.event.data.user_id }}"
+      message: "🏡 {{ state_attr('cover.shellyswitch25_f37a8c', 'friendly_name') }} ist {{ states('cover.shellyswitch25_f37a8c') }}"
+
+# Customize #########################################################
+homeassistant:
+  customize:
+    cover.shellyswitch25_f37a8c:
+      friendly_name: Rollade 1
+    sensor.shellyswitch25_f37a8c_power:
+      friendly_name: Leistung (Rollade 1)
+      icon: mdi:gauge
+    sensor.shellyswitch25_f37a8c_energy:
+      friendly_name: Verbrauch Total (Rollade 1)
+    binary_sensor.shellyswitch25_f37a8c_overheating:
+      friendly_name: Überhitzen (Rollade 1)
+      icon: mdi:thermometer-alert

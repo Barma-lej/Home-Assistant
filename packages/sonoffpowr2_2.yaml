@@ -108,15 +108,21 @@ utility_meter:
 #      - sensor.sonoffpow_02_energy_today
 #      - sensor.sonoffpow_02_energy_yesterday
 
+# Automation ########################################################
 automation:
 - id: telegram_sonoffpow_02
   alias: "Telegram sonoffpow_02"
   mode: parallel
   trigger:
-    platform: event
+  - platform: event
     event_type: telegram_command
     event_data:
       command: "/ambiente_wohnen"
+
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      command: '/ambiente_wohnen'
 
   action:
     - service: light.toggle
@@ -132,7 +138,7 @@ automation:
     - service: telegram_bot.send_message
       data:
         target: "{{ trigger.event.data.user_id }}"
-        message: "{{ state_attr('light.sonoffpow_02', 'friendly_name') }} ist {{ states('light.sonoffpow_02') }}"
+        message: "💡 {{ state_attr('light.sonoffpow_02', 'friendly_name') }} ist {{ states('light.sonoffpow_02') }}"
 
 # Customize #########################################################
 homeassistant:

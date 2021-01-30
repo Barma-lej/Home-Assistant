@@ -113,10 +113,15 @@ automation:
   alias: "Telegram sonoffpow_03"
   mode: parallel
   trigger:
-    platform: event
+  - platform: event
     event_type: telegram_command
     event_data:
       command: "/kuechenlicht"
+
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      command: '/kuechenlicht'
 
   action:
     - service: light.toggle
@@ -132,7 +137,7 @@ automation:
     - service: telegram_bot.send_message
       data:
         target: "{{ trigger.event.data.user_id }}"
-        message: "{{ state_attr('light.sonoffpow_03', 'friendly_name') }} ist {{ states('light.sonoffpow_03') }}"
+        message: "💡 {{ state_attr('light.sonoffpow_03', 'friendly_name') }} ist {{ states('light.sonoffpow_03') }}"
 
 # Customize #########################################################
 homeassistant:

@@ -37,7 +37,9 @@ homeassistant:
   customize:
 # Switch ##########
     switch.sonoffs26_2:
-      friendly_name: Sonoff S26 2
+      friendly_name: Torlicht
+      icon: mdi:home-lightbulb-outline
+#      friendly_name: Sonoff S26 2
 #      icon: mdi:track-light
 ## Light ###########
 #    light.sonoffs26_2:

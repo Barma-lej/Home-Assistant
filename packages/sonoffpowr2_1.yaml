@@ -137,7 +137,9 @@ automation:
     - service: telegram_bot.send_message
       data:
         target: "{{ trigger.event.data.user_id }}"
-        message: "{{ state_attr('light.sonoffpow_01', 'friendly_name') }} ist {{ states('light.sonoffpow_01') }} Service ist {{ trigger.event }}"
+        message: "💡 {{ state_attr('light.sonoffpow_01', 'friendly_name') }} ist {{ states('light.sonoffpow_01') }}"
+
+#  Service ist {{ trigger.event }}"
 
 # Customize #########################################################
 homeassistant:
@@ -145,7 +147,8 @@ homeassistant:
 # Switch ##########
     switch.sonoffpow_01:
       friendly_name: Wandlicht
-      icon: mdi:track-light
+      icon: mdi:wall-sconce-flat
+#      icon: mdi:track-light
 # Light ###########
     light.sonoffpow_01:
       friendly_name: Wandlicht

@@ -37,7 +37,9 @@ homeassistant:
   customize:
 # Switch ##########
     switch.sonoffs20_2:
-      friendly_name: Sonoff S20 2
+      friendly_name: Regenlicht
+      icon: mdi:string-lights
+#      friendly_name: Sonoff S20 2
 #      icon: mdi:track-light
 ## Light ###########
 #    light.sonoffs20_2:
