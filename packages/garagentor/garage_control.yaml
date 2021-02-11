@@ -65,7 +65,7 @@ automation:
 
 - id: telegram_tor
   alias: "Telegram tor"
-  mode: parallel
+  mode: restart
   trigger:
     platform: event
     event_type: telegram_command

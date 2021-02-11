@@ -68,10 +68,10 @@ sensor:
         friendly_name: "Robi - IP Adresse"
         value_template: !secret robi_ip
         icon_template: mdi:ip-network
-      robi_status:
-        friendly_name: "Robi - Status"
-        value_template: "{{ state_attr('vacuum.robi','status') }}"
-        icon_template: mdi:information
+#      robi_status:
+#        friendly_name: "Robi - Status"
+#        value_template: "{{ state_attr('vacuum.robi','status') }}"
+#        icon_template: mdi:information
       robi_battery:
         friendly_name: "Robi - Akku"
         value_template: "{{ state_attr('vacuum.robi','battery_level') | int }}"
@@ -269,11 +269,11 @@ input_number:
 automation:
 
 # If you want to set the vacuum to mop mode, just like the app, here is a script for that:
-#   aspirador_set_mop:
+#   robi_set_mop:
 #    sequence:
 #      service: vacuum.set_fan_speed
 #      data:
-#        entity_id: vacuum.aspirador
+#        entity_id: vacuum.robi
 #        fan_speed: 105
 # Fan speed 105… Very odd. You will see in the app that mop mode is selected.
   - id: robi_modus
@@ -540,12 +540,17 @@ script:
     alias: Robi - Komm mal her
     icon: mdi:shoe-print
     sequence:
-    - service: vacuum.send_command
+#    - service: vacuum.send_command
+#      data:
+#        entity_id: vacuum.robi
+#        command: app_goto_target
+#        zone:  [24500, 20300]
+##        zone:  [26500,30700]
+    - service: xiaomi_miio.vacuum_goto
       data:
         entity_id: vacuum.robi
-        command: app_goto_target
-        zone:  [24500, 20300]
-#        zone:  [26500,30700]
+        x_coord: 24500
+        y_coord: 20300
 #    - service: script.robi_alert_start
 
 #  robi_kitchen:

@@ -142,6 +142,7 @@ api:
 #cloud:
 config:
 conversation: # Allows you to issue voice commands from the frontend in enabled browsers
+dhcp:
 #map: # A map on the frontend to display the location of tracked devices.
 sun: # Track the sun
 system_health: # System Health integration data can be viewed in Developer Tools on the “Info” tab.

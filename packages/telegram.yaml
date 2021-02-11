@@ -63,12 +63,11 @@ automation:
         /start - Zeigt diese Nachricht
         /commands - Zeigt Control Panel
         /help - Zeigt eine Nachricht mit Befehlen an
-      data:
-        keyboard:
-          - '/wandlicht, /wohnlicht, /ambiente_wohnen'
-          - '/kuechenlicht, /ambiente_kueche, /rollade_hinten'
-          - '/rollade_1, /rollade_2, /rollade_3'
-          - '/start, /commands, /help, /tor'
+      keyboard:
+        - '/wandlicht, /wohnlicht, /ambiente_wohnen'
+        - '/kuechenlicht, /ambiente_kueche, /rollade_hinten'
+        - '/rollade_1, /rollade_2, /rollade_3'
+        - '/start, /commands, /help, /tor'
 
 # Commands
 - id: telegram_commands
@@ -89,12 +88,11 @@ automation:
     data:
       target: "{{ trigger.event.data.user_id }}"
       message: Wähle eine Aktion aus
-      data:
-        inline_keyboard:
-          - 'Tor:/tor, Home:/start, Hilfe:/help'
-          - 'Wandlicht:/wandlicht, Wohnlicht:/wohnlicht, Ambiente Wohnzimmer:/ambiente_wohnen'
-          - 'Küchenlicht:/kuechenlicht, Ambiente Küche:/ambiente_kueche, Rollade Hinten:/rollade_hinten'
-          - 'Rollade 1:/rollade_1, Rollade 2:/rollade_2, Rollade 3:/rollade_3'
+      inline_keyboard:
+        - 'Tor:/tor, Home:/start, Hilfe:/help'
+        - 'Wandlicht:/wandlicht, Wohnlicht:/wohnlicht, Ambiente Wohnzimmer:/ambiente_wohnen'
+        - 'Küchenlicht:/kuechenlicht, Ambiente Küche:/ambiente_kueche, Rollade Hinten:/rollade_hinten'
+        - 'Rollade 1:/rollade_1, Rollade 2:/rollade_2, Rollade 3:/rollade_3'
 
 # Help
 - id: telegram_help
