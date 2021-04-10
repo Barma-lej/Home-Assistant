@@ -45,6 +45,7 @@
 - id: rolladen_zu
   alias: Rolladen zu
   description: ''
+  mode: single
   trigger:
   - event: sunset
     offset: 01:30:00
@@ -59,4 +60,4 @@
       message: Rolladen geschlossen
       title: 🔽 Rolladen
     service: notify.telegram_schick_home
-  mode: single
+

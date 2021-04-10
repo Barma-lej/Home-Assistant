@@ -1,11 +1,11 @@
 # Xiaomi Roborock S50
 
 # Integration #######################################################
-vacuum:
-  - platform: xiaomi_miio
-    name: "Robi"
-    host: !secret robi_ip
-    token: !secret robi_token
+#vacuum:
+#  - platform: xiaomi_miio
+#    name: "Robi"
+#    host: !secret robi_ip
+#    token: !secret robi_token
 
 # Recorder ##########################################################
 recorder:

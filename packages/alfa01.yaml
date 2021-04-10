@@ -1,0 +1,99 @@
+# Alfawise PE1004T
+# Sonoff-Tasmota 6.6.0
+
+# Recorder ##########################################################
+#recorder:
+#  exclude:
+#    entities:
+#      - automation.tv_board_off
+
+# Logbook ###########################################################
+#logbook:
+#  exclude:
+#    entities:
+#      - automation.tv_board_off
+
+# Switch ############################################################
+switch:
+  - platform: mqtt
+    name: "Alfa01"
+    state_topic: "alfa01/stat/RESULT"
+    value_template: "{{ value_json.POWER }}"
+    command_topic: "alfa01/cmnd/POWER"
+    availability_topic: "alfa01/tele/LWT"
+    qos: 1
+    payload_on: "ON"
+    payload_off: "OFF"
+    payload_available: "Online"
+    payload_not_available: "Offline"
+    retain: false
+    json_attributes_topic: "alfa01/tele/STATE"
+
+# Sensor ############################################################
+#sensor:
+#  - platform: mqtt
+#    name: "Alfa01 Status"
+#    state_topic: "alfa01/tele/STATE"
+#    value_template: '{{ value_json["Wifi"]["RSSI"] }}'
+#    unit_of_measurement: "%"
+#    json_attributes_topic: "alfa01/tele/STATE"
+##    json_attributes_template: "{{ value_json | tojson }}"
+##    json_attributes:
+##      - Uptime
+##      - Heap
+##      - LoadAvg
+##      - SleepMode
+##      - Sleep
+##      - POWER
+##      - Wifi
+
+# Automations #######################################################
+automation:
+  - id: treppe_licht_an
+    alias: Treppe Licht An
+    trigger:
+    - platform: sun
+      event: sunset
+      offset: "00:15:00"
+    action:
+    - service: switch.turn_on
+      data:
+        entity_id: switch.alfa01
+
+  - id: treppe_licht_aus
+    alias: Treppe Licht Aus
+    trigger:
+    - platform: time
+      at: "00:15:00"
+    action:
+      service: switch.turn_off
+      data:
+        entity_id: switch.alfa01
+
+#  - id: tv_board_off
+#    alias: 'TV Board OFF'
+#  #  initial_state: 'off'
+#    trigger:
+#      platform: state
+#      entity_id: group.familie_wlan
+#      to: 'not_home'
+#    action:
+#      service: switch.turn_off
+#      entity_id: switch.alfa01
+
+# Customize #########################################################
+homeassistant:
+  customize:
+# Switch ##########
+    switch.alfa01:
+      friendly_name: "Treppe"
+      icon: mdi:stairs
+
+#      friendly_name: "TV-Board"
+#      icon: mdi:desktop-classic
+
+# Sensor ##########
+#    sensor.alfa01_status:
+#      friendly_name: TV-Board Status
+#      icon: mdi:information
+#      unit_of_measurement: "%"

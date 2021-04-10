@@ -146,6 +146,7 @@ dhcp:
 #map: # A map on the frontend to display the location of tracked devices.
 sun: # Track the sun
 system_health: # System Health integration data can be viewed in Developer Tools on the “Info” tab.
+my: # This integration handles redirects from the My Home Assistant service.
 
 # Lovelace ##########################################################
 #lovelace:
