@@ -299,7 +299,7 @@ script:
 # Only continue if it is no rain
       - condition: template
         value_template: >
-          {{ is_state('input_boolean.cycle{{ cycle }}_use_sensor_data', 'on') and
+          {{ is_state('input_boolean.cycle' ~ cycle ~ '_use_sensor_data', 'on') and
             not is_state_attr('sensor.landroid_mower_error', 'error_id', 5) }}
 
       - service: script.irrigation_run_a_cycle
@@ -358,7 +358,7 @@ script:
 
 # Turn off schedule if run 'Once' selected
       - service: >
-            {% if states('input_select.cycle' + cycle + '_watering_days') == 'Einmal' %}
+            {% if states('input_select.cycle' ~ cycle ~ '_watering_days') == 'Einmal' %}
               input_boolean.turn_off
             {% else %}
               input_boolean.turn_on
@@ -379,18 +379,18 @@ script:
 # Don't continue if switch is unavailable
       - condition: template
         value_template: >
-          {{ states('switch.zone' + zone + '_valve') != 'unavailable' }}
+          {{ states('switch.zone' ~ zone ~ '_valve') != 'unavailable' }}
 
 # Don't continue if duration is zero
       - condition: template
         value_template: >
-            {% set n = states('input_number.cycle' + cycle + '_zone' + zone + '_duration') | int %}
+            {% set n = states('input_number.cycle' ~ cycle ~ '_zone' ~ zone ~ '_duration') | int %}
             {{ n != 0 }}
 
 # Don't continue if it rains (Если дождь пошёл во время полива)
       - condition: template
         value_template: >
-          {{ is_state('input_boolean.cycle{{ cycle }}_use_sensor_data', 'on') and
+          {{ is_state('input_boolean.cycle' ~ cycle ~ '_use_sensor_data', 'on') and
             not is_state_attr('sensor.landroid_mower_error', 'error_id', 5) }}
 
 # Call the script to set the Tasmota PULSETIME
@@ -417,7 +417,7 @@ script:
         data:
           entity_id: timer.zone_duration
           duration: >
-            {% set duration = states('input_number.cycle' + cycle + '_zone' + zone + '_duration') | float %}
+            {% set duration = states('input_number.cycle' ~ cycle ~ '_zone' ~ zone ~ '_duration') | float %}
             {% set min = (duration // 1) | round(0, floor) %}
             {% set sec = ((duration - min) * 60) | round %}
             00:{{ '%02i' | format(min) }}:{{ '%02i' | format(sec) }}
@@ -438,7 +438,7 @@ script:
 
 # Be sure the current zone switch is off
       - wait_template: >
-          {% set entity = 'switch.zone' + zone + '_valve' %}
+          {% set entity = 'switch.zone' ~ zone ~ '_valve' %}
           {{ is_state(entity , 'off') }}
 
 #######################################
@@ -452,17 +452,17 @@ script:
         data:
           entity_id: input_datetime.cycle{{ cycle }}_next_run_time
           date: >
-            {% if states('input_select.cycle' + cycle + '_watering_days') == 'Täglich' %}
+            {% if states('input_select.cycle' ~ cycle ~ '_watering_days') == 'Täglich' %}
               {{ (as_timestamp(now() ) + 24 * 3600 ) | timestamp_custom("%Y-%m-%d") }}
-            {% elif states('input_select.cycle' + cycle + '_watering_days') == 'Alle 2 Tage' %}
+            {% elif states('input_select.cycle' ~ cycle ~ '_watering_days') == 'Alle 2 Tage' %}
               {{ (as_timestamp(now() ) + 48 * 3600 ) | timestamp_custom("%Y-%m-%d") }}
-            {% elif states('input_select.cycle' + cycle + '_watering_days') == 'Alle 3 Tage' %}
+            {% elif states('input_select.cycle' ~ cycle ~ '_watering_days') == 'Alle 3 Tage' %}
               {{ (as_timestamp(now() ) + 72 * 3600 ) | timestamp_custom("%Y-%m-%d") }}
             {% else %}
-              {{ states('input_datetime.cycle' + cycle + '_next_run_time').split(' ')[0] }}
+              {{ states('input_datetime.cycle' ~ cycle ~ '_next_run_time').split(' ')[0] }}
             {% endif %}
           time: >
-            {{ states('input_select.cycle' + cycle + '_schedule_time') }}
+            {{ states('input_select.cycle' ~ cycle ~ '_schedule_time') }}
 
 #####################################################################
 # Set Tasmota PULSETIME to 30 seconds longer than the zone runtime
@@ -483,12 +483,12 @@ script:
       - service: mqtt.publish
         data:
           topic: >
-            {% if zone in ['1', '2'] %}
+            {% if zone in [1, 2] %}
               {% set tasmota = 'sonoff4ch' %}
             {% endif %}
             {{ tasmota }}/cmnd/pulsetime{{ zone | string}}
           payload: >
-            {% set duration = states('input_number.cycle' + cycle + '_zone' + zone + '_duration') | float %}
+            {% set duration = states('input_number.cycle' ~ cycle ~ '_zone' ~ zone ~ '_duration') | float %}
             {% set payload = 100 + (duration * 60) + 30 %}
             {{ payload | int }}
 # Set pump
@@ -496,7 +496,7 @@ script:
         data:
           topic: sonoff4ch/cmnd/pulsetime4
           payload: >
-            {% set duration = states('input_number.cycle' + cycle + '_zone' + zone + '_duration') | float %}
+            {% set duration = states('input_number.cycle' ~ cycle ~ '_zone' ~ zone ~ '_duration') | float %}
             {% set payload = 100 + (duration * 60) + 30 %}
             {{ payload | int }}
 
