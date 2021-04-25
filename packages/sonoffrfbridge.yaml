@@ -32,37 +32,57 @@ input_boolean:
 
 # Automations #######################################################
 automation:
-  - id: rf_commands
-    alias: 'RF Commands'
-    trigger:
-      platform: state
-      entity_id: sensor.sonoffrfbridge
-    action:
-      service: >
-        {% if (states("sensor.sonoffrfbridge") | float % 2) > 0 -%} homeassistant.turn_on
-        {%- else -%} homeassistant.turn_off
-        {%- endif %}
-      data:
-        entity_id: >
-          {% if is_state("sensor.sonoffrfbridge","20500") or
-                is_state("sensor.sonoffrfbridge","20501") %} switch.alfa01
-          {% elif is_state("sensor.sonoffrfbridge","17684") or
-                  is_state("sensor.sonoffrfbridge","17685") %} switch.alfa02
-          {% elif is_state("sensor.sonoffrfbridge","5396") or
-                  is_state("sensor.sonoffrfbridge","5397") %} switch.alfa03
-          {% elif is_state("sensor.sonoffrfbridge","20") or
-                is_state("sensor.sonoffrfbridge","21") %} switch.sonoffpow_01
-          {% elif is_state("sensor.sonoffrfbridge","16404") or
-                  is_state("sensor.sonoffrfbridge","16405") %} switch.sonoffpow_03
-          {% elif is_state("sensor.sonoffrfbridge","4116") or
-                  is_state("sensor.sonoffrfbridge","4117") %} group.ambientelight
-          {% elif is_state("sensor.sonoffrfbridge","1044") or
-                  is_state("sensor.sonoffrfbridge","1045") %} switch.sonoffpow_02
-          {% elif is_state("sensor.sonoffrfbridge","17428") or
-                  is_state("sensor.sonoffrfbridge","17429") %} switch.sonoffpow_04
-          {% else %}
-                  input_boolean.dummy_switch
-          {% endif %}
+- id: rf_commands
+  alias: 'RF Commands'
+  trigger:
+    platform: state
+    entity_id: sensor.sonoffrfbridge
+  condition: >-
+      {{ states("sensor.sonoffrfbridge") in
+        ["20","21","16404","16405","4116","4117","20500","20501","1044","1045","17428","17429",
+        "5140","5141","21524","21525","21780","21781","7811368"]
+      }}
+  action:
+  - service: >
+      {% if states("sensor.sonoffrfbridge") in ["20","16404","4116","20500"] %} homeassistant.turn_off
+      {% elif states("sensor.sonoffrfbridge") in ["21","16405","4117","20501","21780","21781","7811368"] %} homeassistant.turn_on
+      {% elif states("sensor.sonoffrfbridge") in ["1044","17428","5140","21524"] %} cover.close_cover
+      {% elif states("sensor.sonoffrfbridge") in ["1045","17429","5141","21525"] %} cover.open_cover
+      {% endif %}
+    data:
+      entity_id: >
+        {% if is_state("sensor.sonoffrfbridge","20") or
+          is_state("sensor.sonoffrfbridge","21") %} light.sonoffpow_01
+        {% elif is_state("sensor.sonoffrfbridge","16404") or
+          is_state("sensor.sonoffrfbridge","16405") %} light.shellyswitch25_10c7c3_channel_1
+        {% elif is_state("sensor.sonoffrfbridge","4116") or
+          is_state("sensor.sonoffrfbridge","4117") %} light.sonoffpow_03
+        {% elif is_state("sensor.sonoffrfbridge","20500") or
+          is_state("sensor.sonoffrfbridge","20501") %} group.ambientelight
+
+        {% elif is_state("sensor.sonoffrfbridge","1044") or
+          is_state("sensor.sonoffrfbridge","1045") %} cover.shellyswitch25_10d315
+        {% elif is_state("sensor.sonoffrfbridge","17428") or
+          is_state("sensor.sonoffrfbridge","17429") %} cover.shellyswitch25_f37a8c
+        {% elif is_state("sensor.sonoffrfbridge","5140") or
+          is_state("sensor.sonoffrfbridge","5141") %} cover.shellyswitch25_f37b28
+        {% elif is_state("sensor.sonoffrfbridge","21524") or
+          is_state("sensor.sonoffrfbridge","21525") %} cover.shellyswitch25_10eaa4
+
+        {% elif is_state("sensor.sonoffrfbridge","21780") %} switch.torteil
+        {% elif is_state("sensor.sonoffrfbridge","21781") or
+          is_state("sensor.sonoffrfbridge","7811368") %} switch.tor
+
+        {% else %}
+          input_boolean.dummy_switch
+        {% endif %}
+# ВАЖНО. Сброс состояния, иначе каждые 5 минут повторяется вызов команды
+#  - delay: 00:00:01
+  - service: mqtt.publish
+    data:
+      topic: sonoffrfbridge/tele/RESULT
+      payload: '{"RfReceived":{"Data":"0"}}'
+
 #================================================
 #- id: rf_commands_lights
 #  alias: 'RF Commands Lights'

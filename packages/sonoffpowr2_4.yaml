@@ -1,81 +1,7 @@
 # Sonoff POW R2
-# Sonoff-Tasmota 6.6.0
+# Tasmota Integration
 
-# Switch ############################################################
-switch:
-  - platform: mqtt
-    name: "SonoffPow 04"
-    state_topic: "sonoffpow-04/stat/RESULT"
-    value_template: "{{ value_json.POWER }}"
-    command_topic: "sonoffpow-04/cmnd/POWER"
-    availability_topic: "sonoffpow-04/tele/LWT"
-    qos: 1
-    payload_on: "ON"
-    payload_off: "OFF"
-    payload_available: "Online"
-    payload_not_available: "Offline"
-    retain: false
-
-# Light #############################################################
-light:
-  - platform: switch
-    name: "SonoffPow 04"
-    entity_id: switch.sonoffpow_04
-
-# Sensor ############################################################
-sensor:
-  - platform: mqtt
-    name: "SonoffPow 04 Energy TotalStartTime"
-    state_topic: "sonoffpow-04/tele/SENSOR"
-    value_template: '{{ value_json["ENERGY"]["TotalStartTime"] }}'
-  - platform: mqtt
-    name: "SonoffPow 04 Energy Total"
-    state_topic: "sonoffpow-04/tele/SENSOR"
-    value_template: '{{ value_json["ENERGY"]["Total"] }}'
-#  - platform: mqtt
-#    name: "SonoffPow 04 Energy Yesterday"
-#    state_topic: "sonoffpow-04/tele/SENSOR"
-#    value_template: '{{ value_json["ENERGY"]["Yesterday"] }}'
-  - platform: mqtt
-    name: "SonoffPow 04 Energy Today"
-    state_topic: "sonoffpow-04/tele/SENSOR"
-    value_template: '{{ value_json["ENERGY"]["Today"] }}'
-#  - platform: mqtt
-#    name: "SonoffPow 04 Energy Period"
-#    state_topic: "sonoffpow-04/tele/SENSOR"
-#    value_template: '{{ value_json["ENERGY"]["Period"] }}'
-  - platform: mqtt
-    name: "SonoffPow 04 Energy Power"
-    state_topic: "sonoffpow-04/tele/SENSOR"
-    value_template: '{{ value_json["ENERGY"]["Power"] }}'
-#  - platform: mqtt
-#    name: "SonoffPow 04 Energy ApparentPower"
-#    state_topic: "sonoffpow-04/tele/SENSOR"
-#    value_template: '{{ value_json["ENERGY"]["ApparentPower"] }}'
-#  - platform: mqtt
-#    name: "SonoffPow 04 Energy ReactivePower"
-#    state_topic: "sonoffpow-04/tele/SENSOR"
-#    value_template: '{{ value_json["ENERGY"]["ReactivePower"] }}'
-#  - platform: mqtt
-#    name: "SonoffPow 04 Energy Factor"
-#    state_topic: "sonoffpow-04/tele/SENSOR"
-#    value_template: '{{ value_json["ENERGY"]["Factor"] }}'
-#  - platform: mqtt
-#    name: "SonoffPow 04 Energy Voltage"
-#    state_topic: "sonoffpow-04/tele/SENSOR"
-#    value_template: '{{ value_json["ENERGY"]["Voltage"] }}'
-#  - platform: mqtt
-#    name: "SonoffPow 04 Energy Current"
-#    state_topic: "sonoffpow-04/tele/SENSOR"
-#    value_template: '{{ value_json["ENERGY"]["Current"] }}'
-
-  - platform: mqtt
-    name: "SonoffPow 04 Status"
-    state_topic: "sonoffpow-04/tele/STATE"
-    value_template: '{{ value_json["Wifi"]["RSSI"] }}'
-    unit_of_measurement: "%"
-    json_attributes_topic: "sonoffpow-04/tele/STATE"
-
+# Utility meter #####################################################
 utility_meter:
   sonoffpow_04_energy_d:
     source: sensor.sonoffpow_04_energy_total
@@ -89,25 +15,7 @@ utility_meter:
     source: sensor.sonoffpow_04_energy_total
     cycle: yearly
 
-# Group #############################################################
-#group:
-#  sonoffpow_04:
-#    name: "Ambiente Küche"
-#    entities:
-#      - switch.sonoffpow_04
-#      - light.sonoffpow_04
-#      - sensor.sonoffpow_04_status
-#      - sensor.sonoffpow_04_energy_voltage
-#      - sensor.sonoffpow_04_energy_current
-#      - sensor.sonoffpow_04_energy_power
-#      - sensor.sonoffpow_04_energy_apparentpower
-#      - sensor.sonoffpow_04_energy_reactivepower
-#      - sensor.sonoffpow_04_energy_factor
-#      - sensor.sonoffpow_04_energy_totalstarttime
-#      - sensor.sonoffpow_04_energy_total
-#      - sensor.sonoffpow_04_energy_today
-#      - sensor.sonoffpow_04_energy_yesterday
-
+# Automation ########################################################
 automation:
 - id: telegram_sonoffpow_04
   alias: "Telegram sonoffpow_04"
@@ -142,62 +50,8 @@ automation:
 # Customize #########################################################
 homeassistant:
   customize:
-# Switch ##########
-    switch.sonoffpow_04:
-      friendly_name: Ambiente Küche
-      icon: mdi:led-strip-variant
-# Light ###########
-    light.sonoffpow_04:
-      friendly_name: Ambiente Küche
-      icon: mdi:led-strip-variant
+
 # Sensor ##########
-#    sensor.sonoffpow_04_energy_voltage:
-#      friendly_name: Spannung (Ambiente Küche)
-#      icon: mdi:power-plug
-#      unit_of_measurement: "V"
-#    sensor.sonoffpow_04_energy_current:
-#      friendly_name: Stromstärke (Ambiente Küche)
-#      icon: mdi:current-ac
-#      unit_of_measurement: "A"
-#    sensor.sonoffpow_04_energy_factor:
-#      friendly_name: Leistungsfaktor (Ambiente Küche)
-#      icon: mdi:margin
-#      unit_of_measurement: "%"
-    sensor.sonoffpow_04_energy_power:
-      friendly_name: Leistung (Ambiente Küche)
-      icon: mdi:gauge
-      unit_of_measurement: "W"
-#    sensor.sonoffpow_04_energy_apparentpower:
-#      friendly_name: Scheinleistung (Ambiente Küche)
-#      icon: mdi:resistor
-#      unit_of_measurement: "VA"
-#    sensor.sonoffpow_04_energy_reactivepower:
-#      friendly_name: Blindleistung (Ambiente Küche)
-#      icon: mdi:chart-bell-curve
-#      unit_of_measurement: "VAr"
-
-    sensor.sonoffpow_04_energy_today:
-      friendly_name: Verbrauch Heute (Ambiente Küche)
-      icon: mdi:chart-areaspline
-      unit_of_measurement: "kWh"
-    sensor.sonoffpow_04_energy_total:
-      friendly_name: Verbrauch Total (Ambiente Küche)
-      icon: mdi:chart-areaspline
-      unit_of_measurement: "kWh"
-#    sensor.sonoffpow_04_energy_yesterday:
-#      friendly_name: Verbrauch Gestern (Ambiente Küche)
-#      icon: mdi:chart-areaspline
-#      unit_of_measurement: "kWh"
-    sensor.sonoffpow_04_energy_totalstarttime:
-      friendly_name: "Seit"
-      icon: mdi:calendar-clock
-      device_class: "timestamp"
-
-    sensor.sonoffpow_04_status:
-      friendly_name: Status (Ambiente Küche)
-      icon: mdi:information
-      unit_of_measurement: "%"
-
     sensor.sonoffpow_04_energy_d:
       friendly_name: Verbrauch pro Tag (Ambiente Küche)
 

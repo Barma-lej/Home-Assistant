@@ -60,4 +60,3 @@
       message: Rolladen geschlossen
       title: 🔽 Rolladen
     service: notify.telegram_schick_home
-
