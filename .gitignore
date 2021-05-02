@@ -59,4 +59,5 @@ haus_022019_og.png
 person.yaml
 meteostat.yaml
 
+esphome/garagegate.yaml
 packages/sonoffrfbridge.yaml

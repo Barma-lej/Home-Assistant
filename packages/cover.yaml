@@ -1,0 +1,98 @@
+# Automations and scripts for covers
+
+cover:
+  - platform: group
+    name: rolladen
+    entities:
+      - cover.shellyswitch25_f37a8c
+      - cover.shellyswitch25_f37b28
+      - cover.shellyswitch25_10eaa4
+      - cover.shellyswitch25_10d315
+
+# Input Text ########################################################
+input_text:
+  rolladen_last_state:
+
+# Automation ########################################################
+automation:
+# Rolladen group last state
+- id: set_rolladen_last_state
+  alias: Set rolladen last state
+  mode: single
+  trigger:
+  - platform: state
+    entity_id: cover.rolladen
+
+  action:
+  - service: input_text.set_value
+    target:
+      entity_id: input_text.rolladen_last_state
+    data:
+      value: "{{ trigger.from_state.state }}"
+
+# Scripts ###########################################################
+script:
+
+#######################################
+# Script to management covers with one button.
+# Open -> Stop -> Close -> Stop -> Open
+# is passed:
+#   {{ entity_id }}
+#######################################
+  cover_one_button:
+    alias: Management cover with one button
+    mode: parallel
+    sequence:
+
+    - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ is_state('input_text.' ~ entity_id ~ '_last_state', 'closing') }}"
+        sequence:
+          - service: cover.open_cover
+            target:
+              entity_id: cover.{{ entity_id }}
+      - conditions:
+          - condition: template
+            value_template: "{{ is_state('input_text.' ~ entity_id ~ '_last_state', 'opening') }}"
+        sequence:
+          - service: cover.close_cover
+            target:
+              entity_id: cover.{{ entity_id }}
+      default:
+        - service: cover.stop_cover
+          target:
+            entity_id: cover.{{ entity_id }}
+
+#######################################
+# Script to management covers with two
+# buttons (open and close). If cover
+# opening or closing and one of buttons
+# is pressed then cover stopped
+# is passed:
+#   {{ entity_id }}
+#   {{ mode }}
+#######################################
+  cover_start_stop:
+    alias: Cover open add start stop option
+    mode: parallel
+    sequence:
+    - service: >
+        {% if is_state("cover." ~ entity_id, "opening") or
+              is_state("cover." ~ entity_id, "closing") %}
+          cover.stop_cover
+        {% elif mode == "open" %}
+          cover.open_cover
+        {% elif mode == "close" %}
+          cover.close_cover
+        {% else %}
+          cover.stop_cover
+        {% endif %}
+      target:
+        entity_id: cover.{{ entity_id }}
+
+# Customize #########################################################
+homeassistant:
+  customize:
+    cover.rolladen:
+      friendly_name: Rolladen

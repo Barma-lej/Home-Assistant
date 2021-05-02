@@ -17,12 +17,12 @@ utility_meter:
 
 # Input Text ########################################################
 input_text:
-  rollade_3_last_state:
+  shellyswitch25_10eaa4_last_state:
 
 # Automation ########################################################
 automation:
-- id: set_rollade_3_state
-  alias: Set rollade 3 state
+- id: set_rollade_3_last_state
+  alias: Set rollade 3 last state
   mode: single
   trigger:
   - platform: state
@@ -30,7 +30,8 @@ automation:
 
   action:
   - service: input_text.set_value
-    entity_id: input_text.rollade_3_last_state
+    target:
+      entity_id: input_text.shellyswitch25_10eaa4_last_state
     data:
       value: "{{ trigger.from_state.state }}"
 
@@ -49,24 +50,9 @@ automation:
       command: "/rollade_3"
 
   action:
-  - choose:
-    - conditions:
-        - condition: state
-          entity_id: input_text.rollade_3_last_state
-          state: closing
-      sequence:
-        - service: cover.open_cover
-          entity_id: cover.shellyswitch25_10eaa4
-    - conditions:
-        - condition: state
-          entity_id: input_text.rollade_3_last_state
-          state: opening
-      sequence:
-        - service: cover.close_cover
-          entity_id: cover.shellyswitch25_10eaa4
-    default:
-      - service: cover.stop_cover
-        entity_id: cover.shellyswitch25_10eaa4
+  - service: script.cover_one_button
+    data:
+      entity: shellyswitch25_10eaa4
 
   - wait_for_trigger:
     - platform: state
