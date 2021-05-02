@@ -46,21 +46,21 @@ automation:
   - platform: event
     event_type: telegram_callback
     event_data:
-      command: '/rollade_1'
+      command: "/rollade_1"
 
   action:
   - service: input_text.set_value
     entity_id: input_text.rollade_1_last_state
     data:
       value: >
-        {% if not states('input_text.rollade_1_last_state') -%}
-          {%- if is_state('cover.shellyswitch25_f37a8c', 'open') -%}
-            'opening'
+        {% if not states("input_text.rollade_1_last_state") -%}
+          {%- if is_state("cover.shellyswitch25_f37a8c", "open") -%}
+            "opening"
           {%- else -%}
-            'closing'
+            "closing"
           {%- endif -%}
         {%- else -%}
-          {{ states('input_text.rollade_1_last_state') }}
+          {{ states("input_text.rollade_1_last_state") }}
         {%- endif %}
 
   - choose:

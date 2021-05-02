@@ -29,7 +29,7 @@ automation:
   - platform: event
     event_type: telegram_callback
     event_data:
-      command: '/wandlicht'
+      command: "/wandlicht"
 
   action:
     - service: light.toggle

@@ -56,11 +56,11 @@ sensor:
   - platform: template
     sensors:
       robi_start_time_weekdays:
-        friendly_name: 'Startzeit (Wochentage)'
+        friendly_name: "Startzeit (Wochentage)"
         value_template: "{{ '%0.02d:%0.02d' | format(states('input_number.robi_start_hour_weekdays') | int, states('input_number.robi_start_minutes_weekdays') | int) }}"
         icon_template: mdi:clock-start
       robi_start_time_weekend:
-        friendly_name: 'Startzeit (Wochenende)'
+        friendly_name: "Startzeit (Wochenende)"
         value_template: "{{ '%0.02d:%0.02d' | format(states('input_number.robi_start_hour_weekend') | int, states('input_number.robi_start_minutes_weekend') | int) }}"
         icon_template: mdi:clock-start
 # States ####################
@@ -77,7 +77,7 @@ sensor:
         value_template: "{{ state_attr('vacuum.robi','battery_level') | int }}"
         icon_template: "{{ state_attr('vacuum.robi','battery_icon') }}"
         device_class: battery
-        unit_of_measurement: '%'
+        unit_of_measurement: "%"
       robi_fan_speed:
         friendly_name: "Robi - Modus"
         value_template: "{{ state_attr('vacuum.robi','fan_speed') }}"
@@ -97,7 +97,7 @@ sensor:
         friendly_name: "Robi - Hauptbürste (percent)"
         value_template: "{{ (state_attr('vacuum.robi','main_brush_left') / 3) | round(0) }}"
         icon_template: mdi:broom
-        unit_of_measurement: '%'
+        unit_of_measurement: "%"
       robi_side_brush:
         friendly_name: "Robi - Seitenbürste"
         value_template: "{{ state_attr('vacuum.robi','side_brush_left') }}"
@@ -107,7 +107,7 @@ sensor:
         friendly_name: "Robi - Seitenbürste (percent)"
         value_template: "{{ (state_attr('vacuum.robi','side_brush_left') / 2) | round(0) }}"
         icon_template: mdi:multiplication
-        unit_of_measurement: '%'
+        unit_of_measurement: "%"
       robi_filter:
         friendly_name: "Robi - Filter"
         value_template: "{{ state_attr('vacuum.robi','filter_left') }}"
@@ -117,7 +117,7 @@ sensor:
         friendly_name: "Robi - Filter (percent)"
         value_template: "{{ (state_attr('vacuum.robi','filter_left') / 1.5) | round(0) }}"
         icon_template: mdi:blur-linear
-        unit_of_measurement: '%'
+        unit_of_measurement: "%"
       robi_sensor:
         friendly_name: "Robi - Sensoren"
         value_template: "{{ state_attr('vacuum.robi','sensor_dirty_left') }}"
@@ -127,20 +127,20 @@ sensor:
         friendly_name: "Robi - Sensoren (percent)"
         value_template: "{{ (state_attr('vacuum.robi','sensor_dirty_left') / 0.3) | round(0) }}"
         icon_template: mdi:signal-variant
-        unit_of_measurement: '%'
+        unit_of_measurement: "%"
 
 # Statistik #################
       robi_clean_start:
         friendly_name: "Reinigungsstart"
         value_template: >
-          {%- set date = as_timestamp(state_attr('vacuum.robi','clean_start')) %}
+          {%- set date = as_timestamp(state_attr("vacuum.robi","clean_start")) %}
           {% set weekdays_short = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] -%}
           {{ weekdays_short[(date | timestamp_custom("%w")) | int] }}, {{ date | timestamp_custom("%d.%m.%Y %H:%M:%S") }}
         icon_template: mdi:clock-start
       robi_clean_stop:
         friendly_name: "Reinigungsstop"
         value_template: >
-          {%- set date = as_timestamp(state_attr('vacuum.robi','clean_stop')) %}
+          {%- set date = as_timestamp(state_attr("vacuum.robi","clean_stop")) %}
           {% set weekdays_short = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] -%}
           {{ weekdays_short[(date | timestamp_custom("%w")) | int] }}, {{ date | timestamp_custom("%d.%m.%Y %H:%M:%S") }}
         icon_template: mdi:clock-end
@@ -149,23 +149,23 @@ sensor:
         friendly_name: "Dauer"
         value_template: "{{ state_attr('vacuum.robi','cleaning_time') }}"
         icon_template: mdi:clock-fast
-        unit_of_measurement: 'min'
+        unit_of_measurement: "min"
       robi_cleaned_area:
         friendly_name: "Fläche"
         value_template: "{{ state_attr('vacuum.robi','cleaned_area') }}"
         icon_template: mdi:floor-plan
-        unit_of_measurement: 'm²'
+        unit_of_measurement: "m²"
 
       robi_total_cleaned_area:
         friendly_name: "Fläche (insg.)"
         value_template: "{{ state_attr('vacuum.robi','total_cleaned_area') }}"
         icon_template: mdi:floor-plan
-        unit_of_measurement: 'm²'
+        unit_of_measurement: "m²"
       robi_total_cleaned_time:
         friendly_name: "Dauer (insg.)"
         value_template: "{{ (state_attr('vacuum.robi','total_cleaning_time') // 60) }}:{{ state_attr('vacuum.robi','total_cleaning_time') % 60 }}"
         icon_template: mdi:clock-fast
-        unit_of_measurement: 'Std'
+        unit_of_measurement: "Std"
       robi_cleaning_count:
         friendly_name: "Reinigungen (insg.)"
         value_template: "{{ state_attr('vacuum.robi','cleaning_count') }}"
@@ -287,15 +287,15 @@ automation:
         data:
           entity_id: vacuum.robi
           fan_speed: >
-            {% if trigger.to_state.state == 'Leise' %}
+            {% if trigger.to_state.state == "Leise" %}
               Quiet
-            {% elif trigger.to_state.state == 'Standart' %}
+            {% elif trigger.to_state.state == "Standart" %}
               Standart
-            {% elif trigger.to_state.state == 'Turbo' %}
+            {% elif trigger.to_state.state == "Turbo" %}
               Turbo
-            {% elif trigger.to_state.state == 'Maximum' %}
+            {% elif trigger.to_state.state == "Maximum" %}
               Max
-            {% elif trigger.to_state.state == 'Wischen' %}
+            {% elif trigger.to_state.state == "Wischen" %}
               105
             {% endif %}
 
@@ -305,25 +305,25 @@ automation:
     trigger:
       platform: state
       entity_id: input_select.robi_zone
-      from: 'Raumauswahl'
+      from: "Raumauswahl"
 
     action:
       - service: >
-          {% if is_state('input_select.robi_zone','EG') %}
+          {% if is_state("input_select.robi_zone","EG") %}
             script.robi_home
-          {% elif is_state('input_select.robi_zone','Küche') %}
+          {% elif is_state("input_select.robi_zone","Küche") %}
             script.robi_kitchen
-          {% elif is_state('input_select.robi_zone','Wohnzimmer') %}
+          {% elif is_state("input_select.robi_zone","Wohnzimmer") %}
             script.robi_living_room
-          {% elif is_state('input_select.robi_zone','Stube') %}
+          {% elif is_state("input_select.robi_zone","Stube") %}
             script.robi_stube
-          {% elif is_state('input_select.robi_zone','Schlafzimmer') %}
+          {% elif is_state("input_select.robi_zone","Schlafzimmer") %}
             script.robi_bedroom
-          {% elif is_state('input_select.robi_zone','Flur') %}
+          {% elif is_state("input_select.robi_zone","Flur") %}
             script.robi_flur
-          {% elif is_state('input_select.robi_zone','HWR') %}
+          {% elif is_state("input_select.robi_zone","HWR") %}
             script.robi_hwr
-          {% elif is_state('input_select.robi_zone','WC') %}
+          {% elif is_state("input_select.robi_zone","WC") %}
             script.robi_wc
           {% else %}
           {% endif %}

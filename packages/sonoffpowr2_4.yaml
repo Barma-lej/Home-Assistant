@@ -29,7 +29,7 @@ automation:
   - platform: event
     event_type: telegram_callback
     event_data:
-      command: '/ambiente_kueche'
+      command: "/ambiente_kueche"
 
   action:
     - service: light.toggle

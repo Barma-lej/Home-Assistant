@@ -41,17 +41,17 @@ notify:
 automation:
 # Start
 - id: telegram_start
-  alias: 'Telegram start'
+  alias: "Telegram start"
   trigger:
   - platform: event
     event_type: telegram_command
     event_data:
-      command: '/start'
+      command: "/start"
 
   - platform: event
     event_type: telegram_callback
     event_data:
-      command: '/start'
+      command: "/start"
 
   action:
   - service: telegram_bot.send_message
@@ -64,24 +64,24 @@ automation:
         /commands - Zeigt Control Panel
         /help - Zeigt eine Nachricht mit Befehlen an
       keyboard:
-        - '/wandlicht, /wohnlicht, /ambiente_wohnen'
-        - '/kuechenlicht, /ambiente_kueche, /rollade_hinten'
-        - '/rollade_1, /rollade_2, /rollade_3'
-        - '/start, /commands, /help, /tor'
+        - "/wandlicht, /wohnlicht, /ambiente_wohnen"
+        - "/kuechenlicht, /ambiente_kueche, /rollade_hinten"
+        - "/rollade_1, /rollade_2, /rollade_3"
+        - "/start, /commands, /help, /tor"
 
 # Commands
 - id: telegram_commands
-  alias: 'Telegram commands'
+  alias: "Telegram commands"
   trigger:
   - platform: event
     event_type: telegram_command
     event_data:
-      command: '/commands'
+      command: "/commands"
 
   - platform: event
     event_type: telegram_callback
     event_data:
-      command: '/commands'
+      command: "/commands"
   
   action:
   - service: telegram_bot.send_message
@@ -89,30 +89,30 @@ automation:
       target: "{{ trigger.event.data.user_id }}"
       message: Wähle eine Aktion aus
       inline_keyboard:
-        - 'Tor:/tor, Home:/start, Hilfe:/help'
-        - 'Wandlicht:/wandlicht, Wohnlicht:/wohnlicht, Ambiente Wohnzimmer:/ambiente_wohnen'
-        - 'Küchenlicht:/kuechenlicht, Ambiente Küche:/ambiente_kueche, Rollade Hinten:/rollade_hinten'
-        - 'Rollade 1:/rollade_1, Rollade 2:/rollade_2, Rollade 3:/rollade_3'
+        - "Tor:/tor, Home:/start, Hilfe:/help"
+        - "Wandlicht:/wandlicht, Wohnlicht:/wohnlicht, Ambiente Wohnzimmer:/ambiente_wohnen"
+        - "Küchenlicht:/kuechenlicht, Ambiente Küche:/ambiente_kueche, Rollade Hinten:/rollade_hinten"
+        - "Rollade 1:/rollade_1, Rollade 2:/rollade_2, Rollade 3:/rollade_3"
 
 # Help
 - id: telegram_help
-  alias: 'Telegram help'
+  alias: "Telegram help"
   trigger:
   - platform: event
     event_type: telegram_command
     event_data:
-      command: '/help'
+      command: "/help"
 
   - platform: event
     event_type: telegram_callback
     event_data:
-      command: '/help'
+      command: "/help"
   
   action:
   - service: telegram_bot.answer_callback_query
     data:
-      callback_query_id: '{{ trigger.event.data.id }}'
-      message: 'Bitte schön'
+      callback_query_id: "{{ trigger.event.data.id }}"
+      message: "Bitte schön"
 
   - service: telegram_bot.send_message
     data:
@@ -141,24 +141,24 @@ automation:
 
 #     data:
 #        keyboard:
-#          - '/tor, /start, /help'
-#          - '/wandlicht, /wohnlicht, /ambiente_wohnen'
-#          - '/kuechenlicht, /ambiente_kueche, /rollade_hinten'
-#          - '/rollade_1, /rollade_2, /rollade_3'
+#          - "/tor, /start, /help"
+#          - "/wandlicht, /wohnlicht, /ambiente_wohnen"
+#          - "/kuechenlicht, /ambiente_kueche, /rollade_hinten"
+#          - "/rollade_1, /rollade_2, /rollade_3"
 #        inline_keyboard:
-#          - 'Tor:/tor, Home:/start, Hilfe:/help'
-#          - 'Wandlicht:/wandlicht, Wohnlicht:/wohnlicht, Ambiente Wohnzimmer:/ambiente_wohnen'
-#          - 'Küchenlicht:/kuechenlicht, Ambiente Küche:/ambiente_kueche, Rollade Hinten:/rollade_hinten'
-#          - 'Rollade 1:/rollade_1, Rollade 2:/rollade_2, Rollade 3:/rollade_3'
+#          - "Tor:/tor, Home:/start, Hilfe:/help"
+#          - "Wandlicht:/wandlicht, Wohnlicht:/wohnlicht, Ambiente Wohnzimmer:/ambiente_wohnen"
+#          - "Küchenlicht:/kuechenlicht, Ambiente Küche:/ambiente_kueche, Rollade Hinten:/rollade_hinten"
+#          - "Rollade 1:/rollade_1, Rollade 2:/rollade_2, Rollade 3:/rollade_3"
 
 #
 #- id: telegram_test
-#  alias: 'Telegram test'
+#  alias: "Telegram test"
 #  trigger:
 #    platform: event
 #    event_type: telegram_command
 #    event_data:
-#      command: '/test'
+#      command: "/test"
 #
 #  action:
 #  - service: script.telegram_run_command
@@ -168,13 +168,13 @@ automation:
 #      entity_id: light.sonoffpow_01
 #      data.entity_id_state: light.sonoffpow_01
 #  - service: >
-#      {% if trigger.event.data['from_first'] == 'Barmalej' %}
+#      {% if trigger.event.data["from_first"] == "Barmalej" %}
 #        notify.telegram_bot_anatolij
-#      {% elif trigger.event.data['from_first'] =='Natalja' %}
+#      {% elif trigger.event.data["from_first"] =="Natalja" %}
 #        notify.telegram_bot_natalja
-#      {% elif trigger.event.data['from_first'] =='Kristina' %}
+#      {% elif trigger.event.data["from_first"] =="Kristina" %}
 #        notify.telegram_bot_kristina
-#      {% elif trigger.event.data['from_first'] =='Veronika' %}
+#      {% elif trigger.event.data["from_first"] =="Veronika" %}
 #        notify.telegram_bot_veronika
 #      {% else %}
 #        notify.telegram_schick_home
@@ -192,16 +192,16 @@ script:
     mode: parallel
     fields:
       user:
-        description: 'The user who executed the command'
+        description: "The user who executed the command"
         example: "{{ trigger.event.data['from_first'] }}"
       service:
-        description: 'The service to run'
+        description: "The service to run"
         example: switch.toggle
       entity_id:
-        description: 'The entity to run'
+        description: "The entity to run"
         example: switch.tor
       entity_id_state:
-        description: 'The entity to check the state entity'
+        description: "The entity to check the state entity"
         example: cover.tor
     sequence:
 
@@ -214,27 +214,27 @@ script:
             event_type: state_changed
             event_data:
               entity_id: entity_id_state
-        timeout: '5'
+        timeout: "5"
         continue_on_timeout: true
 
 #      - wait_for_trigger:
 #        - platform: event
 #          event_type: state_changed
 #          event_data:
-#            entity_id: '{{ entity_id_state }}'
+#            entity_id: "{{ entity_id_state }}"
 ##        - platform: state
 ##          entity_id: entity_id_state
 #        timeout: 5
 #        continue_on_timeout: true
 
       - service: >
-          {% if user == 'Barmalej' %}
+          {% if user == "Barmalej" %}
             notify.telegram_bot_anatolij
-          {% elif user =='Natalja' %}
+          {% elif user =="Natalja" %}
             notify.telegram_bot_natalja
-          {% elif user =='Kristina' %}
+          {% elif user =="Kristina" %}
             notify.telegram_bot_kristina
-          {% elif user =='Veronika' %}
+          {% elif user =="Veronika" %}
             notify.telegram_bot_veronika
           {% else %}
             notify.telegram_schick_home
@@ -242,7 +242,7 @@ script:
 
         data:
           message: >
-            {{ state_attr(entity_id, 'friendly_name') }} ist {{ states(entity_id_state) }}
+            {{ state_attr(entity_id, "friendly_name") }} ist {{ states(entity_id_state) }}
 
 
 #tor - Garage öffnen/schliessen

@@ -34,7 +34,7 @@ automation:
   - platform: event
     event_type: telegram_callback
     event_data:
-      command: '/wohnlicht'
+      command: "/wohnlicht"
 
   action:
   - service: light.toggle

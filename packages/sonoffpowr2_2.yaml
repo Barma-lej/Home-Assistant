@@ -29,7 +29,7 @@ automation:
   - platform: event
     event_type: telegram_callback
     event_data:
-      command: '/ambiente_wohnen'
+      command: "/ambiente_wohnen"
 
   action:
     - service: light.toggle

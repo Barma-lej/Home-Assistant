@@ -41,7 +41,7 @@ input_number:
 # Input Selects #####################################################
 input_select:
   radio_station:
-    name: 'Radio:'
+    name: "Radio:"
     options:
       - Stop
       - Europa Plus
@@ -61,7 +61,7 @@ input_select:
     icon: mdi:radio
 
   radio_player:
-    name: 'Lautsprecher:'
+    name: "Lautsprecher:"
     options:
       - Nest Mini
       - Sound Blaster
@@ -138,19 +138,19 @@ script:
 #      - service: media_player.volume_set
 #        data:
 #          entity_id: media_player.google_home
-#          volume_level: '0.25'
+#          volume_level: "0.25"
 #      - service: media_player.volume_set
 #        data:
 #          entity_id: media_player.soundblaster
-#          volume_level: '0.25'
+#          volume_level: "0.25"
 #      - service: media_player.volume_set
 #        data:
 #          entity_id: media_player.flur
-#          volume_level: '0.25'
+#          volume_level: "0.25"
 #      - service: media_player.volume_set
 #        data:
 #          entity_id: media_player.kristina
-#          volume_level: '0.25'
+#          volume_level: "0.25"
       - service: media_player.play_media
 #      - service: media_extractor.play_media
         data:
@@ -177,7 +177,7 @@ script:
             {% elif is_state("input_select.radio_station","Маруся ФМ") %} http://radio-holding.ru:9000/marusya_aac_64
             {% elif is_state("input_select.radio_station","Sex") %} http://ic4.101.ru:8000/a27
             {% endif %}
-          media_content_type: 'music'
+          media_content_type: "music"
 
   radio_stop:
     alias: Radio Stop
@@ -186,23 +186,23 @@ script:
       - service: media_player.volume_set
         data:
           entity_id: media_player.nest_mini
-          volume_level: '0.25'
+          volume_level: "0.25"
       - service: media_player.volume_set
         data:
           entity_id: media_player.google_home
-          volume_level: '0.25'
+          volume_level: "0.25"
       - service: media_player.volume_set
         data:
           entity_id: media_player.soundblaster
-          volume_level: '0.25'
+          volume_level: "0.25"
       - service: media_player.volume_set
         data:
           entity_id: media_player.flur
-          volume_level: '0.25'
+          volume_level: "0.25"
       - service: media_player.volume_set
         data:
           entity_id: media_player.kristina
-          volume_level: '0.25'
+          volume_level: "0.25"
       - service: media_player.turn_off
         data:
           entity_id: >

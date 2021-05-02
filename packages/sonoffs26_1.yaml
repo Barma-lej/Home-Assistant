@@ -4,12 +4,12 @@
 # Automations #######################################################
 automation:
   - id: tv_board_off
-    alias: 'TV Board OFF'
-    initial_state: 'off'
+    alias: "TV Board OFF"
+    initial_state: "off"
     trigger:
       platform: state
       entity_id: group.familie_wlan
-      to: 'not_home'
+      to: "not_home"
     action:
       service: switch.turn_off
       entity_id: switch.sonoffs26_1

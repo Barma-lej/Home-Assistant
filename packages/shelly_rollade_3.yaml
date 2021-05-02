@@ -46,7 +46,7 @@ automation:
   - platform: event
     event_type: telegram_callback
     event_data:
-      command: '/rollade_3'
+      command: "/rollade_3"
 
   action:
   - choose:

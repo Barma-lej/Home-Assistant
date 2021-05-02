@@ -20,7 +20,7 @@ sensor:
     sensors:
       samsung_scx_472x_series_192_168_2_200_cnt:
         value_template: "{{ (state_attr('sensor.samsung_scx_472x_series_192_168_2_200_toner_black','cnt') | float) | round(0) }}"
-        friendly_name: 'Drucker Ausdrucke'
+        friendly_name: "Drucker Ausdrucke"
         unit_of_measurement: " "
 
 # Customize #########################################################

@@ -17,9 +17,9 @@ automation:
       event_data:
         action: call_service
     action:
-    - service: '{{ trigger.event.data.service }}'
+    - service: "{{ trigger.event.data.service }}"
       data:
-        entity_id: '{{ trigger.event.data.entity_id }}'
+        entity_id: "{{ trigger.event.data.entity_id }}"
 
   - id: ifttt_webhook_option
     alias: IFTTT Webhook Option
@@ -29,7 +29,7 @@ automation:
       event_data:
         action: call_option
     action:
-    - service: '{{ trigger.event.data.service }}'
+    - service: "{{ trigger.event.data.service }}"
       data:
-        entity_id: '{{ trigger.event.data.entity_id }}'
-        option: '{{ trigger.event.data.option }}'
+        entity_id: "{{ trigger.event.data.entity_id }}"
+        option: "{{ trigger.event.data.option }}"
