@@ -33,20 +33,40 @@ sensor:
     resources:
     - type: disk_use_percent
       arg: /
+#    - type: disk_use
+#      arg: /
     - type: disk_free
       arg: /
-    - type: memory_free
     - type: memory_use_percent
-    - type: swap_free
+#    - type: memory_use
+    - type: memory_free
     - type: swap_use_percent
-    - type: processor_use
-    - type: last_boot
+#    - type: swap_use
+    - type: swap_free
 #    - type: load_1m
+#    - type: load_5m
     - type: load_15m
     - type: network_in
       arg: ens33
     - type: network_out
       arg: ens33
+    - type: throughput_network_in
+      arg: ens33
+    - type: throughput_network_out
+      arg: ens33
+#    - type: packets_in
+#      arg: ens33
+#    - type: packets_out
+#      arg: ens33
+    - type: ipv4_address
+      arg: ens33
+    - type: ipv6_address
+      arg: ens33
+    - type: processor_use
+#    - type: process
+#      arg: octave-cli
+#    - type: processor_temperature
+    - type: last_boot
 
   - platform: template
     sensors:
@@ -58,7 +78,7 @@ sensor:
 
       last_boot_local:
         friendly_name: "Letzter Start"
-        device_class: timestamp
+#        device_class: timestamp
         icon_template: mdi:clock
         value_template: "{{ as_timestamp(states('sensor.last_boot')) | timestamp_custom('%d.%m.%Y %H:%M') }}"
 
