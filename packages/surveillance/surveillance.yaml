@@ -1,0 +1,75 @@
+# Recorder ##########################################################
+#recorder:
+#  exclude:
+#    entities:
+#      - automation.camera_upload_video_to_telegram
+#
+## Logbook ###########################################################
+#logbook:
+#  exclude:
+#    entities:
+#      - automation.camera_upload_video_to_telegram
+
+# Automations #######################################################
+automation:
+- id: automation.camera_upload_video_to_telegram
+  alias: Camera Upload Video to Telegram
+  mode: parallel
+  trigger:
+    platform: event
+    event_type: folder_watcher
+    event_data:
+      event_type: created
+  action:
+  - delay: 00:00:25 # Чтобы файл успел записаться
+  - service: notify.telegram_schick_home
+    data:
+      title: Surveillance
+      message: "Bewegung erkannt!"
+      data:
+        video:
+          - file: "{{ trigger.event.data.path }}"
+            caption: >-
+              {% if trigger.event.data.folder == "/mnt/sdb1/cam1" %}
+                🏃 *Hinterhof* Bewegung
+              {% elif trigger.event.data.folder == "/mnt/sdb1/cam2" %}
+                🏃 *Garage* Bewegung
+              {% elif trigger.event.data.folder == "/mnt/sdb1/cam3" %}
+                🏃 *Garage* Bewegung
+              {% else %}
+                🏃 *Bewegung erkannt*
+              {% endif -%}
+#  - service: shell_command.delete_file
+#    data:
+#      file_path: "{{ trigger.event.data.path }}"
+##                \U0001F3C3 📹 :movie_camera: *Garage* Bewegung
+
+# Script ############################################################
+#script:
+########################################
+## Script to record and sent motion video to telegram
+## is passed:
+##   {{ camera }} Camera entity_id
+##   {{ file }} Record file full name
+##   {{ caption }}
+########################################
+#  record_motion:
+#    sequence:
+#    - service: camera.record
+#      data:
+#        entity_id: camera.{{ camera }}
+#        filename: "{{ file }}"
+#        lookback: 30
+#        duration: 30
+##    - delay: 00:00:45
+##    - service: notify.telegram_schick_home
+##      data:
+##        title: Surveillance
+##        message: "Bewegung erkannt!"
+##        data:
+##          video:
+##            - file: "{{ file }}"
+##              caption: "{{ caption }}"
+##    - service: shell_command.delete_file
+##      data:
+##        file_path: "{{ file }}"

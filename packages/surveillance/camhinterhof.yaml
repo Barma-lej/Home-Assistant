@@ -1,0 +1,212 @@
+# Android IP Webcamera package
+# Samsung SM-G925X
+
+# Component #########################################################
+android_ip_webcam:
+  - name: CamHinterhof
+    host: !secret cams6e_ip
+    port: !secret cams6e_port
+    username: !secret cams6e_user
+    password: !secret cams6e_pass
+#    scan_interval: Default is 10 seconds. Defines the update interval of the phone.
+    motion_sensor: enable
+    sensors:
+      - audio_connections
+      - battery_level
+      - battery_temp
+      - battery_voltage
+      - light
+      - motion
+      - pressure
+      - proximity
+      - sound
+      - video_connections
+    switches:
+      - exposure_lock
+      - ffc
+      - focus
+      - gps_active
+      - night_vision
+      - overlay
+      - torch
+      - whitebalance_lock
+      - video_recording
+
+# Automation ########################################################
+automation:
+# Aufnahme ########
+#  - id: camhinterhofrecording
+#    alias: Camera Hinterhof Recording
+#    trigger:
+#    - platform: time_pattern
+#      minutes: "/5"
+#    - platform: state
+#      entity_id: switch.camhinterhof_video_recording
+#      to: "off"
+#    condition:
+#    - condition: state
+#      entity_id: switch.camhinterhof_video_recording
+#      state: "off"
+#    action:
+#    - service: switch.turn_on
+#      data:
+#        entity_id: switch.camhinterhof_video_recording
+
+# Nachtmodus ######
+  - id: camhinterhofnighton
+    alias: Camera Hinterhof Night On
+    trigger:
+    - platform: numeric_state
+      entity_id: sensor.camhinterhof_light_level
+      below: "5"
+    condition:
+    - condition: state
+      entity_id: switch.camhinterhof_night_vision
+      state: "off"
+    action:
+    - service: switch.turn_on
+      data:
+        entity_id: switch.camhinterhof_night_vision
+
+  - id: camhinterhofnightoff
+    alias: Camera Hinterhof Night Off
+    trigger:
+    - platform: numeric_state
+      entity_id: sensor.camhinterhof_light_level
+      above: "5"
+    condition:
+    - condition: state
+      entity_id: switch.camhinterhof_night_vision
+      state: "on"
+    action:
+    - service: switch.turn_off
+      data:
+        entity_id: switch.camhinterhof_night_vision
+
+
+# Groups ############################################################
+group:
+# Switches ########
+  camhinterhof_switch:
+    name: Kamera Hinterhof Switch
+# Deprecated    control: hidden
+    entities:
+      - switch.camhinterhof_exposure_lock
+      - switch.camhinterhof_focus
+      - switch.camhinterhof_frontfacing_camera
+      - switch.camhinterhof_gps_active
+      - switch.camhinterhof_night_vision
+      - switch.camhinterhof_overlay
+      - switch.camhinterhof_torch
+      - switch.camhinterhof_video_recording
+      - switch.camhinterhof_white_balance_lock
+
+# Sensors #########
+  camhinterhof_sensor:
+    name: Kamera Hinterhof Sensor
+    entities:
+      - binary_sensor.camhinterhof_motion_active
+      - sensor.camhinterhof_motion
+      - sensor.camhinterhof_sound
+      - sensor.camhinterhof_pressure
+      - sensor.camhinterhof_proximity
+      - sensor.camhinterhof_light_level
+      - sensor.camhinterhof_battery_level
+      - sensor.camhinterhof_battery_temperature
+      - sensor.camhinterhof_battery_voltage
+      - sensor.camhinterhof_audio_connections
+      - sensor.camhinterhof_video_connections
+
+# Customize #########################################################
+homeassistant:
+  customize:
+# Switches ########
+    switch.camhinterhof_torch:
+      friendly_name: Licht
+    switch.camhinterhof_video_recording:
+      friendly_name: Videoaufnahme
+    switch.camhinterhof_night_vision:
+      friendly_name: Nachtmodus
+    switch.camhinterhof_overlay:
+      friendly_name: Beschriftung
+    switch.camhinterhof_frontfacing_camera:
+      friendly_name: Frontkamera
+    switch.camhinterhof_focus:
+      friendly_name: Fokus
+    switch.camhinterhof_exposure_lock:
+      friendly_name: Belichtungsperre
+    switch.camhinterhof_white_balance_lock:
+      friendly_name: Weißabgleichsperre
+    switch.camhinterhof_gps_active:
+      friendly_name: GPS Aktiviert
+
+# Sensors #########
+    sensor.camhinterhof_battery_level:
+      friendly_name: Akkuladestand
+    sensor.camhinterhof_battery_temperature:
+      friendly_name: Akkutemperature
+      unit_of_measurement: "°C"
+    sensor.camhinterhof_battery_voltage:
+      friendly_name: Akkuspannung
+    binary_sensor.camhinterhof_motion_active:
+      friendly_name: Bewegung erkannt
+    sensor.camhinterhof_motion:
+      friendly_name: Bewegung
+    sensor.camhinterhof_light_level:
+      friendly_name: Lichtstärke
+    sensor.camhinterhof_proximity:
+      friendly_name: Annäherung
+    sensor.camhinterhof_sound:
+      friendly_name: Geräusch
+    sensor.camhinterhof_video_connections:
+      friendly_name: Videoverbindungen
+      unit_of_measurement: ""
+    sensor.camhinterhof_audio_connections:
+      friendly_name: Audioverbindungen
+      unit_of_measurement: ""
+    sensor.camhinterhof_pressure:
+      friendly_name: Druck
+
+# Binary Sensor #####################################################
+#binary_sensor:
+#  - platform: rest
+#    name: Kitchen Motion
+#    sensor_class: motion
+#    resource: http://IP:8080/sensors.json?sense=motion_active
+#    value_template: "{{ value_json.motion_active.data[0][1][0] | round(0) }}"
+
+#media_player:
+#  - platform: vlc
+#    name: speaker
+#
+#camera:
+#  - platform: ffmpeg
+#    input: https://192.168.2.210:8080/audio.wav
+#
+#  - platform: generic
+#    name: CamHinterhof ulaw
+#    username: !secret cams6e_user
+#    password: !secret cams6e_pass
+#    still_image_url: http://192.168.2.210:8080/shot.jpg
+#    stream_source: rtsp://192.168.2.210:8080/h264_ulaw.sdp
+#
+#  - platform: generic
+#    name: CamHinterhof pcm
+#    username: !secret cams6e_user
+#    password: !secret cams6e_pass
+#    verify_ssl: false
+#    still_image_url: https://192.168.2.210:8080/shot.jpg
+#    stream_source: https://192.168.2.210:8080/audio.wav
+#
+#  - platform: mjpeg
+#    name: CamHinterhof mjpeg
+#    username: !secret cams6e_user
+#    password: !secret cams6e_pass
+#    mjpeg_url: http://192.168.2.210:8080/video
+#
+#  - platform: onvif
+#    name: CamHinterhof onvif
+#    username: !secret cams6e_user
+#    password: !secret cams6e_pass
+#    host: 192.168.2.210
+#    port: 8080

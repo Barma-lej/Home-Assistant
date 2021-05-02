@@ -13,6 +13,8 @@
 !packages/
 !packages/garagentor/
 !packages/irrigation/
+!packages/landroid/
+!packages/surveillance/
 !packages/weather/
 !packages/weihnachten/
 !themes/
