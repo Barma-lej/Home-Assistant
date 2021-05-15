@@ -6,5 +6,93 @@ switch:
     turn_off: 
       service: shell_command.turn_off_pc1
 
+  - platform: wake_on_lan
+    name: !secret pc2_name
+    mac: !secret pc2_mac
+    host: !secret pc2_host
+    turn_off: 
+      service: shell_command.turn_off_pc2
+
+  - platform: wake_on_lan
+    name: !secret pc3_name
+    mac: !secret pc3_mac
+    host: !secret pc3_host
+    turn_off: 
+      service: shell_command.turn_off_pc3
+
+  - platform: wake_on_lan
+    name: !secret pc4_name
+    mac: !secret pc4_mac
+    host: !secret pc4_host
+    turn_off: 
+      service: shell_command.turn_off_pc4
+
+  - platform: wake_on_lan
+    name: !secret pc5_name
+    mac: !secret pc5_mac
+    host: !secret pc5_host
+    turn_off: 
+      service: shell_command.turn_off_pc5
+
+  - platform: wake_on_lan
+    name: !secret pc6_name
+    mac: !secret pc6_mac
+    host: !secret pc6_host
+    turn_off: 
+      service: shell_command.turn_off_pc6
+
+  - platform: wake_on_lan
+    name: !secret pc7_name
+    mac: !secret pc7_mac
+    host: !secret pc7_host
+    turn_off: 
+      service: shell_command.turn_off_pc7
+
+  - platform: wake_on_lan
+    name: !secret pc8_name
+    mac: !secret pc8_mac
+    host: !secret pc8_host
+    turn_off: 
+      service: shell_command.turn_off_pc8
+
+  - platform: wake_on_lan
+    name: !secret pc9_name
+    mac: !secret pc9_mac
+    host: !secret pc9_host
+    turn_off: 
+      service: shell_command.turn_off_pc9
+
+  - platform: wake_on_lan
+    name: !secret pc10_name
+    mac: !secret pc10_mac
+    host: !secret pc10_host
+    turn_off: 
+      service: shell_command.turn_off_pc10
+
+  - platform: wake_on_lan
+    name: !secret pc11_name
+    mac: !secret pc11_mac
+    host: !secret pc11_host
+    turn_off: 
+      service: shell_command.turn_off_pc11
+
+  - platform: wake_on_lan
+    name: !secret pc12_name
+    mac: !secret pc12_mac
+    host: !secret pc12_host
+    turn_off: 
+      service: shell_command.turn_off_pc12
+
 shell_command:
   turn_off_pc1: !secret pc1_shutdown
+  turn_off_pc2: !secret pc2_shutdown
+  turn_off_pc3: !secret pc2_shutdown
+  turn_off_pc4: !secret pc2_shutdown
+  turn_off_pc5: !secret pc2_shutdown
+  turn_off_pc6: !secret pc2_shutdown
+  turn_off_pc7: !secret pc2_shutdown
+  turn_off_pc8: !secret pc2_shutdown
+  turn_off_pc9: !secret pc2_shutdown
+  turn_off_pc10: !secret pc2_shutdown
+  turn_off_pc11: !secret pc2_shutdown
+  turn_off_pc12: !secret pc2_shutdown
