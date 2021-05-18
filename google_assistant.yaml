@@ -34,7 +34,7 @@ entity_config:
     room: Ambiente
     expose: true
 #================================================
-  switch.alfa01:
+  switch.sonoffs26_1:
     name: TV-Board
     room: Wohnzimmer
     expose: true
@@ -158,7 +158,7 @@ entity_config:
     room: Garage
     expose: true
 #================================================
-  camera.hwr:
-    name: Camera HWR
-    room: HWR
-    expose: true
+#  camera.hwr:
+#    name: Camera HWR
+#    room: HWR
+#    expose: true
