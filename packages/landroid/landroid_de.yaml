@@ -5,6 +5,7 @@ homeassistant:
     sensor.landroid_mower_battery:
       friendly_name: Akkuladung
       device_class: battery
+
     sensor.landroid_mower_error:
       friendly_name: Fehler
     sensor.landroid_mower_status:

@@ -15,7 +15,6 @@ recorder:
       - sensor.landroid_ip
       - sensor.landroid_sn
       - sensor.landroid_mac
-      - sensor.landroid_bat
       - sensor.landroid_lastupdate
       - input_number.landroid_raindelay
       - input_number.landroid_timeextension
@@ -59,7 +58,6 @@ logbook:
       - sensor.landroid_ip
       - sensor.landroid_sn
       - sensor.landroid_mac
-      - sensor.landroid_bat
       - sensor.landroid_lastupdate
       - input_number.landroid_raindelay
       - input_number.landroid_timeextension
@@ -165,6 +163,11 @@ template:
       state: "{{ as_timestamp(strptime( state_attr('sensor.landroid_mower_status', 'last_update'), '%H:%M:%S %d/%m/%Y')) | timestamp_custom('%d.%m.%Y %H:%M:%S') }}"
       icon: mdi:clock
 
+# -55 or higher: 4 bars
+# -56 to -66: 3 bars
+# -67 to -77: 2 bars
+# -78 to -88: 1 bar
+# -89 or lower: 0 bars
     - name: Landroid WIFI
       unique_id: landroid_wifi
       state: "{{ state_attr('sensor.landroid_mower_status', 'rssi') }}"
