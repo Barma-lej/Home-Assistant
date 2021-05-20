@@ -12,6 +12,7 @@ cover:
 # Input Text ########################################################
 input_text:
   rolladen_last_state:
+    initial: opening
 
 # Automation ########################################################
 automation:

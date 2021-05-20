@@ -18,6 +18,7 @@ utility_meter:
 # Input Text ########################################################
 input_text:
   shellyswitch25_f37a8c_last_state:
+    initial: opening
 
 # Automation ########################################################
 automation:
