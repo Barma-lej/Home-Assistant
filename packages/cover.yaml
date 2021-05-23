@@ -11,23 +11,42 @@ cover:
 
 # Input Text ########################################################
 input_text:
-  rolladen_last_state:
+  rolladen_last_action:
+    initial: opening
+  shellyswitch25_10d315_last_action:
+    initial: opening
+  shellyswitch25_10eaa4_last_action:
+    initial: opening
+  shellyswitch25_f37a8c_last_action:
+    initial: opening
+  shellyswitch25_f37b28_last_action:
     initial: opening
 
 # Automation ########################################################
 automation:
-# Rolladen group last state
-- id: set_rolladen_last_state
-  alias: Set rolladen last state
-  mode: single
+# Rolladen group last action
+- id: set_rolladen_last_action
+  alias: Set rolladen last action
+  mode: parallel
   trigger:
-  - platform: state
-    entity_id: cover.rolladen
+    - platform: state
+      entity_id:
+        - cover.rolladen
+        - cover.shellyswitch25_10d315
+        - cover.shellyswitch25_10eaa4
+        - cover.shellyswitch25_f37a8c
+        - cover.shellyswitch25_f37b28
+
+  condition:
+    - condition: or
+      conditions:
+        - "{{ trigger.from_state.state == 'opening' }}"
+        - "{{ trigger.from_state.state == 'closing' }}"
 
   action:
   - service: input_text.set_value
     target:
-      entity_id: input_text.rolladen_last_state
+      entity_id: input_text.{{ trigger.to_state.object_id }}_last_action
     data:
       value: "{{ trigger.from_state.state }}"
 
@@ -44,26 +63,19 @@ script:
     alias: Management cover with one button
     mode: parallel
     sequence:
-
-    - choose:
-      - conditions:
-          - condition: template
-            value_template: "{{ is_state('input_text.' ~ entity_id ~ '_last_state', 'closing') }}"
-        sequence:
-          - service: cover.open_cover
-            target:
-              entity_id: cover.{{ entity_id }}
-      - conditions:
-          - condition: template
-            value_template: "{{ is_state('input_text.' ~ entity_id ~ '_last_state', 'opening') }}"
-        sequence:
-          - service: cover.close_cover
-            target:
-              entity_id: cover.{{ entity_id }}
-      default:
-        - service: cover.stop_cover
-          target:
-            entity_id: cover.{{ entity_id }}
+    - service: >
+        {% if is_state("cover." ~ entity_id, "opening") or
+              is_state("cover." ~ entity_id, "closing") %}
+          cover.stop_cover
+        {% elif is_state('input_text.' ~ entity_id ~ '_last_action', 'closing') %}
+          cover.open_cover
+        {% elif is_state('input_text.' ~ entity_id ~ '_last_action', 'opening') %}
+          cover.close_cover
+        {% else %}
+          cover.stop_cover
+        {% endif %}
+      target:
+        entity_id: cover.{{ entity_id }}
 
 #######################################
 # Script to management covers with two

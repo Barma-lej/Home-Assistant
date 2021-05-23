@@ -15,27 +15,8 @@ utility_meter:
     source: sensor.shellyswitch25_10eaa4_energy
     cycle: yearly
 
-# Input Text ########################################################
-input_text:
-  shellyswitch25_10eaa4_last_state:
-    initial: opening
-
 # Automation ########################################################
 automation:
-- id: set_rollade_3_last_state
-  alias: Set rollade 3 last state
-  mode: single
-  trigger:
-  - platform: state
-    entity_id: cover.shellyswitch25_10eaa4
-
-  action:
-  - service: input_text.set_value
-    target:
-      entity_id: input_text.shellyswitch25_10eaa4_last_state
-    data:
-      value: "{{ trigger.from_state.state }}"
-
 - id: telegram_rollade_3
   alias: "Telegram Rollade 3"
   mode: parallel
