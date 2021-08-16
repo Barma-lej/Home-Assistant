@@ -15,42 +15,42 @@ recorder:
       - sensor.landroid_ip
       - sensor.landroid_sn
       - sensor.landroid_mac
-      - sensor.landroid_lastupdate
-      - input_number.landroid_raindelay
-      - input_number.landroid_timeextension
+#      - sensor.landroid_lastupdate
+#      - input_number.landroid_raindelay
+#      - input_number.landroid_timeextension
       - input_boolean.landroid_info_toggle
-      - input_boolean.landroid_sched_settings
-#      - input_boolean.landroid_0_sched_enable
-#      - input_boolean.landroid_1_sched_enable
-#      - input_boolean.landroid_2_sched_enable
-#      - input_boolean.landroid_3_sched_enable
-#      - input_boolean.landroid_4_sched_enable
-#      - input_boolean.landroid_5_sched_enable
-#      - input_boolean.landroid_6_sched_enable
-#      - input_boolean.landroid_0_cuttoedge
-#      - input_boolean.landroid_1_cuttoedge
-#      - input_boolean.landroid_2_cuttoedge
-#      - input_boolean.landroid_3_cuttoedge
-#      - input_boolean.landroid_4_cuttoedge
-#      - input_boolean.landroid_5_cuttoedge
-#      - input_boolean.landroid_6_cuttoedge
-#      - input_boolean.landroid_view_0
-#      - input_boolean.landroid_view_1
-#      - input_boolean.landroid_view_2
-#      - input_boolean.landroid_view_3
-#      - input_boolean.landroid_view_4
-#      - input_boolean.landroid_view_5
-#      - input_boolean.landroid_view_6
-#      - input_boolean.landroid_view_config
-      - automation.landroid_notify_status
-      - automation.landroid_notify_error
-      - automation.landroid_sync_values
-      - script.landroid_start
-      - script.landroid_stop
-      - script.landroid_pause
-      - script.landroid_set_config
-#      - script.landroid_views_toggle
-
+#      - input_boolean.landroid_sched_settings
+##      - input_boolean.landroid_0_sched_enable
+##      - input_boolean.landroid_1_sched_enable
+##      - input_boolean.landroid_2_sched_enable
+##      - input_boolean.landroid_3_sched_enable
+##      - input_boolean.landroid_4_sched_enable
+##      - input_boolean.landroid_5_sched_enable
+##      - input_boolean.landroid_6_sched_enable
+##      - input_boolean.landroid_0_cuttoedge
+##      - input_boolean.landroid_1_cuttoedge
+##      - input_boolean.landroid_2_cuttoedge
+##      - input_boolean.landroid_3_cuttoedge
+##      - input_boolean.landroid_4_cuttoedge
+##      - input_boolean.landroid_5_cuttoedge
+##      - input_boolean.landroid_6_cuttoedge
+##      - input_boolean.landroid_view_0
+##      - input_boolean.landroid_view_1
+##      - input_boolean.landroid_view_2
+##      - input_boolean.landroid_view_3
+##      - input_boolean.landroid_view_4
+##      - input_boolean.landroid_view_5
+##      - input_boolean.landroid_view_6
+##      - input_boolean.landroid_view_config
+#      - automation.landroid_notify_status
+#      - automation.landroid_notify_error
+#      - automation.landroid_sync_values
+#      - script.landroid_start
+#      - script.landroid_home
+#      - script.landroid_pause
+#      - script.landroid_set_config
+##      - script.landroid_views_toggle
+#
 # Logbook ###########################################################
 logbook:
   exclude:
@@ -58,41 +58,41 @@ logbook:
       - sensor.landroid_ip
       - sensor.landroid_sn
       - sensor.landroid_mac
-      - sensor.landroid_lastupdate
-      - input_number.landroid_raindelay
-      - input_number.landroid_timeextension
+#      - sensor.landroid_lastupdate
+#      - input_number.landroid_raindelay
+#      - input_number.landroid_timeextension
       - input_boolean.landroid_info_toggle
-      - input_boolean.landroid_sched_settings
-#      - input_boolean.landroid_0_sched_enable
-#      - input_boolean.landroid_1_sched_enable
-#      - input_boolean.landroid_2_sched_enable
-#      - input_boolean.landroid_3_sched_enable
-#      - input_boolean.landroid_4_sched_enable
-#      - input_boolean.landroid_5_sched_enable
-#      - input_boolean.landroid_6_sched_enable
-#      - input_boolean.landroid_0_cuttoedge
-#      - input_boolean.landroid_1_cuttoedge
-#      - input_boolean.landroid_2_cuttoedge
-#      - input_boolean.landroid_3_cuttoedge
-#      - input_boolean.landroid_4_cuttoedge
-#      - input_boolean.landroid_5_cuttoedge
-#      - input_boolean.landroid_6_cuttoedge
-#      - input_boolean.landroid_view_0
-#      - input_boolean.landroid_view_1
-#      - input_boolean.landroid_view_2
-#      - input_boolean.landroid_view_3
-#      - input_boolean.landroid_view_4
-#      - input_boolean.landroid_view_5
-#      - input_boolean.landroid_view_6
-#      - input_boolean.landroid_view_config
-      - automation.landroid_notify_status
-      - automation.landroid_notify_error
-      - automation.landroid_sync_values
-      - script.landroid_start
-      - script.landroid_stop
-      - script.landroid_pause
-      - script.landroid_set_config
-#      - script.landroid_views_toggle
+#      - input_boolean.landroid_sched_settings
+##      - input_boolean.landroid_0_sched_enable
+##      - input_boolean.landroid_1_sched_enable
+##      - input_boolean.landroid_2_sched_enable
+##      - input_boolean.landroid_3_sched_enable
+##      - input_boolean.landroid_4_sched_enable
+##      - input_boolean.landroid_5_sched_enable
+##      - input_boolean.landroid_6_sched_enable
+##      - input_boolean.landroid_0_cuttoedge
+##      - input_boolean.landroid_1_cuttoedge
+##      - input_boolean.landroid_2_cuttoedge
+##      - input_boolean.landroid_3_cuttoedge
+##      - input_boolean.landroid_4_cuttoedge
+##      - input_boolean.landroid_5_cuttoedge
+##      - input_boolean.landroid_6_cuttoedge
+##      - input_boolean.landroid_view_0
+##      - input_boolean.landroid_view_1
+##      - input_boolean.landroid_view_2
+##      - input_boolean.landroid_view_3
+##      - input_boolean.landroid_view_4
+##      - input_boolean.landroid_view_5
+##      - input_boolean.landroid_view_6
+##      - input_boolean.landroid_view_config
+#      - automation.landroid_notify_status
+#      - automation.landroid_notify_error
+#      - automation.landroid_sync_values
+#      - script.landroid_start
+#      - script.landroid_home
+#      - script.landroid_pause
+#      - script.landroid_set_config
+##      - script.landroid_views_toggle
 
 # Switch ############################################################
 switch:
@@ -103,7 +103,7 @@ switch:
         turn_on:
           service: script.landroid_start
         turn_off:
-          service: script.landroid_stop
+          service: script.landroid_home
 
 # Sensor ############################################################
 # sensor.landroid_mower_battery
