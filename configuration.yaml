@@ -13,10 +13,14 @@ homeassistant:
     - /mnt/sdb1/cam1
     - /mnt/sdb1/cam2
     - /mnt/sdb1/cam3
+
   media_dirs:
     local: /home/barma/.homeassistant/media
     recording: /mnt/sdb1
+    nasmedia: /mnt/nasmedia
 
+#default_config:
+energy:
 media_source:
 
 panel_iframe: !include panel_iframe.yaml

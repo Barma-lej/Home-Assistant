@@ -6,6 +6,14 @@ light:
     name: shellyswitch25_10c7c3_channel_1
     entity_id: switch.shellyswitch25_10c7c3_channel_1
 
+# Sensor ############################################################
+sensor:
+  - platform: integration
+    source: sensor.shellyswitch25_10c7c3_channel_1_power
+    name: shellyswitch25_10c7c3_channel_1_energy_spent
+    unit_prefix: k
+    round: 2
+
 utility_meter:
   shelly_wohnlicht_d:
     source: sensor.shellyswitch25_10c7c3_channel_1_energy
@@ -58,6 +66,10 @@ homeassistant:
     light.shellyswitch25_10c7c3_channel_1:
       friendly_name: Wohnlicht
       icon: mdi:vanity-light
+
+    sensor.shellyswitch25_10c7c3_channel_1_energy_spent:
+      friendly_name: Verbrauch (Wohnlicht), kWh
+
     sensor.shellyswitch25_10c7c3_channel_1_power:
       friendly_name: Leistung (Wohnlicht)
       icon: mdi:gauge
@@ -69,6 +81,7 @@ homeassistant:
       friendly_name: Verbrauch pro Monat (Wohnlicht)
     sensor.shelly_wohnlicht_y:
       friendly_name: Verbrauch pro Jahr (Wohnlicht)
+
     binary_sensor.shellyswitch25_10c7c3_channel_1_overpowering:
       friendly_name: Überspannung (Wohnlicht)
       icon: mdi:flash-alert

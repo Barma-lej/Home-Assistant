@@ -1,6 +1,14 @@
 # Sonoff POW R2
 # Tasmota integration
 
+# Sensor ############################################################
+sensor:
+  - platform: integration
+    source: sensor.sonoffpow_01_energy_power
+    name: sonoffpow_01_energy_spent
+    unit_prefix: k
+    round: 2
+
 # Utility meter #####################################################
 utility_meter:
   sonoffpow_01_energy_d:
@@ -54,6 +62,9 @@ homeassistant:
   customize:
 
 # Sensor ##########
+    sensor.sonoffpow_01_energy_spent:
+      friendly_name: Verbrauch (Wandlicht), kWh
+
     sensor.sonoffpow_01_energy_d:
       friendly_name: Verbrauch pro Tag (Wandlicht)
 
