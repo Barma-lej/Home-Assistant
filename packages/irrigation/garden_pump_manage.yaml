@@ -45,10 +45,14 @@ automation:
       to: 'off'
       for: '00:00:04'
 
-#    condition:
-#    - condition: state
-#      entity_id: switch.pump
-#      state: 'on'
+    - platform: time_pattern
+      # This will match every 15 minutes
+      minutes: "/15"
+
+    condition:
+    - condition: state
+      entity_id: group.irrigation_switches
+      state: 'off'
 
     action:
     - service: switch.turn_off
