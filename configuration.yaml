@@ -17,7 +17,7 @@ homeassistant:
   media_dirs:
     local: /home/barma/.homeassistant/media
     recording: /mnt/sdb1
-    nasmedia: /mnt/nasmedia
+#    nasmedia: /mnt/nasmedia
 
 #default_config:
 energy:
