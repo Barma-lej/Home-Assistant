@@ -1,7 +1,7 @@
 # Shelly Rollade 3
 # https://www.home-assistant.io/integrations/shelly/
 
-
+# Sensor ############################################################
 utility_meter:
   shelly_rollade_3_d:
     source: sensor.shellyswitch25_10eaa4_energy
@@ -34,7 +34,7 @@ automation:
   action:
   - service: script.cover_one_button
     data:
-      entity: shellyswitch25_10eaa4
+      entity_id: shellyswitch25_10eaa4
 
   - wait_for_trigger:
     - platform: state
