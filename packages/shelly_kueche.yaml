@@ -1,15 +1,6 @@
 # Shelly Kueche
 # https://www.home-assistant.io/integrations/shelly/
 
-#light:
-#  - platform: switch
-#    name: shellyswitch25_10a36d_channel_1
-#    entity_id: switch.shellyswitch25_10a36d_channel_1
-
-#  - platform: switch
-#    name: shellyswitch25_10a36d_channel_2
-#    entity_id: switch.shellyswitch25_10a36d_channel_2
-
 # Sensor ############################################################
 utility_meter:
   shelly_kueche_d:
