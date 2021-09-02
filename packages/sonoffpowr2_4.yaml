@@ -2,18 +2,10 @@
 # Tasmota Integration
 
 # Sensor ############################################################
-sensor:
-  - platform: integration
-    source: sensor.sonoffpow_04_energy_power
-    name: sonoffpow_04_energy_spent
-    unit_prefix: k
-    round: 2
-
-# Utility meter #####################################################
 utility_meter:
-  sonoffpow_04_energy_d:
-    source: sensor.sonoffpow_04_energy_total
-    cycle: daily
+#  sonoffpow_04_energy_d:
+#    source: sensor.sonoffpow_04_energy_total
+#    cycle: daily
 
   sonoffpow_04_energy_m:
     source: sensor.sonoffpow_04_energy_total
@@ -58,16 +50,28 @@ automation:
 # Customize #########################################################
 homeassistant:
   customize:
-
 # Sensor ##########
-    sensor.sonoffpow_04_energy_spent:
-      friendly_name: Verbrauch (Ambiente Küche), kWh
+    sensor.sonoffpow_04_energy_total:
+      friendly_name: Verbrauch Total (Ambiente Küche)
+      icon: mdi:lightning-bolt
 
-    sensor.sonoffpow_04_energy_d:
-      friendly_name: Verbrauch pro Tag (Ambiente Küche)
+    sensor.sonoffpow_04_energy_power:
+      friendly_name: Leistung (Ambiente Küche)
+      icon: hass:gauge
+      device_class: power
+
+    sensor.sonoffpow_04_energy_today:
+      friendly_name: Verbrauch Heute (Ambiente Küche)
+      icon: mdi:lightning-bolt
+
+#    sensor.sonoffpow_04_energy_d:
+#      friendly_name: Verbrauch Heute (Ambiente Küche)
+#      icon: mdi:lightning-bolt
 
     sensor.sonoffpow_04_energy_m:
-      friendly_name: Verbrauch pro Monat (Ambiente Küche)
+      friendly_name: Verbrauch im Monat (Ambiente Küche)
+      icon: mdi:lightning-bolt
 
     sensor.sonoffpow_04_energy_y:
-      friendly_name: Verbrauch pro Jahr (Ambiente Küche)
+      friendly_name: Verbrauch im Jahr (Ambiente Küche)
+      icon: mdi:lightning-bolt

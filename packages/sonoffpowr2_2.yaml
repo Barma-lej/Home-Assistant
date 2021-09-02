@@ -2,18 +2,10 @@
 # Tasmota Integration
 
 # Sensor ############################################################
-sensor:
-  - platform: integration
-    source: sensor.sonoffpow_02_energy_power
-    name: sonoffpow_02_energy_spent
-    unit_prefix: k
-    round: 2
-
-# Utility meter #####################################################
 utility_meter:
-  sonoffpow_02_energy_d:
-    source: sensor.sonoffpow_02_energy_total
-    cycle: daily
+#  sonoffpow_02_energy_d:
+#    source: sensor.sonoffpow_02_energy_total
+#    cycle: daily
 
   sonoffpow_02_energy_m:
     source: sensor.sonoffpow_02_energy_total
@@ -58,16 +50,28 @@ automation:
 # Customize #########################################################
 homeassistant:
   customize:
-
 # Sensor ##########
-    sensor.sonoffpow_02_energy_spent:
-      friendly_name: Verbrauch (Ambiente Wohnen), kWh
+    sensor.sonoffpow_02_energy_total:
+      friendly_name: Verbrauch Total (Ambiente Wohnen)
+      icon: mdi:lightning-bolt
 
-    sensor.sonoffpow_02_energy_d:
-      friendly_name: Verbrauch pro Tag (Ambiente Wohnen)
+    sensor.sonoffpow_02_energy_power:
+      friendly_name: Leistung (Ambiente Wohnen)
+      icon: hass:gauge
+      device_class: power
+
+    sensor.sonoffpow_02_energy_today:
+      friendly_name: Verbrauch Heute (Ambiente Wohnen)
+      icon: mdi:lightning-bolt
+
+#    sensor.sonoffpow_02_energy_d:
+#      friendly_name: Verbrauch Heute (Ambiente Wohnen)
+#      icon: mdi:lightning-bolt
 
     sensor.sonoffpow_02_energy_m:
-      friendly_name: Verbrauch pro Monat (Ambiente Wohnen)
+      friendly_name: Verbrauch im Monat (Ambiente Wohnen)
+      icon: mdi:lightning-bolt
 
     sensor.sonoffpow_02_energy_y:
-      friendly_name: Verbrauch pro Jahr (Ambiente Wohnen)
+      friendly_name: Verbrauch im Jahr (Ambiente Wohnen)
+      icon: mdi:lightning-bolt
