@@ -73,11 +73,11 @@ entity_config:
     name: Wohnzimmerambient
     room: Ambiente
     expose: true
-#================================================
-  light.sonoffpow_03:
-    name: Küchenlicht
-    room: Küche
-    expose: true
+##================================================
+#  light.sonoffpow_03:
+#    name: Küchenlicht
+#    room: Küche
+#    expose: true
 #================================================
   light.sonoffpow_04:
     name: Küchenambient
