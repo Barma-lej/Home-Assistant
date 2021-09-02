@@ -1,0 +1,126 @@
+# Shelly Kueche
+# https://www.home-assistant.io/integrations/shelly/
+
+#light:
+#  - platform: switch
+#    name: shellyswitch25_10a36d_channel_1
+#    entity_id: switch.shellyswitch25_10a36d_channel_1
+
+#  - platform: switch
+#    name: shellyswitch25_10a36d_channel_2
+#    entity_id: switch.shellyswitch25_10a36d_channel_2
+
+# Sensor ############################################################
+utility_meter:
+  shelly_kueche_d:
+    source: sensor.shellyswitch25_10a36d_channel_1_energy
+    cycle: daily
+
+  shelly_kueche_m:
+    source: sensor.shellyswitch25_10a36d_channel_1_energy
+    cycle: monthly
+
+  shelly_kueche_y:
+    source: sensor.shellyswitch25_10a36d_channel_1_energy
+    cycle: yearly
+
+  shelly_essecke_d:
+    source: sensor.shellyswitch25_10a36d_channel_2_energy
+    cycle: daily
+
+  shelly_essecke_m:
+    source: sensor.shellyswitch25_10a36d_channel_2_energy
+    cycle: monthly
+
+  shelly_essecke_y:
+    source: sensor.shellyswitch25_10a36d_channel_2_energy
+    cycle: yearly
+
+
+# Automation ########################################################
+automation:
+- id: telegram_kueche
+  alias: "Telegram Kueche"
+  mode: parallel
+  trigger:
+  - platform: event
+    event_type: telegram_command
+    event_data:
+      command: "/kueche"
+
+  - platform: event
+    event_type: telegram_callback
+    event_data:
+      command: "/kueche"
+
+  action:
+  - service: light.toggle
+    data:
+      entity_id: light.shellyswitch25_10a36d_channel_1
+
+  - wait_for_trigger:
+    - platform: state
+      entity_id: light.shellyswitch25_10a36d_channel_1
+    timeout: 5
+    continue_on_timeout: true
+
+  - service: telegram_bot.send_message
+    data:
+      target: "{{ trigger.event.data.user_id }}"
+      message: "💡 {{ state_attr('light.shellyswitch25_10a36d_channel_1', 'friendly_name') }} ist {{ states('light.shellyswitch25_10a36d_channel_1') }}"
+
+# Customize #########################################################
+homeassistant:
+  customize:
+    light.shellyswitch25_10a36d_channel_1:
+      friendly_name: Küche
+      icon: mdi:dome-light
+
+    light.shellyswitch25_10a36d_channel_2:
+      friendly_name: Essecke
+      icon: mdi:string-lights
+
+    sensor.shellyswitch25_10a36d_channel_1_energy_spent:
+      friendly_name: Verbrauch (Küche), kWh
+
+    sensor.shellyswitch25_10a36d_channel_1_power:
+      friendly_name: Leistung (Küche)
+      icon: mdi:gauge
+    sensor.shellyswitch25_10a36d_channel_1_energy:
+      friendly_name: Verbrauch Total (Küche)
+    sensor.shelly_kueche_d:
+      friendly_name: Verbrauch Heute (Küche)
+      icon: mdi:lightning-bolt
+    sensor.shelly_kueche_m:
+      friendly_name: Verbrauch im Monat (Küche)
+      icon: mdi:lightning-bolt
+    sensor.shelly_kueche_y:
+      friendly_name: Verbrauch im Jahr (Küche)
+      icon: mdi:lightning-bolt
+
+    binary_sensor.shellyswitch25_10a36d_channel_1_overpowering:
+      friendly_name: Überspannung (Küche)
+      icon: mdi:flash-alert
+
+    sensor.shellyswitch25_10a36d_channel_2_power:
+      friendly_name: Leistung (Essecke)
+      icon: mdi:gauge
+    sensor.shellyswitch25_10a36d_channel_2_energy:
+      friendly_name: Verbrauch Total (Essecke)
+    sensor.shelly_essecke_d:
+      friendly_name: Verbrauch Heute (Essecke)
+      icon: mdi:lightning-bolt
+    sensor.shelly_essecke_m:
+      friendly_name: Verbrauch im Monat (Essecke)
+      icon: mdi:lightning-bolt
+    sensor.shelly_essecke_y:
+      friendly_name: Verbrauch im Jahr (Essecke)
+      icon: mdi:lightning-bolt
+
+    binary_sensor.shellyswitch25_10a36d_channel_2_overpowering:
+      friendly_name: Überspannung (Essecke)
+      icon: mdi:flash-alert
+
+    binary_sensor.shellyswitch25_10a36d_overheating:
+      friendly_name: Überhitzen (Küche)
+      icon: mdi:thermometer-alert
