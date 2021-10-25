@@ -1,0 +1,52 @@
+# Garage
+# Smartthings integration
+
+# Sensor ##############################
+sensor:
+  - platform: history_stats
+    name: Trockner Betriebszeit Heute
+    entity_id: sensor.trockner_dryer_machine_state
+    state: "run"
+    type: time
+    start: "{{ now().replace(hour=0, minute=0, second=0) }}"
+    end: "{{ now() }}"
+
+  - platform: history_stats
+    name: Trockner Betriebszeit Monat
+    entity_id: sensor.trockner_dryer_machine_state
+    state: "run"
+    type: time
+    end: "{{ now() }}"
+    duration:
+      days: 30
+
+  - platform: history_stats
+    name: Trockner Betriebszeit Jahr
+    entity_id: sensor.trockner_dryer_machine_state
+    state: "run"
+    type: time
+    end: "{{ now() }}"
+    duration:
+      days: 365
+
+  - platform: history_stats
+    name: Trockner Betriebszeit
+    entity_id: sensor.trockner_dryer_machine_state
+    state: "run"
+    type: time
+    start: "{{ 0 }}"
+    end: "{{ now() }}"
+
+homeassistant:
+  customize:
+    sensor.trockner_betriebszeit_heute:
+      icon: mdi:calendar-clock
+
+    sensor.trockner_betriebszeit_monat:
+      icon: mdi:calendar-clock
+
+    sensor.trockner_betriebszeit_jahr:
+      icon: mdi:calendar-clock
+
+    sensor.trockner_betriebszeit:
+      icon: mdi:calendar-clock
