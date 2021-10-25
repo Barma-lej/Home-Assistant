@@ -1,18 +1,34 @@
-# Raspberry PI Monitor
+# NUC Monitor
 
 # Recorder ##########################################################
 recorder:
   exclude:
     entities:
       - sensor.load_15m
-      - sensor.last_boot_local
+#      - sensor.last_boot_local
 
 # Logbook ###########################################################
 logbook:
   exclude:
     entities:
       - sensor.load_15m
-      - sensor.last_boot_local
+#      - sensor.last_boot_local
+
+
+template:
+  - sensor:
+# States ####################
+    - name: "cpu_load"
+      unique_id: cpu_load
+      state: "{{ (states('sensor.load_15m') | float ) | round(2) }}"
+      icon: mdi:memory
+      unit_of_measurement: " "
+
+    - name: "last_boot_local"
+      unique_id: last_boot_local
+      state: "{{ as_timestamp(states('sensor.last_boot')) | timestamp_custom('%d.%m.%Y %H:%M') }}"
+      icon: mdi:clock
+      unit_of_measurement: " "
 
 sensor:
 ## Command Line
@@ -82,24 +98,6 @@ sensor:
         icon_template: mdi:clock
         value_template: "{{ as_timestamp(states('sensor.last_boot')) | timestamp_custom('%d.%m.%Y %H:%M') }}"
 
-#automation:
-## Netzteilproblem #
-#  - id: 'rpi_power_issue'
-#    alias: Netzteilproblem Notification
-#    trigger:
-#    - platform: numeric_state
-#      entity_id: sensor.rpi_power_status
-#      value_template: '{{ state.attributes.value }}'
-#      above: 0
-#      for:
-#        minutes: 1
-#    condition:
-#    action:
-#      service: persistent_notification.create
-#      data:
-#        message: "Raspberry Netzteil: {{ states('sensor.rpi_power_status') }}. Status hat von {{ trigger.from_state.state }} geändert"
-#        title: "Netzteilproblem"
-
 # Customize #########################################################
 homeassistant:
   customize:
@@ -108,3 +106,9 @@ homeassistant:
       friendly_name: "CPU use"
     sensor.load_1m:
       unit_of_measurement: ""
+
+    sensor.cpu_load:
+      friendly_name: "CPU Load 15m"
+
+    sensor.last_boot_local:
+      friendly_name: "Letzter Start"

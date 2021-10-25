@@ -11,15 +11,12 @@
 recorder:
   exclude:
     entities:
-      - sensor.robi_start_time_weekdays
-      - sensor.robi_start_time_weekend
-      - sensor.robi_ip
-      - sensor.robi_fan_speed
-      - sensor.robi_fan_speed_list
-      - sensor.robi_main_brush_pct
-      - sensor.robi_side_brush_pct
-      - sensor.robi_filter_pct
-      - sensor.robi_sensor_pct
+#      - sensor.robi_fan_speed
+#      - sensor.robi_fan_speed_list
+#      - sensor.robi_main_brush_pct
+#      - sensor.robi_side_brush_pct
+#      - sensor.robi_filter_pct
+#      - sensor.robi_sensor_pct
       - input_select.robi_fan_speed_list
       - input_select.robi_zone
       - input_boolean.robi_zone_settings
@@ -33,15 +30,12 @@ recorder:
 logbook:
   exclude:
     entities:
-      - sensor.robi_start_time_weekdays
-      - sensor.robi_start_time_weekend
-      - sensor.robi_ip
-      - sensor.robi_fan_speed
-      - sensor.robi_fan_speed_list
-      - sensor.robi_main_brush_pct
-      - sensor.robi_side_brush_pct
-      - sensor.robi_filter_pct
-      - sensor.robi_sensor_pct
+#      - sensor.robi_fan_speed
+#      - sensor.robi_fan_speed_list
+#      - sensor.robi_main_brush_pct
+#      - sensor.robi_side_brush_pct
+#      - sensor.robi_filter_pct
+#      - sensor.robi_sensor_pct
       - input_select.robi_fan_speed_list
       - input_select.robi_zone
       - input_boolean.robi_zone_settings
@@ -51,126 +45,141 @@ logbook:
       - input_number.robi_start_minutes_weekdays
       - input_number.robi_start_hour_weekdays
 
+homeassistant:
+  customize:
+# Sensors ###################
+    sensor.robi_start_time_weekdays:
+      friendly_name: "Startzeit (Wochentage)"
+    sensor.robi_start_time_weekend:
+      friendly_name: "Startzeit (Wochenende)"
+    sensor.robi_battery:
+      friendly_name: "Robi - Akku"
+    sensor.robi_main_brush_pct:
+      friendly_name: "Robi - Hauptbürste (percent)"
+    sensor.robi_side_brush_pct:
+      friendly_name: "Robi - Seitenbürste (percent)"
+    sensor.robi_filter_pct:
+      friendly_name: "Robi - Filter (percent)"
+    sensor.robi_sensor_pct:
+      friendly_name: "Robi - Sensoren (percent)"
+    sensor.robi_total_cleaned_time:
+      friendly_name: "Dauer (insg.)"
+
 # Sensor  ###########################################################
-sensor:
-  - platform: template
-    sensors:
-      robi_start_time_weekdays:
-        friendly_name: "Startzeit (Wochentage)"
-        value_template: "{{ '%0.02d:%0.02d' | format(states('input_number.robi_start_hour_weekdays') | int, states('input_number.robi_start_minutes_weekdays') | int) }}"
-        icon_template: mdi:clock-start
-      robi_start_time_weekend:
-        friendly_name: "Startzeit (Wochenende)"
-        value_template: "{{ '%0.02d:%0.02d' | format(states('input_number.robi_start_hour_weekend') | int, states('input_number.robi_start_minutes_weekend') | int) }}"
-        icon_template: mdi:clock-start
+template:
+  - sensor:
 # States ####################
-      robi_ip:
-        friendly_name: "Robi - IP Adresse"
-        value_template: !secret robi_ip
-        icon_template: mdi:ip-network
-#      robi_status:
-#        friendly_name: "Robi - Status"
-#        value_template: "{{ state_attr('vacuum.robi','status') }}"
-#        icon_template: mdi:information
-      robi_battery:
-        friendly_name: "Robi - Akku"
-        value_template: "{{ state_attr('vacuum.robi','battery_level') | int }}"
-        icon_template: "{{ state_attr('vacuum.robi','battery_icon') }}"
-        device_class: battery
-        unit_of_measurement: "%"
-      robi_fan_speed:
-        friendly_name: "Robi - Modus"
-        value_template: "{{ state_attr('vacuum.robi','fan_speed') }}"
-        icon_template: mdi:fan
-      robi_fan_speed_list:
-        friendly_name: "Robi - Modusliste"
-        value_template: "{{ state_attr('vacuum.robi','fan_speed_list') }}"
-        icon_template: mdi:pinwheel
+    - name: "robi_start_time_weekdays"
+      unique_id: robi_start_time_weekdays
+      state: "{{ '%0.02d:%0.02d' | format(states('input_number.robi_start_hour_weekdays') | int, states('input_number.robi_start_minutes_weekdays') | int) }}"
+      icon: mdi:clock-start
+
+    - name: "robi_start_time_weekend"
+      unique_id: robi_start_time_weekend
+      state: "{{ '%0.02d:%0.02d' | format(states('input_number.robi_start_hour_weekend') | int, states('input_number.robi_start_minutes_weekend') | int) }}"
+      icon: mdi:clock-start
+
+    - name: "robi_battery"
+      unique_id: robi_battery
+      state: "{{ state_attr('vacuum.robi','battery_level') | int }}"
+      device_class: battery
+      unit_of_measurement: "%"
 
 # Accesories ################
-      robi_main_brush:
-        friendly_name: "Robi - Hauptbürste"
-        value_template: "{{ state_attr('vacuum.robi','main_brush_left') }}"
-        icon_template: mdi:broom
-        unit_of_measurement: "Std"
-      robi_main_brush_pct:
-        friendly_name: "Robi - Hauptbürste (percent)"
-        value_template: "{{ (state_attr('vacuum.robi','main_brush_left') / 3) | round(0) }}"
-        icon_template: mdi:broom
-        unit_of_measurement: "%"
-      robi_side_brush:
-        friendly_name: "Robi - Seitenbürste"
-        value_template: "{{ state_attr('vacuum.robi','side_brush_left') }}"
-        icon_template: mdi:multiplication
-        unit_of_measurement: "Std"
-      robi_side_brush_pct:
-        friendly_name: "Robi - Seitenbürste (percent)"
-        value_template: "{{ (state_attr('vacuum.robi','side_brush_left') / 2) | round(0) }}"
-        icon_template: mdi:multiplication
-        unit_of_measurement: "%"
-      robi_filter:
-        friendly_name: "Robi - Filter"
-        value_template: "{{ state_attr('vacuum.robi','filter_left') }}"
-        icon_template: mdi:blur-linear
-        unit_of_measurement: "Std"
-      robi_filter_pct:
-        friendly_name: "Robi - Filter (percent)"
-        value_template: "{{ (state_attr('vacuum.robi','filter_left') / 1.5) | round(0) }}"
-        icon_template: mdi:blur-linear
-        unit_of_measurement: "%"
-      robi_sensor:
-        friendly_name: "Robi - Sensoren"
-        value_template: "{{ state_attr('vacuum.robi','sensor_dirty_left') }}"
-        icon_template: mdi:signal-variant
-        unit_of_measurement: "Std"
-      robi_sensor_pct:
-        friendly_name: "Robi - Sensoren (percent)"
-        value_template: "{{ (state_attr('vacuum.robi','sensor_dirty_left') / 0.3) | round(0) }}"
-        icon_template: mdi:signal-variant
-        unit_of_measurement: "%"
+    - name: "robi_main_brush_pct"
+      unique_id: robi_main_brush_pct
+      state: "{{ (state_attr('vacuum.robi','main_brush_left') / 3) | round(0) }}"
+      icon: mdi:broom
+      unit_of_measurement: "%"
+
+    - name: "robi_side_brush_pct"
+      unique_id: robi_side_brush_pct
+      state: "{{ (state_attr('vacuum.robi','side_brush_left') / 2) | round(0) }}"
+      icon: mdi:multiplication
+      unit_of_measurement: "%"
+
+    - name: "robi_filter_pct"
+      unique_id: robi_filter_pct
+      state: "{{ (state_attr('vacuum.robi','filter_left') / 1.5) | round(0) }}"
+      icon: mdi:blur-linear
+      unit_of_measurement: "%"
+
+    - name: "robi_sensor_pct"
+      unique_id: robi_sensor_pct
+      state: "{{ (state_attr('vacuum.robi','sensor_dirty_left') / 0.3) | round(0) }}"
+      icon: mdi:signal-variant
+      unit_of_measurement: "%"
 
 # Statistik #################
-      robi_clean_start:
-        friendly_name: "Reinigungsstart"
-        value_template: >
-          {%- set date = as_timestamp(state_attr("vacuum.robi","clean_start")) %}
-          {% set weekdays_short = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] -%}
-          {{ weekdays_short[(date | timestamp_custom("%w")) | int] }}, {{ date | timestamp_custom("%d.%m.%Y %H:%M:%S") }}
-        icon_template: mdi:clock-start
-      robi_clean_stop:
-        friendly_name: "Reinigungsstop"
-        value_template: >
-          {%- set date = as_timestamp(state_attr("vacuum.robi","clean_stop")) %}
-          {% set weekdays_short = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] -%}
-          {{ weekdays_short[(date | timestamp_custom("%w")) | int] }}, {{ date | timestamp_custom("%d.%m.%Y %H:%M:%S") }}
-        icon_template: mdi:clock-end
+    - name: "robi_total_cleaned_time"
+      unique_id: robi_total_cleaned_time
+      state: "{{ (state_attr('vacuum.robi','total_cleaning_time') // 60) }}:{{ state_attr('vacuum.robi','total_cleaning_time') % 60 }}"
+      icon: mdi:clock-fast
+      unit_of_measurement: "Std"
 
-      robi_cleaning_time:
-        friendly_name: "Dauer"
-        value_template: "{{ state_attr('vacuum.robi','cleaning_time') }}"
-        icon_template: mdi:clock-fast
-        unit_of_measurement: "min"
-      robi_cleaned_area:
-        friendly_name: "Fläche"
-        value_template: "{{ state_attr('vacuum.robi','cleaned_area') }}"
-        icon_template: mdi:floor-plan
-        unit_of_measurement: "m²"
+#sensor:
+#  - platform: template
+#    sensors:
+# States ####################
+#      robi_fan_speed:
+#        friendly_name: "Robi - Modus"
+#        value_template: "{{ state_attr('vacuum.robi','fan_speed') }}"
+#        icon_template: mdi:fan
+#      robi_fan_speed_list:
+#        friendly_name: "Robi - Modusliste"
+#        value_template: "{{ state_attr('vacuum.robi','fan_speed_list') }}"
+#        icon_template: mdi:pinwheel
 
-      robi_total_cleaned_area:
-        friendly_name: "Fläche (insg.)"
-        value_template: "{{ state_attr('vacuum.robi','total_cleaned_area') }}"
-        icon_template: mdi:floor-plan
-        unit_of_measurement: "m²"
-      robi_total_cleaned_time:
-        friendly_name: "Dauer (insg.)"
-        value_template: "{{ (state_attr('vacuum.robi','total_cleaning_time') // 60) }}:{{ state_attr('vacuum.robi','total_cleaning_time') % 60 }}"
-        icon_template: mdi:clock-fast
-        unit_of_measurement: "Std"
-      robi_cleaning_count:
-        friendly_name: "Reinigungen (insg.)"
-        value_template: "{{ state_attr('vacuum.robi','cleaning_count') }}"
-        icon_template: "mdi:calculator"
-        unit_of_measurement: " "
+
+
+# Accesories ################
+#      robi_main_brush:
+#        friendly_name: "Robi - Hauptbürste"
+#        value_template: "{{ state_attr('vacuum.robi','main_brush_left') }}"
+#        icon_template: mdi:broom
+#        unit_of_measurement: "Std"
+#      robi_main_brush_pct:
+#        friendly_name: "Robi - Hauptbürste (percent)"
+#        value_template: "{{ (state_attr('vacuum.robi','main_brush_left') / 3) | round(0) }}"
+#        icon_template: mdi:broom
+#        unit_of_measurement: "%"
+#      robi_side_brush:
+#        friendly_name: "Robi - Seitenbürste"
+#        value_template: "{{ state_attr('vacuum.robi','side_brush_left') }}"
+#        icon_template: mdi:multiplication
+#        unit_of_measurement: "Std"
+#      robi_side_brush_pct:
+#        friendly_name: "Robi - Seitenbürste (percent)"
+#        value_template: "{{ (state_attr('vacuum.robi','side_brush_left') / 2) | round(0) }}"
+#        icon_template: mdi:multiplication
+#        unit_of_measurement: "%"
+#      robi_filter:
+#        friendly_name: "Robi - Filter"
+#        value_template: "{{ state_attr('vacuum.robi','filter_left') }}"
+#        icon_template: mdi:blur-linear
+#        unit_of_measurement: "Std"
+#      robi_filter_pct:
+#        friendly_name: "Robi - Filter (percent)"
+#        value_template: "{{ (state_attr('vacuum.robi','filter_left') / 1.5) | round(0) }}"
+#        icon_template: mdi:blur-linear
+#        unit_of_measurement: "%"
+#      robi_sensor:
+#        friendly_name: "Robi - Sensoren"
+#        value_template: "{{ state_attr('vacuum.robi','sensor_dirty_left') }}"
+#        icon_template: mdi:signal-variant
+#        unit_of_measurement: "Std"
+#      robi_sensor_pct:
+#        friendly_name: "Robi - Sensoren (percent)"
+#        value_template: "{{ (state_attr('vacuum.robi','sensor_dirty_left') / 0.3) | round(0) }}"
+#        icon_template: mdi:signal-variant
+#        unit_of_measurement: "%"
+
+# Statistik #################
+#      robi_total_cleaned_time:
+#        friendly_name: "Dauer (insg.)"
+#        value_template: "{{ (state_attr('vacuum.robi','total_cleaning_time') // 60) }}:{{ state_attr('vacuum.robi','total_cleaning_time') % 60 }}"
+#        icon_template: mdi:clock-fast
+#        unit_of_measurement: "Std"
 
 #   - platform: rest
 #     resource: !secret robi_resource_map
@@ -433,12 +442,6 @@ automation:
 
 # Script ############################################################
 script:
-#  robi_home:
-#    sequence:
-#    - service: vacuum.start
-#      data:
-#        entity_id: vacuum.robi
-#    - service: script.robi_alert_start
 
   robi_home:
     alias: Robi - Reinigen
@@ -540,26 +543,12 @@ script:
     alias: Robi - Komm mal her
     icon: mdi:shoe-print
     sequence:
-#    - service: vacuum.send_command
-#      data:
-#        entity_id: vacuum.robi
-#        command: app_goto_target
-#        zone:  [24500, 20300]
-##        zone:  [26500,30700]
     - service: xiaomi_miio.vacuum_goto
       data:
         entity_id: vacuum.robi
         x_coord: 24500
         y_coord: 20300
 #    - service: script.robi_alert_start
-
-#  robi_kitchen:
-#    sequence:
-#    - service: vacuum.send_command
-#      data:
-#        entity_id: vacuum.robi
-#        command: app_zoned_clean
-#        params: [[28000, 16800, 31000, 21700, 1]]
 
 # Alerts ############################################################
 #  robi_alert_start:
