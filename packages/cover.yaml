@@ -2,6 +2,7 @@
 
 cover:
   - platform: group
+    unique_id: rolladen
     name: rolladen
     entities:
       - cover.shellyswitch25_f37a8c
