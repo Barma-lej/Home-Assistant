@@ -39,7 +39,7 @@ entity_config:
     room: Wohnzimmer
     expose: true
 #================================================
-  switch.landroid_mowing:
+  switch.mower_mowing:
     name: Mähroboter
     room: Garten
     expose: true
