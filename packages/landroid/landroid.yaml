@@ -316,6 +316,18 @@ template:
       icon: mdi:seat-flat-angled
       unit_of_measurement: "°"
 
+# Input Select ######################################################
+input_select:
+  mower_zone:
+    name: Mower zone
+    initial: "0"
+    options:
+      - "0"
+      - "1"
+      - "2"
+      - "3"
+    icon: mdi:vector-difference
+
 # Input Number ######################################################
 input_number:
   mower_raindelay:
@@ -336,6 +348,79 @@ input_number:
     unit_of_measurement: "%"
     icon: mdi:clock-out
 
+  # Multizone
+  mower_zone0_distance:
+    name: Mower zone 0 distance
+    initial: 0
+    min: 0
+    max: 1000
+    step: 1
+    unit_of_measurement: "m"
+    icon: mdi:numeric-0-box-outline
+
+  mower_zone1_distance:
+    name: Mower zone 1 distance
+    initial: 0
+    min: 0
+    max: 1000
+    step: 1
+    unit_of_measurement: "m"
+    icon: mdi:numeric-1-box-outline
+
+  mower_zone2_distance:
+    name: Mower zone 2 distance
+    initial: 0
+    min: 0
+    max: 1000
+    step: 1
+    unit_of_measurement: "m"
+    icon: mdi:numeric-2-box-outline
+
+  mower_zone3_distance:
+    name: Mower zone 3 distance
+    initial: 0
+    min: 0
+    max: 1000
+    step: 1
+    unit_of_measurement: "m"
+    icon: mdi:numeric-3-box-outline
+
+  mower_zone0_probability:
+    name: Mower zone 0 probability
+    initial: 0
+    min: 0
+    max: 100
+    step: 10
+    unit_of_measurement: "%"
+    icon: mdi:numeric-0-circle-outline
+
+  mower_zone1_probability:
+    name: Mower zone 1 probability
+    initial: 0
+    min: 0
+    max: 100
+    step: 10
+    unit_of_measurement: "%"
+    icon: mdi:numeric-1-circle-outline
+
+  mower_zone2_probability:
+    name: Mower zone 2 probability
+    initial: 0
+    min: 0
+    max: 100
+    step: 10
+    unit_of_measurement: "%"
+    icon: mdi:numeric-2-circle-outline
+
+  mower_zone3_probability:
+    name: Mower zone 3 probability
+    initial: 0
+    min: 0
+    max: 100
+    step: 10
+    unit_of_measurement: "%"
+    icon: mdi:numeric-3-circle-outline
+
 # Input Boolean #####################################################
 input_boolean:
 # Booleans for Lovelace
@@ -343,10 +428,16 @@ input_boolean:
     name: Scheduler settings
     initial: false
     icon: mdi:timer
+
   mower_info_toggle:
     name: Info toggle
     initial: false
     icon: mdi:information
+
+  mower_zone_enable:
+    name: Enable zones
+    initial: false
+    icon: mdi:vector-difference
 
 ## Enable scheduler on weekdays
 #  mower_0_sched_enable:
@@ -479,14 +570,38 @@ automation:
     action:
       # Get rain delay
       - service: input_number.set_value
-        data:
+        target:
           entity_id: input_number.mower_raindelay
+        data:
           value: "{{ state_attr('sensor.landroid_mower_status','raindelay') | int }}"
       # Get time extension
       - service: input_number.set_value
-        data:
+        target:
           entity_id: input_number.mower_timeextension
+        data:
           value: "{{ state_attr('sensor.landroid_mower_status','timeextension') | int }}"
+      # Get mower zone
+      - service: input_select.select_option
+        target:
+          entity_id: input_select.mower_zone
+        data:
+          option: "{{ state_attr('sensor.landroid_mower_status','mowing_zone') }}"
+
+      # Get time extension
+#  # Set mowing zone
+#  - id: mower_set_zone
+#    alias: Mower set mowing zone
+#    mode: restart
+#    trigger:
+#      - platform: state
+#        entity_id: input_select.mower_zone
+#        for: "00:00:03"
+#
+#    action:
+#      - service: landroid_cloud.setzone
+#        data:
+#          id: "{{ state_attr('sensor.landroid_mower_status','id') }}"
+#          zone: "{{ states('input_select.mower_zone') | int }}"
 
 # Scripts ###########################################################
 # Services
@@ -534,6 +649,47 @@ script:
         id: "{{ state_attr('sensor.landroid_mower_status','id') }}"
         raindelay: "{{ states('input_number.mower_raindelay') | int }}"
         timeextension: "{{ states('input_number.mower_timeextension') | int }}"
+
+  # Mower set mowing zone
+  mower_setzone:
+    alias: Mower set mowing zone
+    mode: restart
+    sequence:
+      - service: input_select.select_next
+        target:
+          entity_id: input_select.mower_zone
+
+      - delay: "00:00:03"
+
+      - service: landroid_cloud.setzone
+        data:
+          id: "{{ state_attr('sensor.landroid_mower_status','id') }}"
+          zone: "{{ states('input_select.mower_zone') | int }}"
+
+  mower_setzones:
+    alias: Mower set mowing zones
+    sequence:
+      service: landroid_cloud.config
+      data:
+        id: "{{ state_attr('sensor.landroid_mower_status','id') }}"
+        multizone_distances: >-
+          {% if is_state('input_boolean.mower_zone_enable', 'on') -%}
+            [{{ states('input_number.mower_zone0_distance') | int }},
+            {{ states('input_number.mower_zone1_distance') | int }},
+            {{ states('input_number.mower_zone2_distance') | int }},
+            {{ states('input_number.mower_zone3_distance') | int }}]
+          {%- else -%}
+            [0,0,0,0]
+          {%- endif %}
+        multizone_probabilities: >-
+          {% if is_state('input_boolean.mower_zone_enable', 'on') -%}
+            [{{ ((states('input_number.mower_zone0_probability') | int) / 10)  | round(0) }},
+            {{ ((states('input_number.mower_zone1_probability') | int) / 10)  | round(0) }},
+            {{ ((states('input_number.mower_zone2_probability') | int) / 10)  | round(0) }},
+            {{ ((states('input_number.mower_zone3_probability') | int) / 10)  | round(0) }}]
+          {%- else -%}
+            [0,0,0,0]
+          {%- endif %}
 
 # Select view
 # Select view - add button in Lovelace
