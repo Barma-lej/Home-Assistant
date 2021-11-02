@@ -12,13 +12,20 @@ landroid_cloud:
 recorder:
   exclude:
     entities:
+  # Swithes #######
+    #  - swith.mower_mowing
+    #  - swith.mower_home
+    #  - swith.mower_edgecut
+    #  - swith.mower_partymode
+    #  - swith.mower_lock
+  # Sensors #######
       - sensor.mower_ip
       - sensor.mower_sn
       - sensor.mower_mac
     #  - sensor.mower_lastupdate
     #  - input_number.mower_raindelay
     #  - input_number.mower_timeextension
-      - input_boolean.mower_info_toggle
+    #  - input_boolean.mower_info_toggle
     #  - input_boolean.mower_sched_settings
     ##  - input_boolean.mower_0_sched_enable
     ##  - input_boolean.mower_1_sched_enable
@@ -41,7 +48,8 @@ recorder:
     ##  - input_boolean.mower_view_4
     ##  - input_boolean.mower_view_5
     ##  - input_boolean.mower_view_6
-    ##  - input_boolean.mower_view_config
+      - input_boolean.mower_view_config
+      - input_boolean.mower_view_setzones
     #  - automation.mower_notify_status
     #  - automation.mower_notify_error
     #  - automation.mower_sync_values
@@ -49,50 +57,85 @@ recorder:
     #  - script.mower_home
     #  - script.mower_pause
     #  - script.mower_set_config
-    ##  - script.mower_views_toggle
+      - script.mower_views_toggle
 
 # Logbook ###########################################################
 logbook:
   exclude:
     entities:
+    # Swithes ###############
+      #- swith.mower_mowing
+      #- swith.mower_home
+      #- swith.mower_edgecut
+      #- swith.mower_partymode
+      #- swith.mower_lock
+
+    # Sensors ###############
       - sensor.mower_ip
-      - sensor.mower_sn
-      - sensor.mower_mac
-    #  - sensor.mower_lastupdate
-    #  - input_number.mower_raindelay
-    #  - input_number.mower_timeextension
+      #- sensor.mower_bladetime
+      #- sensor.mower_current bladetime
+      #- sensor.mower_totaltime
+      #- sensor.mower_distance
+      #- sensor.mower_lastupdate
+      #- sensor.mower_wifi
+      #- sensor.mower_yaw
+      #- sensor.mower_roll
+      #- sensor.mower_pitch
+
+    # Input selects #########
+      - input_select.mower_zone
+
+    # Input numbers #########
+      - input_number.mower_raindelay
+      - input_number.mower_timeextension
+      - input_number.mower_zone0_distance
+      - input_number.mower_zone1_distance
+      - input_number.mower_zone2_distance
+      - input_number.mower_zone3_distance
+      - input_number.mower_zone0_probability
+      - input_number.mower_zone1_probability
+      - input_number.mower_zone2_probability
+      - input_number.mower_zone3_probability
+
+    # Input booleans ########
+      - input_boolean.mower_sched_settings
       - input_boolean.mower_info_toggle
-    #  - input_boolean.mower_sched_settings
-    ##  - input_boolean.mower_0_sched_enable
-    ##  - input_boolean.mower_1_sched_enable
-    ##  - input_boolean.mower_2_sched_enable
-    ##  - input_boolean.mower_3_sched_enable
-    ##  - input_boolean.mower_4_sched_enable
-    ##  - input_boolean.mower_5_sched_enable
-    ##  - input_boolean.mower_6_sched_enable
-    ##  - input_boolean.mower_0_cuttoedge
-    ##  - input_boolean.mower_1_cuttoedge
-    ##  - input_boolean.mower_2_cuttoedge
-    ##  - input_boolean.mower_3_cuttoedge
-    ##  - input_boolean.mower_4_cuttoedge
-    ##  - input_boolean.mower_5_cuttoedge
-    ##  - input_boolean.mower_6_cuttoedge
-    ##  - input_boolean.mower_view_0
-    ##  - input_boolean.mower_view_1
-    ##  - input_boolean.mower_view_2
-    ##  - input_boolean.mower_view_3
-    ##  - input_boolean.mower_view_4
-    ##  - input_boolean.mower_view_5
-    ##  - input_boolean.mower_view_6
-    ##  - input_boolean.mower_view_config
-    #  - automation.mower_notify_status
-    #  - automation.mower_notify_error
-    #  - automation.mower_sync_values
-    #  - script.mower_start
-    #  - script.mower_home
-    #  - script.mower_pause
-    #  - script.mower_set_config
-    ##  - script.mower_views_toggle
+      - input_boolean.mower_zone_enable
+      - input_boolean.mower_view_config
+      - input_boolean.mower_view_setzones
+      ##- input_boolean.mower_view_0
+      ##- input_boolean.mower_view_1
+      ##- input_boolean.mower_view_2
+      ##- input_boolean.mower_view_3
+      ##- input_boolean.mower_view_4
+      ##- input_boolean.mower_view_5
+      ##- input_boolean.mower_view_6
+      ##- input_boolean.mower_0_sched_enable
+      ##- input_boolean.mower_1_sched_enable
+      ##- input_boolean.mower_2_sched_enable
+      ##- input_boolean.mower_3_sched_enable
+      ##- input_boolean.mower_4_sched_enable
+      ##- input_boolean.mower_5_sched_enable
+      ##- input_boolean.mower_6_sched_enable
+      ##- input_boolean.mower_0_cuttoedge
+      ##- input_boolean.mower_1_cuttoedge
+      ##- input_boolean.mower_2_cuttoedge
+      ##- input_boolean.mower_3_cuttoedge
+      ##- input_boolean.mower_4_cuttoedge
+      ##- input_boolean.mower_5_cuttoedge
+      ##- input_boolean.mower_6_cuttoedge
+
+    # Automations ######
+      - automation.mower_notify_status
+      - automation.mower_notify_error
+      - automation.mower_sync_values
+      - automation.mower_views_switch
+
+    # Scripts ##########
+      - script.mower_set_config
+      - script.mower_setzone
+      - script.mower_setzones
+      - script.mower_views_toggle
 
 # Switch ############################################################
 switch:
@@ -219,13 +262,13 @@ switch:
 # sensor.landroid_mower_status
 template:
   sensor:
-# Info ############
+  # Info ############
     - name: Mower IP
       unique_id: mower_ip
       state: !secret mower_ip
       icon: mdi:ip-network
 
-# Status ##########
+  # Status ##########
     - name: Mower bladetime
       unique_id: mower_bladetime
       state: "{{ state_attr('sensor.landroid_mower_status', 'total_blade_time') }}"
@@ -254,7 +297,7 @@ template:
             {{ '0 min' }}
           {% endif %}
 
-    - name: Mower Totaltime
+    - name: Mower totaltime
       unique_id: mower_totaltime
       state: "{{ state_attr('sensor.landroid_mower_status', 'work_time') }}"
       icon: mdi:bus-clock
@@ -298,19 +341,19 @@ template:
       # -78 to -88: 1 bar
       # -89 or lower: 0 bars
 
-    - name: Mower Yaw
+    - name: Mower yaw
       unique_id: mower_yaw
       state: "{{ state_attr('sensor.landroid_mower_status', 'yaw') }}"
       icon: mdi:axis-z-rotate-clockwise
       unit_of_measurement: "°"
 
-    - name: Mower Roll
+    - name: Mower roll
       unique_id: mower_roll
       state: "{{ state_attr('sensor.landroid_mower_status', 'roll') }}"
       icon: mdi:axis-x-rotate-clockwise
       unit_of_measurement: "°"
 
-    - name: Mower Pitch
+    - name: Mower pitch
       unique_id: mower_pitch
       state: "{{ state_attr('sensor.landroid_mower_status', 'pitch') }}"
       icon: mdi:seat-flat-angled
@@ -350,34 +393,31 @@ input_number:
 
   # Multizone
   mower_zone0_distance:
-    name: Mower zone 0 distance
+    name: "Zone 0: Distance"
     initial: 0
     min: 0
     max: 1000
     step: 1
     unit_of_measurement: "m"
     icon: mdi:numeric-0-box-outline
-
   mower_zone1_distance:
-    name: Mower zone 1 distance
+    name: "Zone 1: Distance"
     initial: 0
     min: 0
     max: 1000
     step: 1
     unit_of_measurement: "m"
     icon: mdi:numeric-1-box-outline
-
   mower_zone2_distance:
-    name: Mower zone 2 distance
+    name: "Zone 2: Distance"
     initial: 0
     min: 0
     max: 1000
     step: 1
     unit_of_measurement: "m"
     icon: mdi:numeric-2-box-outline
-
   mower_zone3_distance:
-    name: Mower zone 3 distance
+    name: "Zone 3: Distance"
     initial: 0
     min: 0
     max: 1000
@@ -386,34 +426,31 @@ input_number:
     icon: mdi:numeric-3-box-outline
 
   mower_zone0_probability:
-    name: Mower zone 0 probability
+    name: "Zone 0: Probability"
     initial: 0
     min: 0
     max: 100
     step: 10
     unit_of_measurement: "%"
     icon: mdi:numeric-0-circle-outline
-
   mower_zone1_probability:
-    name: Mower zone 1 probability
+    name: "Zone 1: Probability"
     initial: 0
     min: 0
     max: 100
     step: 10
     unit_of_measurement: "%"
     icon: mdi:numeric-1-circle-outline
-
   mower_zone2_probability:
-    name: Mower zone 2 probability
+    name: "Zone 2: Probability"
     initial: 0
     min: 0
     max: 100
     step: 10
     unit_of_measurement: "%"
     icon: mdi:numeric-2-circle-outline
-
   mower_zone3_probability:
-    name: Mower zone 3 probability
+    name: "Zone 3: Probability"
     initial: 0
     min: 0
     max: 100
@@ -423,7 +460,7 @@ input_number:
 
 # Input Boolean #####################################################
 input_boolean:
-# Booleans for Lovelace
+  # Booleans for Lovelace
   mower_sched_settings:
     name: Scheduler settings
     initial: false
@@ -435,87 +472,91 @@ input_boolean:
     icon: mdi:information
 
   mower_zone_enable:
-    name: Enable zones
+    name: Enable multizone
     initial: false
     icon: mdi:vector-difference
 
-## Enable scheduler on weekdays
-#  mower_0_sched_enable:
-#    name: Sunday
-#    icon: mdi:calendar
-#  mower_1_sched_enable:
-#    name: Monday
-#    icon: mdi:calendar-today
-#  mower_2_sched_enable:
-#    name: Tuesday
-#    icon: mdi:calendar-minus
-#  mower_3_sched_enable:
-#    name: Wednesday
-#    icon: mdi:calendar-range
-#  mower_4_sched_enable:
-#    name: Thursday
-#    icon: mdi:calendar-multiselect
-#  mower_5_sched_enable:
-#    name: Friday
-#    icon: mdi:calendar-heart
-#  mower_6_sched_enable:
-#    name: Saturday
-#    icon: mdi:calendar-check
-#
-## Enable Cut to Edge on weekdays
-#  mower_0_cuttoedge:
-#    name: Cut to Edge (0)
-#    icon: mdi:scissors-cutting
-#  mower_1_cuttoedge:
-#    name: Cut to Edge (1)
-#    icon: mdi:scissors-cutting
-#  mower_2_cuttoedge:
-#    name: Cut to Edge (2)
-#    icon: mdi:scissors-cutting
-#  mower_3_cuttoedge:
-#    name: Cut to Edge (3)
-#    icon: mdi:scissors-cutting
-#  mower_4_cuttoedge:
-#    name: Cut to Edge (4)
-#    icon: mdi:scissors-cutting
-#  mower_5_cuttoedge:
-#    name: Cut to Edge (5)
-#    icon: mdi:scissors-cutting
-#  mower_6_cuttoedge:
-#    name: Cut to Edge (6)
-#    icon: mdi:scissors-cutting
+  # Booleans for views in Lovelace
+  mower_view_config:
+    name: Configuration
+    icon: mdi:tools
+  mower_view_setzones:
+    name: Multizone
+    icon: mdi:vector-difference
 
-## Booleans for views in Lovelace
-#  mower_view_0:
-#    name: Sun.
-#    icon: mdi:calendar
-#  mower_view_1:
-#    name: Mon.
-#    icon: mdi:calendar-today
-#  mower_view_2:
-#    name: Tue.
-#    icon: mdi:calendar-minus
-#  mower_view_3:
-#    name: Wed.
-#    icon: mdi:calendar-range
-#  mower_view_4:
-#    name: Thu.
-#    icon: mdi:calendar-multiselect
-#  mower_view_5:
-#    name: Fri.
-#    icon: mdi:calendar-heart
-#  mower_view_6:
-#    name: Sat.
-#    icon: mdi:calendar-check
-#  mower_view_config:
-#    name: Conf.
-#    icon: mdi:tools
+  #mower_view_0:
+  #  name: Sun.
+  #  icon: mdi:calendar
+  #mower_view_1:
+  #  name: Mon.
+  #  icon: mdi:calendar-today
+  #mower_view_2:
+  #  name: Tue.
+  #  icon: mdi:calendar-minus
+  #mower_view_3:
+  #  name: Wed.
+  #  icon: mdi:calendar-range
+  #mower_view_4:
+  #  name: Thu.
+  #  icon: mdi:calendar-multiselect
+  #mower_view_5:
+  #  name: Fri.
+  #  icon: mdi:calendar-heart
+  #mower_view_6:
+  #  name: Sat.
+  #  icon: mdi:calendar-check
+
+# Enable scheduler on weekdays
+  #mower_0_sched_enable:
+  #  name: Sunday
+  #  icon: mdi:calendar
+  #mower_1_sched_enable:
+  #  name: Monday
+  #  icon: mdi:calendar-today
+  #mower_2_sched_enable:
+  #  name: Tuesday
+  #  icon: mdi:calendar-minus
+  #mower_3_sched_enable:
+  #  name: Wednesday
+  #  icon: mdi:calendar-range
+  #mower_4_sched_enable:
+  #  name: Thursday
+  #  icon: mdi:calendar-multiselect
+  #mower_5_sched_enable:
+  #  name: Friday
+  #  icon: mdi:calendar-heart
+  #mower_6_sched_enable:
+  #  name: Saturday
+  #  icon: mdi:calendar-check
+
+# Enable Cut to Edge on weekdays
+  #mower_0_cuttoedge:
+  #  name: Cut to Edge (0)
+  #  icon: mdi:scissors-cutting
+  #mower_1_cuttoedge:
+  #  name: Cut to Edge (1)
+  #  icon: mdi:scissors-cutting
+  #mower_2_cuttoedge:
+  #  name: Cut to Edge (2)
+  #  icon: mdi:scissors-cutting
+  #mower_3_cuttoedge:
+  #  name: Cut to Edge (3)
+  #  icon: mdi:scissors-cutting
+  #mower_4_cuttoedge:
+  #  name: Cut to Edge (4)
+  #  icon: mdi:scissors-cutting
+  #mower_5_cuttoedge:
+  #  name: Cut to Edge (5)
+  #  icon: mdi:scissors-cutting
+  #mower_6_cuttoedge:
+  #  name: Cut to Edge (6)
+  #  icon: mdi:scissors-cutting
+
 
 # Automations #######################################################
 automation:
-  # Status notificaion
   - id: mower_notify_status
-    alias: Mower Notify Status
+    alias: Mower status notificaion
     initial_state: false
     trigger:
       - platform: state
@@ -535,9 +576,8 @@ automation:
     #      title: 🏎️ Lanroid M500
     #      message: "{{ trigger.from_state.state }} -> {{ trigger.to_state.state }} - {{ states('sensor.date_time') }}"
 
-  # Error notificaion
   - id: mower_notify_error
-    alias: Mower Notify Error
+    alias: Mower error notificaion
     initial_state: true
     trigger:
       - platform: state
@@ -557,7 +597,6 @@ automation:
     #      title: 🏎️ Lanroid M500
     #      message: "{{ trigger.from_state.state }} -> {{ trigger.to_state.state }} - {{ states('sensor.date_time') }}"
 
-  # Sync Mower states
   - id: mower_sync_values
     alias: Mower sync values
     trigger:
@@ -587,22 +626,6 @@ automation:
         data:
           option: "{{ state_attr('sensor.landroid_mower_status','mowing_zone') }}"
 
-      # Get time extension
-#  # Set mowing zone
-#  - id: mower_set_zone
-#    alias: Mower set mowing zone
-#    mode: restart
-#    trigger:
-#      - platform: state
-#        entity_id: input_select.mower_zone
-#        for: "00:00:03"
-#
-#    action:
-#      - service: landroid_cloud.setzone
-#        data:
-#          id: "{{ state_attr('sensor.landroid_mower_status','id') }}"
-#          zone: "{{ states('input_select.mower_zone') | int }}"
-
 # Scripts ###########################################################
 # Services
 # landroid_cloud.start
@@ -616,33 +639,8 @@ automation:
 # landroid_cloud.edgecut (only for models with the function available in the app)
 
 script:
-  # Starts the mower
-  mower_start:
-    alias: Mower start
-    sequence:
-      service: landroid_cloud.start
-      data:
-        id: "{{ state_attr('sensor.landroid_mower_status','id') }}"
-
-  # Stops the mower and sends it home
-  mower_home:
-    alias: Mower home
-    sequence:
-      service: landroid_cloud.home
-      data:
-        id: "{{ state_attr('sensor.landroid_mower_status','id') }}"
-
-  # Pause the mower
-  mower_pause:
-    alias: Mower pause
-    sequence:
-      service: landroid_cloud.pause
-      data:
-        id: "{{ state_attr('sensor.landroid_mower_status','id') }}"
-
-  # Set rain delay and time extension
   mower_set_config:
-    alias: Mower set config
+    alias: Mower set rain delay and time extension
     sequence:
       service: landroid_cloud.config
       data:
@@ -650,7 +648,6 @@ script:
         raindelay: "{{ states('input_number.mower_raindelay') | int }}"
         timeextension: "{{ states('input_number.mower_timeextension') | int }}"
 
-  # Mower set mowing zone
   mower_setzone:
     alias: Mower set mowing zone
     mode: restart
@@ -667,7 +664,7 @@ script:
           zone: "{{ states('input_select.mower_zone') | int }}"
 
   mower_setzones:
-    alias: Mower set mowing zones
+    alias: Mower set multizone distances
     sequence:
       service: landroid_cloud.config
       data:
@@ -690,6 +687,25 @@ script:
           {%- else -%}
             [0,0,0,0]
           {%- endif %}
+
+  mower_views_toggle:
+    description: "View configuration panel like tabs"
+    mode: restart
+    fields:
+      entity_id:
+        description: "Current switch"
+        example: "input_boolean.mower_view_config"
+    sequence:
+      - service: input_boolean.turn_off
+        data:
+          entity_id: >
+            {% for item in states["input_boolean"] if item.object_id.startswith("mower_view_") and
+                                                      item.entity_id != entity_id -%}
+              {% if not loop.first %},{% endif %}{{ item.entity_id }}
+            {%- endfor %}
+      - service: input_boolean.turn_on
+        data:
+          entity_id: "{{ entity_id }}"
 
 # Select view
 # Select view - add button in Lovelace
@@ -767,3 +783,42 @@ script:
 # 32=Kantenschnitt
 # 33=Suche Mähbereich
 # 34=Pause / gestoppt
+
+#  # Turn on a visible tab, and turn off others
+#  - id: mower_views_switch
+#    alias: Mower views switch
+#    mode: parallel
+#    trigger:
+#      - platform: state
+#        entity_id:
+#        - input_boolean.mower_view_config
+#        - input_boolean.mower_view_setzones
+#    action:
+#      service: script.mower_views_toggle
+#      data:
+#        entity_id: "{{ trigger.entity_id }}"
+
+#  # Starts the mower
+#  mower_start:
+#    alias: Mower start
+#    sequence:
+#      service: landroid_cloud.start
+#      data:
+#        id: "{{ state_attr('sensor.landroid_mower_status','id') }}"
+#
+#  # Stops the mower and sends it home
+#  mower_home:
+#    alias: Mower home
+#    sequence:
+#      service: landroid_cloud.home
+#      data:
+#        id: "{{ state_attr('sensor.landroid_mower_status','id') }}"
+#
+#  # Pause the mower
+#  mower_pause:
+#    alias: Mower pause
+#    sequence:
+#      service: landroid_cloud.pause
+#      data:
+#        id: "{{ state_attr('sensor.landroid_mower_status','id') }}"
+
