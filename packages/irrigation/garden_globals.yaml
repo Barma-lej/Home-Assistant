@@ -389,8 +389,8 @@ sensor:
             {% set weekdays_short = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] %}
             {% set months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "Nowember", "Dezember"] %}
             {% set months_short = ["Jan", "Feb", "Mrz", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Now", "Dez"] %}
-            {% set w = date | timestamp_custom("%w") | int %}
-            {% set m = date | timestamp_custom("%m") | int -%}
+            {% set w = date | timestamp_custom("%w") | int(0) %}
+            {% set m = date | timestamp_custom("%m") | int(0) -%}
             {{ weekdays_short[w] }} {{ date | timestamp_custom("%d") }} {{ months_short[m-1] }} um {{ date | timestamp_custom("%H:%M") }}
           {% else %}
             -
@@ -406,8 +406,8 @@ sensor:
             {% set weekdays_short = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] %}
             {% set months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "Nowember", "Dezember"] %}
             {% set months_short = ["Jan", "Feb", "Mrz", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Now", "Dez"] %}
-            {% set w = date | timestamp_custom("%w") | int %}
-            {% set m = date | timestamp_custom("%m") | int -%}
+            {% set w = date | timestamp_custom("%w") | int(0) %}
+            {% set m = date | timestamp_custom("%m") | int(0) -%}
             {{ weekdays_short[w] }} {{ date | timestamp_custom("%d") }} {{ months_short[m-1] }} um {{ date | timestamp_custom("%H:%M") }}
           {% else %}
             -

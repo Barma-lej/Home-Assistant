@@ -384,7 +384,7 @@ script:
 # Don't continue if duration is zero
       - condition: template
         value_template: >
-            {% set n = states('input_number.cycle' ~ cycle ~ '_zone' ~ zone ~ '_duration') | int %}
+            {% set n = states('input_number.cycle' ~ cycle ~ '_zone' ~ zone ~ '_duration') | int(0) %}
             {{ n != 0 }}
 
 # Don't continue if it rains (Если дождь пошёл во время полива)
@@ -417,7 +417,7 @@ script:
         data:
           entity_id: timer.zone_duration
           duration: >
-            {% set duration = states('input_number.cycle' ~ cycle ~ '_zone' ~ zone ~ '_duration') | float %}
+            {% set duration = states('input_number.cycle' ~ cycle ~ '_zone' ~ zone ~ '_duration') | float(0) %}
             {% set min = (duration // 1) | round(0, floor) %}
             {% set sec = ((duration - min) * 60) | round %}
             00:{{ '%02i' | format(min) }}:{{ '%02i' | format(sec) }}
@@ -488,15 +488,15 @@ script:
             {% endif %}
             {{ tasmota }}/cmnd/pulsetime{{ zone | string}}
           payload: >
-            {% set duration = states('input_number.cycle' ~ cycle ~ '_zone' ~ zone ~ '_duration') | float %}
+            {% set duration = states('input_number.cycle' ~ cycle ~ '_zone' ~ zone ~ '_duration') | float(0) %}
             {% set payload = 100 + (duration * 60) + 30 %}
-            {{ payload | int }}
+            {{ payload | int(0) }}
 # Set pump
       - service: mqtt.publish
         data:
           topic: sonoff4ch/cmnd/pulsetime4
           payload: >
-            {% set duration = states('input_number.cycle' ~ cycle ~ '_zone' ~ zone ~ '_duration') | float %}
+            {% set duration = states('input_number.cycle' ~ cycle ~ '_zone' ~ zone ~ '_duration') | float(0) %}
             {% set payload = 100 + (duration * 60) + 30 %}
-            {{ payload | int }}
+            {{ payload | int(0) }}
 

@@ -20,7 +20,7 @@ template:
 # States ####################
     - name: "cpu_load"
       unique_id: cpu_load
-      state: "{{ (states('sensor.load_15m') | float ) | round(2) }}"
+      state: "{{ (states('sensor.load_15m') | float(0) ) | round(2) }}"
       icon: mdi:memory
       unit_of_measurement: " "
 
@@ -89,7 +89,7 @@ sensor:
       cpu_load:
         friendly_name: "CPU Load 15m"
         icon_template: mdi:memory
-        value_template: "{{ (states('sensor.load_15m') | float ) | round(2) }}"
+        value_template: "{{ (states('sensor.load_15m') | float(0) ) | round(2) }}"
         unit_of_measurement: " "
 
       last_boot_local:
