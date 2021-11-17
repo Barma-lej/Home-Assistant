@@ -8,7 +8,7 @@ android_ip_webcam:
     port: !secret cams6_port
     username: !secret cams6_user
     password: !secret cams6_pass
-#    scan_interval: Default is 10 seconds. Defines the update interval of the phone.
+    # scan_interval: Default is 10 seconds. Defines the update interval of the phone.
     motion_sensor: enable
     sensors:
       - audio_connections
@@ -34,31 +34,31 @@ android_ip_webcam:
 
 # Automation ########################################################
 automation:
-# Aufnahme ########
-#  - id: camgaragerecording
-#    alias: Camera Garage Recording
-#    trigger:
-#    - platform: time_pattern
-#      minutes: "/5"
-#    - platform: state
-#      entity_id: switch.camgarage_video_recording
-#      to: "off"
-#    condition:
-#    - condition: state
-#      entity_id: switch.camgarage_video_recording
-#      state: "off"
-#    action:
-#    - service: switch.turn_on
-#      data:
-#        entity_id: switch.camgarage_video_recording
+  # Aufnahme ########
+  # - id: camgaragerecording
+  #   alias: Camera Garage Recording
+  #   trigger:
+  #   - platform: time_pattern
+  #     minutes: "/5"
+  #   - platform: state
+  #     entity_id: switch.camgarage_video_recording
+  #     to: "off"
+  #   condition:
+  #   - condition: state
+  #     entity_id: switch.camgarage_video_recording
+  #     state: "off"
+  #   action:
+  #   - service: switch.turn_on
+  #     data:
+  #       entity_id: switch.camgarage_video_recording
 
-# Nachtmodus ######
+  # Nachtmodus ######
   - id: camgaragenighton
     alias: Camera Garage Night On
     trigger:
     - platform: numeric_state
       entity_id: sensor.camgarage_light_level
-      below: "5"
+      below: "1"
     condition:
     - condition: state
       entity_id: switch.camgarage_night_vision
@@ -73,7 +73,7 @@ automation:
     trigger:
     - platform: numeric_state
       entity_id: sensor.camgarage_light_level
-      above: "5"
+      above: "0"
     condition:
     - condition: state
       entity_id: switch.camgarage_night_vision
@@ -83,13 +83,40 @@ automation:
       data:
         entity_id: switch.camgarage_night_vision
 
+  # Charging control
+  - id: camera_garage_akku_charging
+    alias: Camera garage akku charging
+    description: 'Camera garage akku charging'
+    mode: single
+    trigger:
+    - platform: time_pattern
+      minutes: '/10'
+
+    condition:
+      condition: or
+      conditions:
+        - condition: numeric_state
+          entity_id: sensor.camgarage_battery_level
+          above: 95
+        - condition: numeric_state
+          entity_id: sensor.camgarage_battery_level
+          below: 35
+
+    action:
+    - service: >-
+        {% if states('sensor.camgarage_battery_level') | int < 35 -%}
+          switch.turn_on
+        {%- else -%}
+          switch.turn_off
+        {%- endif %}
+      data:
+        entity_id: switch.alfa03
 
 # Groups ############################################################
 group:
-# Switches ########
+  # Switches ########
   camgarage_switch:
     name: Kamera Garage Switch
-# Deprecated    control: hidden
     entities:
       - switch.camgarage_exposure_lock
       - switch.camgarage_focus
@@ -101,7 +128,7 @@ group:
       - switch.camgarage_video_recording
       - switch.camgarage_white_balance_lock
 
-# Sensors #########
+  # Sensors #########
   camgarage_sensor:
     name: Kamera Garage Sensor
     entities:
@@ -120,7 +147,7 @@ group:
 # Customize #########################################################
 homeassistant:
   customize:
-# Switches ########
+    # Switches ########
     switch.camgarage_torch:
       friendly_name: Licht
     switch.camgarage_video_recording:
@@ -140,7 +167,7 @@ homeassistant:
     switch.camgarage_gps_active:
       friendly_name: GPS Aktiviert
 
-# Sensors #########
+    # Sensors #########
     sensor.camgarage_battery_level:
       friendly_name: Akkuladestand
     sensor.camgarage_battery_temperature:
@@ -168,12 +195,12 @@ homeassistant:
       friendly_name: Druck
 
 # Binary Sensor #####################################################
-#binary_sensor:
-#  - platform: rest
-#    name: Kitchen Motion
-#    sensor_class: motion
-#    resource: http://IP:8080/sensors.json?sense=motion_active
-#    value_template: "{{ value_json.motion_active.data[0][1][0] | round(0) }}"
+# binary_sensor:
+#   - platform: rest
+#     name: Kitchen Motion
+#     sensor_class: motion
+#     resource: http://IP:8080/sensors.json?sense=motion_active
+#     value_template: "{{ value_json.motion_active.data[0][1][0] | round(0) }}"
 
 #media_player:
 #  - platform: vlc

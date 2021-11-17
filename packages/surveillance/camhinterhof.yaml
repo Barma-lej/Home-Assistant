@@ -52,13 +52,13 @@ automation:
 #      data:
 #        entity_id: switch.camhinterhof_video_recording
 
-# Nachtmodus ######
+  # Nachtmodus
   - id: camhinterhofnighton
     alias: Camera Hinterhof Night On
     trigger:
     - platform: numeric_state
       entity_id: sensor.camhinterhof_light_level
-      below: "5"
+      below: "1"
     condition:
     - condition: state
       entity_id: switch.camhinterhof_night_vision
@@ -73,7 +73,7 @@ automation:
     trigger:
     - platform: numeric_state
       entity_id: sensor.camhinterhof_light_level
-      above: "5"
+      above: "0"
     condition:
     - condition: state
       entity_id: switch.camhinterhof_night_vision
@@ -83,6 +83,34 @@ automation:
       data:
         entity_id: switch.camhinterhof_night_vision
 
+  # Charging control
+  - id: camera_hinterhof_akku_charging
+    alias: Camera hinterhof akku charging
+    description: 'Camera hinterhof akku charging'
+    mode: single
+    trigger:
+    - platform: time_pattern
+      minutes: '/10'
+
+    condition:
+      condition: or
+      conditions:
+        - condition: numeric_state
+          entity_id: sensor.camhinterhof_battery_level
+          above: 95
+        - condition: numeric_state
+          entity_id: sensor.camhinterhof_battery_level
+          below: 30
+
+    action:
+    - service: >-
+        {% if states('sensor.camhinterhof_battery_level') | int < 30 -%}
+          switch.turn_on
+        {%- else -%}
+          switch.turn_off
+        {%- endif %}
+      data:
+        entity_id: switch.sonoffs26_2
 
 # Groups ############################################################
 group:
