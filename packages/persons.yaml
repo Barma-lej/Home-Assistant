@@ -1,0 +1,33 @@
+# Person's things
+
+input_boolean:
+  nataljas_night_shift:
+    name: "Natalja's night shift"
+    icon: mdi:shield-moon-outline
+
+automation:
+  id: natalias_night_shift
+  alias: Natalia's night shift
+  description: Set Natalia's night shift
+  mode: restart
+  trigger:
+    - platform: time
+      at: '07:00'
+    - platform: time
+      at: '19:00'
+
+  action:
+    - service: >-
+        {% if ((as_timestamp(states.calendar.dienstplan_natalja_schick.attributes.start_time) - as_timestamp(now())) < 86400)
+          and ((as_timestamp(states.calendar.dienstplan_natalja_schick.attributes.start_time) - as_timestamp(now())) > 0) %}
+          input_boolean.turn_on
+        {% else %}
+          input_boolean.turn_off
+        {% endif %}
+      target:
+        entity_id: input_boolean.nataljas_night_shift
+
+homeassistant:
+  customization:
+    automation.natalias_night_shift:
+      icon: mdi:shield-moon-outline

@@ -1,0 +1,10 @@
+# Sonoff S20 1
+# Sonoff-Tasmota
+
+# Customize #########################################################
+homeassistant:
+  customize:
+    # Switch ##########
+    switch.sonoffs20_1:
+      friendly_name: Küchenfenster
+      icon: mdi:candle

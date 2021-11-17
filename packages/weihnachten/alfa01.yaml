@@ -1,0 +1,10 @@
+# Alfawise PE1004T
+# Sonoff-Tasmota
+
+# Customize #########################################################
+homeassistant:
+  customize:
+    # Switch ##########
+    switch.alfa01:
+      friendly_name: "Treppe"
+      icon: mdi:stairs

@@ -1,0 +1,10 @@
+# Sonoff S20 2
+# Sonoff-Tasmota
+
+# Customize #########################################################
+homeassistant:
+  customize:
+    # Switch ##########
+    switch.sonoffs20_2:
+      friendly_name: Regenlicht
+      icon: mdi:string-lights
