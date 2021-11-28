@@ -202,8 +202,9 @@ input_select:
 # input Boolean #####################################################
 input_boolean:
   robi_zone_settings:
-    name: zone settings
+    name: View zone settings
     initial: false
+    icon: mdi:vector-selection
 
 # input Number ######################################################
 input_number:
@@ -366,6 +367,11 @@ automation:
     trigger:
     - platform: state
       entity_id: vacuum.robi
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 3
+        milliseconds: 0
 
     condition:
     - condition: template
