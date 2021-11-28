@@ -1,0 +1,21 @@
+# Reolink E1 Zoom
+# IPC_515BSD6
+
+# Scripts ###########################################################
+script:
+  camera_garage_gate_view:
+    alias: Camera-Garage Toransicht
+    sequence:
+    - service: onvif.ptz
+      data:
+        entity_id: camera.reolink_e1_zoom_profile000_mainstream
+        preset: '000'
+        move_mode: GotoPreset
+  camera_garage_door_view:
+    alias: Camera-Garage Türansicht
+    sequence:
+    - service: onvif.ptz
+      data:
+        entity_id: camera.reolink_e1_zoom_profile000_mainstream
+        preset: '001'
+        move_mode: GotoPreset

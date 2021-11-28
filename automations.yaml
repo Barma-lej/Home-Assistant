@@ -60,3 +60,72 @@
       message: Rolladen geschlossen
       title: 🔽 Rolladen
     service: notify.telegram_schick_home
+- id: 'garagenlicht_einschalten'
+  alias: Garagenlicht einschalten
+  description: Garagenlicht einschalten nach der Sonnenunregang oder wenn es dunkel
+    ist
+  trigger:
+  - type: value
+    platform: device
+    device_id: db8b13c767d84865a607aca77975a221
+    entity_id: sensor.torposition
+    domain: sensor
+    above: 50
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  condition:
+  - condition: or
+    conditions:
+    - condition: sun
+      before: sunrise
+      before_offset: 00:15:00
+      after: sunset
+    - condition: sun
+      after: sunset
+      after_offset: -00:15:00
+  action:
+  - type: turn_on
+    device_id: 63713a671de1472e84d5832bcb399f0e
+    entity_id: light.sonoffbnsz01
+    domain: light
+    brightness_pct: 100
+  - delay:
+      hours: 0
+      minutes: 10
+      seconds: 0
+      milliseconds: 0
+  - type: turn_off
+    device_id: 63713a671de1472e84d5832bcb399f0e
+    entity_id: light.sonoffbnsz01
+    domain: light
+  mode: restart
+- id: 'garagenlicht_ausschalten'
+  alias: Garagenlicht ausschalten
+  description: Garagenlicht ausschalten wenn das Garagentor geschlossen wurde
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.tor_offen
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  - platform: state
+    entity_id: input_boolean.torteil
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  condition: []
+  action:
+  - type: turn_off
+    device_id: 63713a671de1472e84d5832bcb399f0e
+    entity_id: light.sonoffbnsz01
+    domain: light
+  mode: restart
