@@ -1,3 +1,4 @@
+# Irrigation - Global variables and scripts
 
 # Groups ############################################################
 group:
@@ -5,7 +6,7 @@ group:
     entities:
       - switch.zone1_valve
       - switch.zone2_valve
-#      - switch.zone3_valve
+    #  - switch.zone3_valve
 
   irrigation_automations:
     entities:
@@ -14,7 +15,7 @@ group:
       - automation.irrigation_failsafe_pump_master_control_switch
       - automation.irrigation_failsafe_valve_1_on
       - automation.irrigation_failsafe_valve_2_on
-#      - automation.irrigation_failsafe_valve_3_on
+    #  - automation.irrigation_failsafe_valve_3_on
       - automation.irrigation_master_control_switch
       - automation.irrigation_pump_off
       - automation.irrigation_pump_on
@@ -26,55 +27,56 @@ group:
 
 # Input_Booleans ####################################################
 input_boolean:
-
   irrigation_master_control_switch:
-    name: Master Control Switch
+    name: Irrigation - Master Control Switch
     icon: mdi:sprinkler-variant
 
   cycle1_enable:
-    name: Enable schedule
+    name: Irrigation - Enable schedule
     icon: mdi:pipe
-
   cycle2_enable:
-    name: Enable schedule
+    name: Irrigation - Enable schedule
     icon: mdi:pipe
 
   cycle1_enable_saved_state:
-
+    name: Irrigation - Save state of the cycle1
+    icon: mdi:content-save
   cycle2_enable_saved_state:
+    name: Irrigation - Save state of the cycle2
+    icon: mdi:content-save
 
   cycle1_use_sensor_data:
-    name: Use sensor data
+    name: Irrigation - Use sensor data
     icon: mdi:thermometer-lines
-
   cycle2_use_sensor_data:
-    name: Use sensor data
+    name: Irrigation - Use sensor data
     icon: mdi:thermometer-lines
 
   cycle1_manual_run:
-    name: Run morning cycle now
+    name: Irrigation - Run morning cycle now
     icon: mdi:arrow-right-drop-circle
-
   cycle2_manual_run:
-    name: Run afternoon cycle now
+    name: Irrigation - Run afternoon cycle now
     icon: mdi:arrow-right-drop-circle
 
   cycle1_running:
-    name: Cycle 1 running
-
+    name: Irrigation - Cycle 1 running
+    icon: mdi:run
   cycle2_running:
-    name: Cycle 2 running
+    name: Irrigation - Cycle 2 running
+    icon: mdi:run
 
 # Input_Texts #######################################################
 input_text:
   current_zone:
-    name: Current zone
+    name: Irrigation - Current zone
+    icon: mdi:select-marker
 
 # Input_Selects ####################################################\
 input_select:
 
   cycle1_watering_days:
-    name: Morning cycle watering days
+    name: Irrigation - Morning cycle watering days
     options:
       - 'Täglich'
       - 'Alle 2 Tage'
@@ -83,7 +85,7 @@ input_select:
     icon: mdi:calendar
 
   cycle2_watering_days:
-    name: Afternoon cycle watering days
+    name: Irrigation - Afternoon cycle watering days
     options:
       - 'Täglich'
       - 'Alle 2 Tage'
@@ -92,7 +94,7 @@ input_select:
     icon: mdi:calendar
 
   cycle1_schedule_time:
-    name: Morning cycle schedule start time
+    name: Irrigation - Morning cycle schedule start time
     options:
       - '00:00'
       - '00:15'
@@ -193,7 +195,7 @@ input_select:
     icon: mdi:alarm
 
   cycle2_schedule_time:
-    name: Afternoon cycle schedule start time
+    name: Irrigation - Afternoon cycle schedule start time
     options:
       - '00:00'
       - '00:15'
@@ -296,75 +298,72 @@ input_select:
 # Input_Datetimes ###################################################
 input_datetime:
   cycle1_next_run_time:
+    name: Irrigation - Next run time of the cycle1
     has_date: true
     has_time: true
+    icon: mdi:clock-out
 
   cycle2_next_run_time:
+    name: Irrigation - Next run time of the cycle2
     has_date: true
     has_time: true
+    icon: mdi:clock-out
 
 # Input_Numbers #####################################################
 input_number:
-# Cycle 1 #############################
   cycle1_zone1_duration:
-    name: Zone 1 duration
+    name: Irrigation - Zone 1 duration
     min: 0
     max: 90
     step: 1
     icon: mdi:camera-timer
     unit_of_measurement: min
-
   cycle1_zone2_duration:
-    name: Zone 2 duration
+    name: Irrigation - Zone 2 duration
     min: 0
     max: 90
     step: 1
     icon: mdi:camera-timer
     unit_of_measurement: min
 
-# Cycle 2 #############################
   cycle2_zone1_duration:
-    name: Zone 1 duration
+    name: Irrigation - Zone 1 duration
     min: 0
     max: 90
     step: 1
     icon: mdi:camera-timer
     unit_of_measurement: min
-
   cycle2_zone2_duration:
-    name: Zone 2 duration
+    name: Irrigation - Zone 2 duration
     min: 0
     max: 90
     step: 1
     icon: mdi:camera-timer
     unit_of_measurement: min
 
-
-# The temperature above which the irrigation will started
+  # The temperature above which the irrigation will started
   cycle1_temperature_threshold:
-    name: Temperature threshold
+    name: Irrigation - Temperature threshold
     min: 10
     max: 30
     icon: mdi:thermometer
     unit_of_measurement: "°C"
-
   cycle2_temperature_threshold:
-    name: Temperature threshold
+    name: Irrigation - Temperature threshold
     min: 10
     max: 30
     icon: mdi:thermometer
     unit_of_measurement: "°C"
 
-# The moisture below which the irrigation will started
+  # The moisture below which the irrigation will started
   zone1_moisture_threshold:
-    name: Moisture threshold
+    name: Irrigation - Moisture threshold
     min: 5
     max: 30
     icon: mdi:water-percent
     unit_of_measurement: "%"
-
   zone2_moisture_threshold:
-    name: Moisture threshold
+    name: Irrigation - Moisture threshold
     min: 5
     max: 30
     icon: mdi:water-percent
@@ -373,69 +372,129 @@ input_number:
 # Timers ############################################################
 timer:
   zone_duration:
-    name: Time remaining
+    name: Irrigation - Time remaining
+
+# Template sensors ##################################################
+template:
+  - sensor:
+    - name: Cycle1 next run time
+      unique_id: cycle1_next_run_time
+      state: >-
+        {% if is_state('input_boolean.cycle1_enable', 'on') %}
+          {%- set date = state_attr('input_datetime.cycle1_next_run_time', 'timestamp') %}
+          {% set weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"] %}
+          {% set weekdays_short = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] %}
+          {% set months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "Nowember", "Dezember"] %}
+          {% set months_short = ["Jan", "Feb", "Mrz", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Now", "Dez"] %}
+          {% set w = date | timestamp_custom("%w") | int(0) %}
+          {% set m = date | timestamp_custom("%m") | int(0) -%}
+          {{ weekdays_short[w] }} {{ date | timestamp_custom('%d.%m.%Y %H:%M:%S', true) }}
+        {% else %}
+          -
+        {% endif %}
+      icon: mdi:clock-start
+
+    - name: Cycle2 next run time
+      unique_id: cycle2_next_run_time
+      state: >-
+        {% if is_state('input_boolean.cycle2_enable', 'on') %}
+          {%- set date = state_attr('input_datetime.cycle2_next_run_time', 'timestamp') %}
+          {% set weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"] %}
+          {% set weekdays_short = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] %}
+          {% set months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "Nowember", "Dezember"] %}
+          {% set months_short = ["Jan", "Feb", "Mrz", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Now", "Dez"] %}
+          {% set w = date | timestamp_custom("%w") | int(0) %}
+          {% set m = date | timestamp_custom("%m") | int(0) -%}
+          {{ weekdays_short[w] }} {{ date | timestamp_custom('%d.%m.%Y %H:%M:%S', true) }}
+        {% else %}
+          -
+        {% endif %}
+      icon: mdi:clock-start
+
+    - name: Cycle running
+      unique_id: cycle_running
+      state: >-
+        {% if is_state('input_boolean.cycle1_running', 'on') %}
+          Morgen
+        {% elif is_state('input_boolean.cycle2_running', 'on') %}
+          Abend
+        {% else %}
+          -
+        {% endif %}
+      icon: >-
+        {% if is_state('input_boolean.cycle1_running', 'on') or
+              is_state('input_boolean.cycle2_running', 'on') %}
+          mdi:water-pump
+        {% else %}
+          mdi:water-pump-off
+        {% endif %}
+
+    - name: Zone being watered
+      unique_id: zone_being_watered
+      state: "{{ states('input_text.current_zone') }}"
+      icon: mdi:fountain
 
 # Sensors ###########################################################
-sensor:
-  - platform: template
-    sensors:
+# sensor:
+  # - platform: template
+  #   sensors:
 
-      cycle1_next_run_time:
-        friendly_name: "Next scheduled run time"
-        value_template: >
-          {% if is_state('input_boolean.cycle1_enable', 'on') %}
-            {%- set date = state_attr('input_datetime.cycle1_next_run_time', 'timestamp') %}
-            {% set weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"] %}
-            {% set weekdays_short = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] %}
-            {% set months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "Nowember", "Dezember"] %}
-            {% set months_short = ["Jan", "Feb", "Mrz", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Now", "Dez"] %}
-            {% set w = date | timestamp_custom("%w") | int(0) %}
-            {% set m = date | timestamp_custom("%m") | int(0) -%}
-            {{ weekdays_short[w] }} {{ date | timestamp_custom("%d") }} {{ months_short[m-1] }} um {{ date | timestamp_custom("%H:%M") }}
-          {% else %}
-            -
-          {% endif %}
-        icon_template: 'mdi:clock-start'
+      # cycle1_next_run_time:
+      #   friendly_name: "Next scheduled run time"
+      #   value_template: >
+      #     {% if is_state('input_boolean.cycle1_enable', 'on') %}
+      #       {%- set date = state_attr('input_datetime.cycle1_next_run_time', 'timestamp') %}
+      #       {% set weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"] %}
+      #       {% set weekdays_short = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] %}
+      #       {% set months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "Nowember", "Dezember"] %}
+      #       {% set months_short = ["Jan", "Feb", "Mrz", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Now", "Dez"] %}
+      #       {% set w = date | timestamp_custom("%w") | int(0) %}
+      #       {% set m = date | timestamp_custom("%m") | int(0) -%}
+      #       {{ weekdays_short[w] }} {{ date | timestamp_custom("%d") }} {{ months_short[m-1] }} um {{ date | timestamp_custom("%H:%M") }}
+      #     {% else %}
+      #       -
+      #     {% endif %}
+      #   icon_template: 'mdi:clock-start'
 
-      cycle2_next_run_time:
-        friendly_name: "Next scheduled run time"
-        value_template: >
-          {% if is_state('input_boolean.cycle2_enable', 'on') %}
-            {%- set date = state_attr('input_datetime.cycle2_next_run_time', 'timestamp') %}
-            {% set weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"] %}
-            {% set weekdays_short = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] %}
-            {% set months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "Nowember", "Dezember"] %}
-            {% set months_short = ["Jan", "Feb", "Mrz", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Now", "Dez"] %}
-            {% set w = date | timestamp_custom("%w") | int(0) %}
-            {% set m = date | timestamp_custom("%m") | int(0) -%}
-            {{ weekdays_short[w] }} {{ date | timestamp_custom("%d") }} {{ months_short[m-1] }} um {{ date | timestamp_custom("%H:%M") }}
-          {% else %}
-            -
-          {% endif %}
-        icon_template: 'mdi:clock-start'
+      # cycle2_next_run_time:
+      #   friendly_name: "Next scheduled run time"
+      #   value_template: >
+      #     {% if is_state('input_boolean.cycle2_enable', 'on') %}
+      #       {%- set date = state_attr('input_datetime.cycle2_next_run_time', 'timestamp') %}
+      #       {% set weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"] %}
+      #       {% set weekdays_short = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] %}
+      #       {% set months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "Nowember", "Dezember"] %}
+      #       {% set months_short = ["Jan", "Feb", "Mrz", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Now", "Dez"] %}
+      #       {% set w = date | timestamp_custom("%w") | int(0) %}
+      #       {% set m = date | timestamp_custom("%m") | int(0) -%}
+      #       {{ weekdays_short[w] }} {{ date | timestamp_custom("%d") }} {{ months_short[m-1] }} um {{ date | timestamp_custom("%H:%M") }}
+      #     {% else %}
+      #       -
+      #     {% endif %}
+      #   icon_template: 'mdi:clock-start'
 
-      cycle_running:
-        friendly_name: "Cycle Running"
-        value_template: >
-          {% if is_state('input_boolean.cycle1_running', 'on') %}
-            Morgen
-          {% elif is_state('input_boolean.cycle2_running', 'on') %}
-            Abend
-          {% else %}
-            -
-          {% endif %}
-        icon_template: >
-          {% if is_state('input_boolean.cycle1_running', 'on') or
-                is_state('input_boolean.cycle2_running', 'on') %}
-            mdi:water-pump
-          {% else %}
-            mdi:water-pump-off
-          {% endif %}
+      # cycle_running:
+      #   friendly_name: "Cycle Running"
+      #   value_template: >
+      #     {% if is_state('input_boolean.cycle1_running', 'on') %}
+      #       Morgen
+      #     {% elif is_state('input_boolean.cycle2_running', 'on') %}
+      #       Abend
+      #     {% else %}
+      #       -
+      #     {% endif %}
+      #   icon_template: >
+      #     {% if is_state('input_boolean.cycle1_running', 'on') or
+      #           is_state('input_boolean.cycle2_running', 'on') %}
+      #       mdi:water-pump
+      #     {% else %}
+      #       mdi:water-pump-off
+      #     {% endif %}
 
-      zone_being_watered:
-        friendly_name: "Zone being watered"
-        value_template: "{{ states('input_text.current_zone') }}"
-        icon_template: 'mdi:fountain'
+      # zone_being_watered:
+      #   friendly_name: "Zone being watered"
+      #   value_template: "{{ states('input_text.current_zone') }}"
+      #   icon_template: 'mdi:fountain'
 
 homeassistant:
   customize:
@@ -446,7 +505,7 @@ homeassistant:
     group.irrigation_automations:
       friendly_name: "Automatisierungen"
 
-# Input Boolean #####################################################
+    # Input Boolean #################################################
     input_boolean.irrigation_master_control_switch:
       friendly_name: "Bewässerungsautomat"
       icon: mdi:sprinkler-variant
@@ -475,7 +534,7 @@ homeassistant:
       friendly_name: "Abendzyklus starten"
       icon: mdi:weather-sunset-down
 
-# Input Select ######################################################
+    # Input Select ##################################################
     input_select.cycle1_watering_days:
       friendly_name: Bewässerungstage am Morgen
 
@@ -488,7 +547,7 @@ homeassistant:
     input_select.cycle2_schedule_time:
       friendly_name: Startzeit des Abendszyklus
 
-# Input Number ######################################################
+    # Input Number ##################################################
     input_number.cycle1_zone1_duration:
       friendly_name: Hinten Dauer
 
@@ -517,11 +576,11 @@ homeassistant:
       friendly_name: Bodenfeuchte hinten
       icon: mdi:water-percent
 
-# Timer #############################################################
+    # Timer #########################################################
     timer.zone_duration:
       friendly_name: Verbleibende Zeit
 
-# Sensors ###########################################################
+    # Sensors #######################################################
     sensor.cycle1_next_run_time:
       friendly_name: "Nächste geplante Laufzeit"
 

@@ -9,14 +9,16 @@ homeassistant:
   internal_url: !secret ha_internal_url
   packages: !include_dir_named packages
   customize: !include customize.yaml
-  allowlist_external_dirs:
-    - /mnt/sdb1/cam1
-    - /mnt/sdb1/cam2
-    - /mnt/sdb1/cam3
+#  allowlist_external_dirs:
+#    - /mnt/sdb1/cam1
+#    - /mnt/sdb1/cam2
+#    - /mnt/sdb1/cam3
+#
+#  media_dirs:
+#    local: /home/barma/.homeassistant/media
+#    recording: /mnt/sdb1
 
-  media_dirs:
-    local: /home/barma/.homeassistant/media
-    recording: /mnt/sdb1
+
 #    nasmedia: /mnt/nasmedia
 
 #default_config:
@@ -42,14 +44,19 @@ frontend:
 
 # HTTP ##############################################################
 http:
-  ssl_certificate: !secret http_ssl_certificate
-  ssl_key: !secret http_ssl_key
-#  api_password: !secret api_pass
+  ssl_certificate: /ssl/fullchain.pem
+  ssl_key: /ssl/privkey.pem
   ip_ban_enabled: true
-#  - platform: rest 
-#    resource: !secret url
-#    headers: 
-#      authorization: !secret along_token
+  login_attempts_threshold: 15
+
+#  ssl_certificate: !secret http_ssl_certificate
+#  ssl_key: !secret http_ssl_key
+##  api_password: !secret api_pass
+#  ip_ban_enabled: true
+##  - platform: rest 
+##    resource: !secret url
+##    headers: 
+##      authorization: !secret along_token
 
 websocket_api:
 

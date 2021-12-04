@@ -112,7 +112,7 @@ automation:
         data:
           cycle: '2'
 
-# Run A Cycle Manually ##############################################
+  # Run A Cycle Manually ############################################
   - id: irrigation_run_a_cycle_manually
     alias: Irrigation - Run A Cycle Manually
     # initial_state: on
@@ -125,7 +125,7 @@ automation:
         to: 'on'
 
     condition:
-# Don't run if the other cycle is already running
+      # Don't run if the other cycle is already running
       - condition: template
         value_template: >
           {% if trigger.entity_id == 'input_boolean.cycle1_manual_run' %}
@@ -135,26 +135,26 @@ automation:
           {% endif %}
 
     action:
-# Update progress in ui ###############
+      # Update progress in ui
       - service: input_text.set_value
         data:
           entity_id: input_text.current_zone
           value: 'Initialising...'
 
-# Make sure nothing in the system is running ########################
-# Turn off valves #####################
+      # Make sure nothing in the system is running
+      # Turn off valves
       - service: homeassistant.turn_off
         data:
           entity_id: group.irrigation_switches
 
-# Turn off scripts ####################
+      # Turn off scripts
       - service: homeassistant.turn_off
         entity_id: script.irrigation_run_a_cycle
 
       - service: homeassistant.turn_off
         entity_id: script.irrigation_irrigate_a_zone
 
-# Save the current state of both cycle_enabled booleans
+      # Save the current state of both cycle_enabled booleans
       - service: >
           {% if is_state('input_boolean.cycle1_enable', 'on') %}
             input_boolean.turn_on
@@ -173,13 +173,13 @@ automation:
         data:
           entity_id: input_boolean.cycle2_enable_saved_state
 
-# Disable both programmes #############
+      # Disable both programmes
       - service: homeassistant.turn_off
         entity_id:
         - input_boolean.cycle1_enable
         - input_boolean.cycle2_enable
 
-# Run a cycle #########################
+      # Run a cycle
       - service: script.irrigation_run_a_cycle
         data:
           cycle: >
@@ -189,16 +189,16 @@ automation:
               2
             {% endif %}
 
-# Wait until script is finished #######
+      # Wait until script is finished
       - wait_template: "{{ is_state('script.irrigation_run_a_cycle', 'off') }}"
 
-# Turn off both manual run booleans (in case one was turned on while the other was already running)
+      # Turn off both manual run booleans (in case one was turned on while the other was already running)
       - service: homeassistant.turn_off
         entity_id:
         - input_boolean.cycle1_manual_run
         - input_boolean.cycle2_manual_run
 
-# Restore the previous state of both cycle_enabled booleans
+      # Restore the previous state of both cycle_enabled booleans
       - service: >
           {% if is_state('input_boolean.cycle1_enable_saved_state', 'on') %}
             input_boolean.turn_on

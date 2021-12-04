@@ -1,13 +1,18 @@
+# Irrigation - Lovelace variables and scripts
+
 # Input_Booleans ####################################################
 input_boolean:
   irrigation_view_cycle1:
     name: View Cycle1
+    icon: mdi:weather-sunset-up
 
   irrigation_view_cycle2:
     name: View Cycle2
+    icon: mdi:weather-sunset-down
 
   irrigation_view_stat:
     name: View Statistics
+    icon: mdi:history
 
 # Scripts ###########################################################
 
@@ -66,7 +71,6 @@ script:
 
 homeassistant:
   customize:
-
     input_boolean.irrigation_view_cycle1:
       friendly_name: "Morgen"
       icon: mdi:weather-sunset-up

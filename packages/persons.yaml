@@ -16,10 +16,15 @@ automation:
     - platform: time
       at: '19:00'
 
+  condition:
+      condition: template
+      value_template: "{{ is_state('calendar.dienstplan_natalja_schick','on') }}"
+
   action:
     - service: >-
-        {% if ((as_timestamp(states.calendar.dienstplan_natalja_schick.attributes.start_time) - as_timestamp(now())) < 86400)
-          and ((as_timestamp(states.calendar.dienstplan_natalja_schick.attributes.start_time) - as_timestamp(now())) > 0) %}
+        {% set night_shift_start = as_timestamp(states.calendar.dienstplan_natalja_schick.attributes.start_time) %}
+        {% if (( night_shift_start - as_timestamp(now()) ) < 86400 )
+          and (( night_shift_start - as_timestamp(now()) ) > 0 ) %}
           input_boolean.turn_on
         {% else %}
           input_boolean.turn_off
