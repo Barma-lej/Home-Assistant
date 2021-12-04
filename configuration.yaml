@@ -9,16 +9,15 @@ homeassistant:
   internal_url: !secret ha_internal_url
   packages: !include_dir_named packages
   customize: !include customize.yaml
-#  allowlist_external_dirs:
-#    - /mnt/sdb1/cam1
-#    - /mnt/sdb1/cam2
-#    - /mnt/sdb1/cam3
-#
-#  media_dirs:
-#    local: /home/barma/.homeassistant/media
-#    recording: /mnt/sdb1
 
-#    nasmedia: /mnt/nasmedia
+  # allowlist_external_dirs:
+  #   - /mnt/sdb1/cam1
+  #   - /mnt/sdb1/cam2
+  #   - /mnt/sdb1/cam3
+
+  media_dirs:
+    local: /media
+    # recording: /mnt/sdb1
 
 #default_config:
 energy:
@@ -27,9 +26,9 @@ media_source:
 panel_iframe: !include panel_iframe.yaml
 
 folder_watcher:
-  - folder: /mnt/sdb1/cam1
-  - folder: /mnt/sdb1/cam2
-  - folder: /mnt/sdb1/cam3
+  - folder: /media/cam1
+  - folder: /media/cam2
+  - folder: /media/cam3
 ##    patterns:
 ##      - '*.mkv'
 
