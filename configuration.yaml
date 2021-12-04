@@ -18,7 +18,6 @@ homeassistant:
 #    local: /home/barma/.homeassistant/media
 #    recording: /mnt/sdb1
 
-
 #    nasmedia: /mnt/nasmedia
 
 #default_config:
@@ -53,9 +52,9 @@ http:
 #  ssl_key: !secret http_ssl_key
 ##  api_password: !secret api_pass
 #  ip_ban_enabled: true
-##  - platform: rest 
+##  - platform: rest
 ##    resource: !secret url
-##    headers: 
+##    headers:
 ##      authorization: !secret along_token
 
 websocket_api:
@@ -63,31 +62,31 @@ websocket_api:
 mobile_app:
 
 logger:
-#  default: critical
+  #  default: critical
   default: warning
   logs:
     homeassistant.components.http.ban: warning
     homeassistant.components.device_tracker: warn
     homeassistant.components.camera: warn
-#    homeassistant.core: debug
-#    homeassistant.components: warn
-#    homeassistant.components.syncthru: debug
-#    homeassistant.components.rfxtrx: warn
-#    homeassistant.components.websocket_api: debug
-#    homeassistant.components.ezviz.camera: debug
+    #    homeassistant.core: debug
+    #    homeassistant.components: warn
+    #    homeassistant.components.syncthru: debug
+    #    homeassistant.components.rfxtrx: warn
+    #    homeassistant.components.websocket_api: debug
+    #    homeassistant.components.ezviz.camera: debug
     custom_components.xiaomi_miio_fan.fan: fatal
     miio.miioprotocol: fatal
 
 # Recorder ##########################################################
 recorder:
-#  purge_interval: 1
+  #  purge_interval: 1
   purge_keep_days: 30
-#  db_url: !secret db_url
+  #  db_url: !secret db_url
   exclude:
     domains:
-#      - automation
+      #      - automation
       - calendar
-#      - script
+      #      - script
       - updater
       - weblink
     entity_globs:
@@ -105,9 +104,9 @@ recorder:
 logbook:
   exclude:
     domains:
-#      - automation
+      #      - automation
       - calendar
-#      - script
+      #      - script
       - updater
       - weblink
     entities:
@@ -162,7 +161,7 @@ my: # This integration handles redirects from the My Home Assistant service.
 tts:
   - platform: yandextts
     api_key: !secret yandex_api_key
-    language: 'ru-RU'
+    language: "ru-RU"
     codec: mp3
     voice: oksana
     emotion: good
