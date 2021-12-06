@@ -28,7 +28,6 @@ logbook:
       - script.radio
       - script.radio_stop
 
-
 # Input Numbers #####################################################
 input_number:
   radio_volume:
@@ -84,18 +83,18 @@ group:
 
 # Automations #######################################################
 automation:
-# Stops the radio #
+  # Stops the radio #
   - id: radio_stop
     alias: Radio Stop
     trigger:
-    - platform: state
-      entity_id: input_select.radio_station
-      to: "Stop"
+      - platform: state
+        entity_id: input_select.radio_station
+        to: "Stop"
     action:
       service: script.radio_stop
 
-# Streaming the radio
-# home_group определяем в Google Home APP
+  # Streaming the radio
+  # home_group определяем в Google Home APP
   - id: radio_stream
     alias: Radio Stream
     trigger:
@@ -104,7 +103,7 @@ automation:
     action:
       service: script.radio
 
-# Set radio volume
+  # Set radio volume
   - id: radio_volume
     alias: Radio Volume
     trigger:
@@ -130,29 +129,29 @@ automation:
 
 # Scripts ###########################################################
 script:
-# Plays the radio
+  # Plays the radio
   radio:
     alias: Radio an
     icon: mdi:play
     sequence:
-#      - service: media_player.volume_set
-#        data:
-#          entity_id: media_player.google_home
-#          volume_level: "0.25"
-#      - service: media_player.volume_set
-#        data:
-#          entity_id: media_player.soundblaster
-#          volume_level: "0.25"
-#      - service: media_player.volume_set
-#        data:
-#          entity_id: media_player.flur
-#          volume_level: "0.25"
-#      - service: media_player.volume_set
-#        data:
-#          entity_id: media_player.kristina
-#          volume_level: "0.25"
+      #      - service: media_player.volume_set
+      #        data:
+      #          entity_id: media_player.google_home
+      #          volume_level: "0.25"
+      #      - service: media_player.volume_set
+      #        data:
+      #          entity_id: media_player.soundblaster
+      #          volume_level: "0.25"
+      #      - service: media_player.volume_set
+      #        data:
+      #          entity_id: media_player.flur
+      #          volume_level: "0.25"
+      #      - service: media_player.volume_set
+      #        data:
+      #          entity_id: media_player.kristina
+      #          volume_level: "0.25"
       - service: media_player.play_media
-#      - service: media_extractor.play_media
+        #      - service: media_extractor.play_media
         data:
           entity_id: >
             {% if is_state("input_select.radio_player","Home Mini") %} media_player.google_home
@@ -217,7 +216,7 @@ script:
 # Customize #########################################################
 homeassistant:
   customize:
-# Groups ##########
+    # Groups ##########
     group.radio:
       friendly_name: Radio
     script.radio:

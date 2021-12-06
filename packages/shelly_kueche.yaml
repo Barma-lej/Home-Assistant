@@ -27,38 +27,37 @@ utility_meter:
     source: sensor.shellyswitch25_10a36d_channel_2_energy
     cycle: yearly
 
-
 # Automation ########################################################
 automation:
-- id: telegram_kueche
-  alias: "Telegram Kueche"
-  mode: parallel
-  trigger:
-  - platform: event
-    event_type: telegram_command
-    event_data:
-      command: "/kueche"
+  - id: telegram_kueche
+    alias: "Telegram Kueche"
+    mode: parallel
+    trigger:
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: "/kueche"
 
-  - platform: event
-    event_type: telegram_callback
-    event_data:
-      command: "/kueche"
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          command: "/kueche"
 
-  action:
-  - service: light.toggle
-    data:
-      entity_id: light.shellyswitch25_10a36d_channel_1
+    action:
+      - service: light.toggle
+        data:
+          entity_id: light.shellyswitch25_10a36d_channel_1
 
-  - wait_for_trigger:
-    - platform: state
-      entity_id: light.shellyswitch25_10a36d_channel_1
-    timeout: 5
-    continue_on_timeout: true
+      - wait_for_trigger:
+          - platform: state
+            entity_id: light.shellyswitch25_10a36d_channel_1
+        timeout: 5
+        continue_on_timeout: true
 
-  - service: telegram_bot.send_message
-    data:
-      target: "{{ trigger.event.data.user_id }}"
-      message: "💡 {{ state_attr('light.shellyswitch25_10a36d_channel_1', 'friendly_name') }} ist {{ states('light.shellyswitch25_10a36d_channel_1') }}"
+      - service: telegram_bot.send_message
+        data:
+          target: "{{ trigger.event.data.user_id }}"
+          message: "💡 {{ state_attr('light.shellyswitch25_10a36d_channel_1', 'friendly_name') }} ist {{ states('light.shellyswitch25_10a36d_channel_1') }}"
 
 # Customize #########################################################
 homeassistant:

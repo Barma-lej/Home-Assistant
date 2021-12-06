@@ -64,15 +64,15 @@ logger:
   #  default: critical
   default: warning
   logs:
-    homeassistant.components.http.ban: warning
+    homeassistant.components.http.ban: warn
     homeassistant.components.device_tracker: warn
     homeassistant.components.camera: warn
-    #    homeassistant.core: debug
-    #    homeassistant.components: warn
-    #    homeassistant.components.syncthru: debug
-    #    homeassistant.components.rfxtrx: warn
-    #    homeassistant.components.websocket_api: debug
-    #    homeassistant.components.ezviz.camera: debug
+    # homeassistant.core: debug
+    # homeassistant.components: warn
+    # homeassistant.components.syncthru: debug
+    # homeassistant.components.rfxtrx: warn
+    # homeassistant.components.websocket_api: debug
+    fritzconnection: warn
     custom_components.xiaomi_miio_fan.fan: fatal
     miio.miioprotocol: fatal
 
@@ -168,7 +168,7 @@ tts:
 #  - platform: google
 
 ## FFMPEG ############################################################
-#ffmpeg:
+# ffmpeg:
 ##  ffmpeg_bin: /usr/bin/ffmpeg
 
 stream:

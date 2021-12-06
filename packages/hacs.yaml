@@ -9,11 +9,11 @@ automation:
   - id: "hacs_updates"
     alias: Hacs Update Available Notifications
     trigger:
-    - platform: numeric_state
-      entity_id: sensor.hacs
-      above: 0
+      - platform: numeric_state
+        entity_id: sensor.hacs
+        above: 0
     action:
-    - service: persistent_notification.create
-      data:
-        title: Aktualisierung verfügbar
-        message: "{{ states('sensor.hacs') }} HACS Updates verfügbar"
+      - service: persistent_notification.create
+        data:
+          title: Aktualisierung verfügbar
+          message: "{{ states('sensor.hacs') }} HACS Updates verfügbar"

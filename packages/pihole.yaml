@@ -7,7 +7,7 @@
 # Customize #########################################################
 homeassistant:
   customize:
-# Sensor ##########
+    # Sensor ##########
     sensor.pi_hole_ads_blocked_today:
       unit_of_measurement: " "
     sensor.pi_hole_dns_unique_clients:

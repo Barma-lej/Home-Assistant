@@ -12,80 +12,80 @@ landroid_cloud:
 recorder:
   exclude:
     entities:
-  # Swithes #######
-    #  - swith.mower_mowing
-    #  - swith.mower_home
-    #  - swith.mower_edgecut
-    #  - swith.mower_partymode
-    #  - swith.mower_lock
-  # Sensors #######
+      # Swithes #######
+      # - swith.mower_mowing
+      # - swith.mower_home
+      # - swith.mower_edgecut
+      # - swith.mower_partymode
+      # - swith.mower_lock
+      # Sensors #######
       - sensor.mower_ip
       - sensor.mower_sn
       - sensor.mower_mac
-    #  - sensor.mower_lastupdate
-    #  - input_number.mower_raindelay
-    #  - input_number.mower_timeextension
-    #  - input_boolean.mower_info_toggle
-    #  - input_boolean.mower_sched_settings
-    ##  - input_boolean.mower_0_sched_enable
-    ##  - input_boolean.mower_1_sched_enable
-    ##  - input_boolean.mower_2_sched_enable
-    ##  - input_boolean.mower_3_sched_enable
-    ##  - input_boolean.mower_4_sched_enable
-    ##  - input_boolean.mower_5_sched_enable
-    ##  - input_boolean.mower_6_sched_enable
-    ##  - input_boolean.mower_0_cuttoedge
-    ##  - input_boolean.mower_1_cuttoedge
-    ##  - input_boolean.mower_2_cuttoedge
-    ##  - input_boolean.mower_3_cuttoedge
-    ##  - input_boolean.mower_4_cuttoedge
-    ##  - input_boolean.mower_5_cuttoedge
-    ##  - input_boolean.mower_6_cuttoedge
-    ##  - input_boolean.mower_view_0
-    ##  - input_boolean.mower_view_1
-    ##  - input_boolean.mower_view_2
-    ##  - input_boolean.mower_view_3
-    ##  - input_boolean.mower_view_4
-    ##  - input_boolean.mower_view_5
-    ##  - input_boolean.mower_view_6
+      # - sensor.mower_lastupdate
+      # - input_number.mower_raindelay
+      # - input_number.mower_timeextension
+      # - input_boolean.mower_info_toggle
+      # - input_boolean.mower_sched_settings
+      # - input_boolean.mower_0_sched_enable
+      # - input_boolean.mower_1_sched_enable
+      # - input_boolean.mower_2_sched_enable
+      # - input_boolean.mower_3_sched_enable
+      # - input_boolean.mower_4_sched_enable
+      # - input_boolean.mower_5_sched_enable
+      # - input_boolean.mower_6_sched_enable
+      # - input_boolean.mower_0_cuttoedge
+      # - input_boolean.mower_1_cuttoedge
+      # - input_boolean.mower_2_cuttoedge
+      # - input_boolean.mower_3_cuttoedge
+      # - input_boolean.mower_4_cuttoedge
+      # - input_boolean.mower_5_cuttoedge
+      # - input_boolean.mower_6_cuttoedge
+      # - input_boolean.mower_view_0
+      # - input_boolean.mower_view_1
+      # - input_boolean.mower_view_2
+      # - input_boolean.mower_view_3
+      # - input_boolean.mower_view_4
+      # - input_boolean.mower_view_5
+      # - input_boolean.mower_view_6
       - input_boolean.mower_view_config
       - input_boolean.mower_view_setzones
-    #  - automation.mower_notify_status
-    #  - automation.mower_notify_error
-    #  - automation.mower_sync_values
-    #  - script.mower_start
-    #  - script.mower_home
-    #  - script.mower_pause
-    #  - script.mower_set_config
+      # - automation.mower_notify_status
+      # - automation.mower_notify_error
+      # - automation.mower_sync_values
+      # - script.mower_start
+      # - script.mower_home
+      # - script.mower_pause
+      # - script.mower_set_config
       - script.mower_views_toggle
 
 # Logbook ###########################################################
 logbook:
   exclude:
     entities:
-    # Swithes ###############
-      #- swith.mower_mowing
-      #- swith.mower_home
-      #- swith.mower_edgecut
-      #- swith.mower_partymode
-      #- swith.mower_lock
+      # Swithes ###############
+      # - swith.mower_mowing
+      # - swith.mower_home
+      # - swith.mower_edgecut
+      # - swith.mower_partymode
+      # - swith.mower_lock
 
-    # Sensors ###############
+      # Sensors ###############
       - sensor.mower_ip
-      #- sensor.mower_bladetime
-      #- sensor.mower_current bladetime
-      #- sensor.mower_totaltime
-      #- sensor.mower_distance
-      #- sensor.mower_lastupdate
-      #- sensor.mower_wifi
-      #- sensor.mower_yaw
-      #- sensor.mower_roll
-      #- sensor.mower_pitch
+      # - sensor.mower_bladetime
+      # - sensor.mower_current bladetime
+      # - sensor.mower_totaltime
+      # - sensor.mower_distance
+      # - sensor.mower_lastupdate
+      # - sensor.mower_wifi
+      # - sensor.mower_yaw
+      # - sensor.mower_roll
+      # - sensor.mower_pitch
 
-    # Input selects #########
+      # Input selects #########
       - input_select.mower_zone
 
-    # Input numbers #########
+      # Input numbers #########
       - input_number.mower_raindelay
       - input_number.mower_timeextension
       - input_number.mower_zone0_distance
@@ -97,41 +97,41 @@ logbook:
       - input_number.mower_zone2_probability
       - input_number.mower_zone3_probability
 
-    # Input booleans ########
+      # Input booleans ########
       - input_boolean.mower_sched_settings
       - input_boolean.mower_info_toggle
       - input_boolean.mower_zone_enable
       - input_boolean.mower_view_config
       - input_boolean.mower_view_setzones
-      ##- input_boolean.mower_view_0
-      ##- input_boolean.mower_view_1
-      ##- input_boolean.mower_view_2
-      ##- input_boolean.mower_view_3
-      ##- input_boolean.mower_view_4
-      ##- input_boolean.mower_view_5
-      ##- input_boolean.mower_view_6
-      ##- input_boolean.mower_0_sched_enable
-      ##- input_boolean.mower_1_sched_enable
-      ##- input_boolean.mower_2_sched_enable
-      ##- input_boolean.mower_3_sched_enable
-      ##- input_boolean.mower_4_sched_enable
-      ##- input_boolean.mower_5_sched_enable
-      ##- input_boolean.mower_6_sched_enable
-      ##- input_boolean.mower_0_cuttoedge
-      ##- input_boolean.mower_1_cuttoedge
-      ##- input_boolean.mower_2_cuttoedge
-      ##- input_boolean.mower_3_cuttoedge
-      ##- input_boolean.mower_4_cuttoedge
-      ##- input_boolean.mower_5_cuttoedge
-      ##- input_boolean.mower_6_cuttoedge
+      # - input_boolean.mower_view_0
+      # - input_boolean.mower_view_1
+      # - input_boolean.mower_view_2
+      # - input_boolean.mower_view_3
+      # - input_boolean.mower_view_4
+      # - input_boolean.mower_view_5
+      # - input_boolean.mower_view_6
+      # - input_boolean.mower_0_sched_enable
+      # - input_boolean.mower_1_sched_enable
+      # - input_boolean.mower_2_sched_enable
+      # - input_boolean.mower_3_sched_enable
+      # - input_boolean.mower_4_sched_enable
+      # - input_boolean.mower_5_sched_enable
+      # - input_boolean.mower_6_sched_enable
+      # - input_boolean.mower_0_cuttoedge
+      # - input_boolean.mower_1_cuttoedge
+      # - input_boolean.mower_2_cuttoedge
+      # - input_boolean.mower_3_cuttoedge
+      # - input_boolean.mower_4_cuttoedge
+      # - input_boolean.mower_5_cuttoedge
+      # - input_boolean.mower_6_cuttoedge
 
-    # Automations ######
+      # Automations ######
       - automation.mower_notify_status
       - automation.mower_notify_error
       - automation.mower_sync_values
       - automation.mower_views_switch
 
-    # Scripts ##########
+      # Scripts ##########
       - script.mower_set_config
       - script.mower_setzone
       - script.mower_setzones
@@ -207,12 +207,12 @@ switch:
           {% else %}
             mdi:motion-play
           {% endif %}
-        #entity_picture_template: >-
-        #  {% if is_state_attr('sensor.landroid_mower_status', 'status_id', 32) %}
-        #    /local/mower/cut-to-edge-on.png
-        #  {% else %}
-        #    /local/mower/cut-to-edge.png
-        #  {% endif %}
+        # entity_picture_template: >-
+        #   {% if is_state_attr('sensor.landroid_mower_status', 'status_id', 32) %}
+        #     /local/mower/cut-to-edge-on.png
+        #   {% else %}
+        #     /local/mower/cut-to-edge.png
+        #   {% endif %}
 
       mower_partymode:
         unique_id: mower_partymode
@@ -233,7 +233,7 @@ switch:
           {% else %}
             mdi:sleep
           {% endif %}
-        #  service: script.mower_partymode
+        # service: script.mower_partymode
 
       mower_lock:
         unique_id: mower_lock
@@ -262,13 +262,13 @@ switch:
 # sensor.landroid_mower_status
 template:
   sensor:
-  # Info ############
+    # Info ############
     - name: Mower IP
       unique_id: mower_ip
       state: !secret mower_ip
       icon: mdi:ip-network
 
-  # Status ##########
+    # Status ##########
     - name: Mower bladetime
       unique_id: mower_bladetime
       state: "{{ state_attr('sensor.landroid_mower_status', 'total_blade_time') }}"
@@ -507,51 +507,50 @@ input_boolean:
   #  icon: mdi:calendar-check
 
 # Enable scheduler on weekdays
-  #mower_0_sched_enable:
-  #  name: Sunday
-  #  icon: mdi:calendar
-  #mower_1_sched_enable:
-  #  name: Monday
-  #  icon: mdi:calendar-today
-  #mower_2_sched_enable:
-  #  name: Tuesday
-  #  icon: mdi:calendar-minus
-  #mower_3_sched_enable:
-  #  name: Wednesday
-  #  icon: mdi:calendar-range
-  #mower_4_sched_enable:
-  #  name: Thursday
-  #  icon: mdi:calendar-multiselect
-  #mower_5_sched_enable:
-  #  name: Friday
-  #  icon: mdi:calendar-heart
-  #mower_6_sched_enable:
-  #  name: Saturday
-  #  icon: mdi:calendar-check
+#mower_0_sched_enable:
+#  name: Sunday
+#  icon: mdi:calendar
+#mower_1_sched_enable:
+#  name: Monday
+#  icon: mdi:calendar-today
+#mower_2_sched_enable:
+#  name: Tuesday
+#  icon: mdi:calendar-minus
+#mower_3_sched_enable:
+#  name: Wednesday
+#  icon: mdi:calendar-range
+#mower_4_sched_enable:
+#  name: Thursday
+#  icon: mdi:calendar-multiselect
+#mower_5_sched_enable:
+#  name: Friday
+#  icon: mdi:calendar-heart
+#mower_6_sched_enable:
+#  name: Saturday
+#  icon: mdi:calendar-check
 
 # Enable Cut to Edge on weekdays
-  #mower_0_cuttoedge:
-  #  name: Cut to Edge (0)
-  #  icon: mdi:scissors-cutting
-  #mower_1_cuttoedge:
-  #  name: Cut to Edge (1)
-  #  icon: mdi:scissors-cutting
-  #mower_2_cuttoedge:
-  #  name: Cut to Edge (2)
-  #  icon: mdi:scissors-cutting
-  #mower_3_cuttoedge:
-  #  name: Cut to Edge (3)
-  #  icon: mdi:scissors-cutting
-  #mower_4_cuttoedge:
-  #  name: Cut to Edge (4)
-  #  icon: mdi:scissors-cutting
-  #mower_5_cuttoedge:
-  #  name: Cut to Edge (5)
-  #  icon: mdi:scissors-cutting
-  #mower_6_cuttoedge:
-  #  name: Cut to Edge (6)
-  #  icon: mdi:scissors-cutting
-
+#mower_0_cuttoedge:
+#  name: Cut to Edge (0)
+#  icon: mdi:scissors-cutting
+#mower_1_cuttoedge:
+#  name: Cut to Edge (1)
+#  icon: mdi:scissors-cutting
+#mower_2_cuttoedge:
+#  name: Cut to Edge (2)
+#  icon: mdi:scissors-cutting
+#mower_3_cuttoedge:
+#  name: Cut to Edge (3)
+#  icon: mdi:scissors-cutting
+#mower_4_cuttoedge:
+#  name: Cut to Edge (4)
+#  icon: mdi:scissors-cutting
+#mower_5_cuttoedge:
+#  name: Cut to Edge (5)
+#  icon: mdi:scissors-cutting
+#mower_6_cuttoedge:
+#  name: Cut to Edge (6)
+#  icon: mdi:scissors-cutting
 
 # Automations #######################################################
 automation:
@@ -706,7 +705,6 @@ script:
       - service: input_boolean.turn_on
         data:
           entity_id: "{{ entity_id }}"
-
 # Select view
 # Select view - add button in Lovelace
 #############################

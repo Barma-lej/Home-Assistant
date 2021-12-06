@@ -5,16 +5,16 @@ media_extractor:
   default_query: best
   customize:
     media_player.nest_mini:
-#      video: bestvideo
+      # video: bestvideo
       music: bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=ogg]/bestaudio
     media_player.google_home:
-#      video: bestvideo
+      # video: bestvideo
       music: bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=ogg]/bestaudio
     media_player.kristina:
-#      video: bestvideo
+      # video: bestvideo
       music: bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=ogg]/bestaudio
     media_player.flur:
-#      video: bestvideo
+      # video: bestvideo
       music: bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=ogg]/bestaudio
     media_player.chromecast:
       video: bestvideo
@@ -23,9 +23,8 @@ media_extractor:
       video: bestvideo
       music: bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=ogg]/bestaudio
     media_player.soundblaster:
-#      video: bestvideo
+      # video: bestvideo
       music: bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=ogg]/bestaudio
     media_player.sony_bravia_kd55x8505b:
       video: bestvideo
       music: bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=ogg]/bestaudio
-    

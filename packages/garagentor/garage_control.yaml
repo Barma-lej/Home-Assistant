@@ -20,80 +20,79 @@ logbook:
 # Input ############################################################
 input_boolean:
   torteil:
-    name: 'Tor Teiloffnung'
+    name: "Tor Teiloffnung"
     initial: off
     icon: mdi:garage-alert
 
 # Automations #######################################################
 automation:
-- id: 'torteiloffnung_on'
-  alias: Torteiloffnung ON
-  trigger:
-  - platform: state
-    entity_id: switch.torteil
-    to: 'on'
-
-  condition:
-  - condition: state
-    entity_id: input_boolean.torteil
-    state: 'off'
-
-  action:
-  - delay:
-      seconds: 2
-  - alias: ''
-    service: homeassistant.turn_on
-    data:
-      entity_id: input_boolean.torteil
-
-#- id: 'torteil_off'
-#  alias: Torteiloffnung OFF
-#  description: ''
-#  trigger:
-#  - entity_id: binary_sensor.tor_geoffnet
-#    platform: state
-#    to: 'on'
-#  condition:
-#  - condition: state
-#    entity_id: input_boolean.torteil
-#    state: 'on'
-#  action:
-#  - alias: ''
-#    service: homeassistant.turn_off
-#    data:
-#      entity_id: input_boolean.torteil
-
-- id: telegram_tor
-  alias: "Telegram tor"
-  mode: restart
-  trigger:
-    platform: event
-    event_type: telegram_command
-    event_data:
-      command: "/tor"
-
-  action:
-    - service: switch.toggle
-      data:
-        entity_id: switch.tor
-
-    - wait_for_trigger:
+  - id: "torteiloffnung_on"
+    alias: Torteiloffnung ON
+    trigger:
       - platform: state
-        entity_id: cover.tor
-      timeout: 30
-      continue_on_timeout: true
+        entity_id: switch.torteil
+        to: "on"
 
-    - service: telegram_bot.send_message
-      data:
-        target: "{{ trigger.event.data.user_id }}"
-        message: "{{ state_attr('switch.tor', 'friendly_name') }} ist auf {{ state_attr('cover.tor', 'current_position') }}% geöffnet "
+    condition:
+      - condition: state
+        entity_id: input_boolean.torteil
+        state: "off"
+
+    action:
+      - delay:
+          seconds: 2
+      - alias: ""
+        service: homeassistant.turn_on
+        data:
+          entity_id: input_boolean.torteil
+
+  #- id: 'torteil_off'
+  #  alias: Torteiloffnung OFF
+  #  description: ''
+  #  trigger:
+  #  - entity_id: binary_sensor.tor_geoffnet
+  #    platform: state
+  #    to: 'on'
+  #  condition:
+  #  - condition: state
+  #    entity_id: input_boolean.torteil
+  #    state: 'on'
+  #  action:
+  #  - alias: ''
+  #    service: homeassistant.turn_off
+  #    data:
+  #      entity_id: input_boolean.torteil
+
+  - id: telegram_tor
+    alias: "Telegram tor"
+    mode: restart
+    trigger:
+      platform: event
+      event_type: telegram_command
+      event_data:
+        command: "/tor"
+
+    action:
+      - service: switch.toggle
+        data:
+          entity_id: switch.tor
+
+      - wait_for_trigger:
+          - platform: state
+            entity_id: cover.tor
+        timeout: 30
+        continue_on_timeout: true
+
+      - service: telegram_bot.send_message
+        data:
+          target: "{{ trigger.event.data.user_id }}"
+          message: "{{ state_attr('switch.tor', 'friendly_name') }} ist auf {{ state_attr('cover.tor', 'current_position') }}% geöffnet "
 
 # Customize #########################################################
 homeassistant:
   customize:
-# Sensor ##########
+    # Sensor ##########
     sensor.tor_wifi_signal:
       unit_of_measurement: "dBm"
     cover.tor:
       icon: mdi:garage
-

@@ -17,35 +17,35 @@ utility_meter:
 
 # Automation ########################################################
 automation:
-- id: telegram_rollade_hinten
-  alias: "Telegram Rollade hinten"
-  mode: parallel
-  trigger:
-  - platform: event
-    event_type: telegram_command
-    event_data:
-      command: "/rollade_hinten"
+  - id: telegram_rollade_hinten
+    alias: "Telegram Rollade hinten"
+    mode: parallel
+    trigger:
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: "/rollade_hinten"
 
-  - platform: event
-    event_type: telegram_callback
-    event_data:
-      command: "/rollade_hinten"
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          command: "/rollade_hinten"
 
-  action:
-  - service: script.cover_one_button
-    data:
-      entity_id: shellyswitch25_10d315
+    action:
+      - service: script.cover_one_button
+        data:
+          entity_id: shellyswitch25_10d315
 
-  - wait_for_trigger:
-    - platform: state
-      entity_id: cover.shellyswitch25_10d315
-    timeout: 5
-    continue_on_timeout: true
+      - wait_for_trigger:
+          - platform: state
+            entity_id: cover.shellyswitch25_10d315
+        timeout: 5
+        continue_on_timeout: true
 
-  - service: telegram_bot.send_message
-    data:
-      target: "{{ trigger.event.data.user_id }}"
-      message: "🏡 {{ state_attr('cover.shellyswitch25_10d315', 'friendly_name') }} ist {{ states('cover.shellyswitch25_10d315') }}"
+      - service: telegram_bot.send_message
+        data:
+          target: "{{ trigger.event.data.user_id }}"
+          message: "🏡 {{ state_attr('cover.shellyswitch25_10d315', 'friendly_name') }} ist {{ states('cover.shellyswitch25_10d315') }}"
 
 # Customize #########################################################
 homeassistant:

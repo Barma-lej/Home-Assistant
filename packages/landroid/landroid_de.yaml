@@ -1,7 +1,7 @@
 # Customize #########################################################
 homeassistant:
   customize:
-  # Switches ###########
+    # Switches ###########
     switch.mower_mowing:
       friendly_name: Mähen
     switch.mower_home:
@@ -13,7 +13,7 @@ homeassistant:
     switch.mower_lock:
       friendly_name: Sperren
 
-  # Sensors ############
+    # Sensors ############
     sensor.landroid_mower_battery:
       friendly_name: Akkuladung
       device_class: battery
@@ -45,11 +45,11 @@ homeassistant:
     sensor.mower_pitch:
       friendly_name: Nicken/Тангаж
 
-  # Input Selects ######
+    # Input Selects ######
     input_select.mower_zone:
       friendly_name: Mähzone
 
-  # Input Numbers ######
+    # Input Numbers ######
     input_number.mower_raindelay:
       friendly_name: Regenverzögerung
     input_number.mower_timeextension:
@@ -73,7 +73,7 @@ homeassistant:
     input_number.mower_zone3_probability:
       friendly_name: "Mähzone 3: Wahrscheinlichkeit"
 
-  # Input Booleans #####
+    # Input Booleans #####
     input_boolean.mower_sched_settings:
       friendly_name: Mähplan
     input_boolean.mower_info_toggle:
@@ -131,8 +131,7 @@ homeassistant:
     #input_boolean.mower_6_cuttoedge:
     #  friendly_name: Cut to edge
 
-
-  # Automations ########
+    # Automations ########
     automation.mower_notify_status:
       friendly_name: Statusbenachrichtigung
       icon: mdi:bell
@@ -148,8 +147,7 @@ homeassistant:
     #  friendly_name: Registerkarten umschalten
     #  icon: mdi:tab
 
-
-# Scripts #########
+    # Scripts #########
     script.mower_set_config:
       friendly_name: Konfiguration speichern
       icon: mdi:content-save-settings

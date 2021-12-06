@@ -5,7 +5,7 @@
 automation:
   - id: tv_board_off
     alias: "TV Board OFF"
-    initial_state: "off"
+    initial_state: false
     trigger:
       platform: state
       entity_id: group.familie_wlan

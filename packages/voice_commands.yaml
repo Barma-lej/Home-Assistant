@@ -1,7 +1,7 @@
 conversation:
   intents:
     LivingRoomTemperature:
-     - Привет
+      - Привет
 
 intent_script:
   LivingRoomTemperature:

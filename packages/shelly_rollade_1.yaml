@@ -17,35 +17,35 @@ utility_meter:
 
 # Automation ########################################################
 automation:
-- id: telegram_rollade_1
-  alias: "Telegram Rollade 1"
-  mode: parallel
-  trigger:
-  - platform: event
-    event_type: telegram_command
-    event_data:
-      command: "/rollade_1"
+  - id: telegram_rollade_1
+    alias: "Telegram Rollade 1"
+    mode: parallel
+    trigger:
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: "/rollade_1"
 
-  - platform: event
-    event_type: telegram_callback
-    event_data:
-      command: "/rollade_1"
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          command: "/rollade_1"
 
-  action:
-  - service: script.cover_one_button
-    data:
-      entity_id: shellyswitch25_f37a8c
+    action:
+      - service: script.cover_one_button
+        data:
+          entity_id: shellyswitch25_f37a8c
 
-  - wait_for_trigger:
-    - platform: state
-      entity_id: cover.shellyswitch25_f37a8c
-    timeout: 5
-    continue_on_timeout: true
+      - wait_for_trigger:
+          - platform: state
+            entity_id: cover.shellyswitch25_f37a8c
+        timeout: 5
+        continue_on_timeout: true
 
-  - service: telegram_bot.send_message
-    data:
-      target: "{{ trigger.event.data.user_id }}"
-      message: "🏡 {{ state_attr('cover.shellyswitch25_f37a8c', 'friendly_name') }} ist {{ states('cover.shellyswitch25_f37a8c') }}"
+      - service: telegram_bot.send_message
+        data:
+          target: "{{ trigger.event.data.user_id }}"
+          message: "🏡 {{ state_attr('cover.shellyswitch25_f37a8c', 'friendly_name') }} ist {{ states('cover.shellyswitch25_f37a8c') }}"
 
 # Customize #########################################################
 homeassistant:

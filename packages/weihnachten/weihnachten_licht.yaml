@@ -14,11 +14,11 @@ group:
     name: Weihnachten Licht draussen
     entities:
       # - switch.alfa01
-      # - switch.alfa03
+      - switch.alfa03
       # - switch.sonoffs20_1
       # - switch.sonoffs20_2
       # - switch.sonoffs26_1
-      # - switch.sonoffs26_2
+      - switch.sonoffs26_2
 
 # Automations #######################################################
 automation:
@@ -74,12 +74,12 @@ automation:
     condition:
       - condition: state
         entity_id: input_boolean.nataljas_night_shift
-        state: 'on'
+        state: "on"
 
     action:
-    - service: switch.turn_on
-      data:
-        entity_id: group.weihnachten_licht
+      - service: switch.turn_on
+        data:
+          entity_id: group.weihnachten_licht
 
   - id: weihnachten_licht_aus
     alias: Weihnachten Licht Aus

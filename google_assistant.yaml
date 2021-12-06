@@ -20,105 +20,85 @@ service_account: !include google_sevice_account.json
 report_state: true
 expose_by_default: false
 secure_devices_pin: !secret google_secure_device_pin
-#client_id:
-#access_token:
-#agent_user_id:
+# client_id:
+# access_token:
+# agent_user_id:
 exposed_domains:
   - camera
-#  - switch
-#  - light
-#  - cover
+  # - switch
+  # - light
+  # - cover
 entity_config:
   group.weihnachten_licht:
     name: Weihnachten
     room: Ambiente
     expose: true
-#================================================
+
   switch.sonoffs26_1:
     name: TV-Board
     room: Wohnzimmer
     expose: true
-#================================================
+
   switch.mower_mowing:
     name: Mähroboter
     room: Garten
     expose: true
-##================================================
-#  switch.sonoffpow_01:
-#    name: Wandlicht
-#    room: Wohnzimmer
-#    expose: true
-##================================================
-#  switch.sonoffpow_02:
-#    name: Wohnzimmerambient
-#    room: Ambiente
-#    expose: true
-##================================================
-#  switch.sonoffpow_03:
-#    name: Küchenlicht
-#    room: Küche
-#    expose: true
-##================================================
-#  switch.sonoffpow_04:
-#    name: Küchenambient
-#    room: Ambiente
-#    expose: true
-#================================================
+
   light.sonoffpow_01:
     name: Wandlicht
     room: Wohnzimmer
     expose: true
-#================================================
+
   light.sonoffpow_02:
     name: Wohnzimmerambient
     room: Ambiente
     expose: true
-##================================================
-#  light.sonoffpow_03:
-#    name: Küchenlicht
-#    room: Küche
-#    expose: true
-#================================================
+
+  # light.sonoffpow_03:
+  #   name: Küchenlicht
+  #   room: Küche
+  #   expose: true
+
   light.sonoffpow_04:
     name: Küchenambient
     room: Ambiente
     expose: true
-#================================================
+
   media_player.sony_bravia_kd55x8505b:
     name: TV
     room: Wohnzimmer
     expose: true
-#================================================
+
   group.ambientelight:
     name: Ambiente Licht
     room: Ambiente
     expose: true
-#================================================
-#  light.yeelight_ceiling1_mibt13035629:
-#    name: Kristinas Licht
-#    room: Kristina
-#    expose: true
-#================================================
+
+  # light.yeelight_ceiling1_mibt13035629:
+  #   name: Kristinas Licht
+  #   room: Kristina
+  #   expose: true
+
   light.sonoffrf1:
     name: Leiste
     room: Kristina
     expose: true
-#================================================
+
   light.esplight6f:
     name: LED
     room: Garage
     expose: true
-#================================================
-#  cover.tor:
-#    name: Tor
-#    aliases:
-#      - garagentor
-#      - tor
-#      - garage
-#      - ворота
-#    room: Garage
-#    expose: true
-#================================================
+
+  # cover.tor:
+  #   name: Tor
+  #   aliases:
+  #     - garagentor
+  #     - tor
+  #     - garage
+  #     - ворота
+  #   room: Garage
+  #   expose: true
+
   switch.tor:
     name: Garage
     aliases:
@@ -128,37 +108,24 @@ entity_config:
       - ворота
     room: Garage
     expose: true
-#================================================
+
   switch.torteil:
-    name: 'Tor teilöffnen'
+    name: "Tor teilöffnen"
     room: Garage
     expose: true
-#================================================
-#  sensor.gartorpos:
-#    name: Tor Status
-#    room: Garage
-#    expose: true
-#================================================
-#    aliases:
-#      - source
-#    aliases:
-#      - bright lights
-#      - entry lights
-#  light.living_room:
-#    expose: false
-#    room: living room
-#================================================
-  camera.camhinterhof:
-    name: Camera Hinterhof
-    room: Arbeitszimmer
-    expose: true
-#================================================
-  camera.camgarage:
-    name: Camera Garage
-    room: Garage
-    expose: true
-#================================================
-#  camera.hwr:
-#    name: Camera HWR
-#    room: HWR
-#    expose: true
+
+  # sensor.gartorpos:
+  #   name: Tor Status
+  #   room: Garage
+  #   expose: true
+  #   aliases:
+  #     - source
+
+  # light.living_room:
+  #   expose: false
+  #   room: living room
+
+  # camera.hwr:
+  #   name: Camera HWR
+  #   room: HWR
+  #   expose: true

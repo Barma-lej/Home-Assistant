@@ -19,15 +19,14 @@
 #      - conductivity
 #      - battery
 
-
 plant:
   rasen:
     sensors:
-#      moisture: sensor.flower_1_moisture
-#      battery: sensor.flower_1_battery
-#      temperature: sensor.flower_1_temperature
-#      conductivity: sensor.flower_1_conductivity
-#      brightness: sensor.flower_1_light_intensity
+      #      moisture: sensor.flower_1_moisture
+      #      battery: sensor.flower_1_battery
+      #      temperature: sensor.flower_1_temperature
+      #      conductivity: sensor.flower_1_conductivity
+      #      brightness: sensor.flower_1_light_intensity
       moisture: sensor.rasen_moisture
       battery: sensor.rasen_battery
       temperature: sensor.rasen_temperature
@@ -46,10 +45,9 @@ plant:
 
 homeassistant:
   customize:
-
     plant.rasen:
       friendly_name: Rasen
-#      entity_picture: /local/images/rasen.png
+    #      entity_picture: /local/images/rasen.png
 
     sensor.rasen_moisture:
       friendly_name: Bodenfeuchte (Rasen)

@@ -56,11 +56,11 @@ automation:
           - "{{ trigger.from_state.state == 'closing' }}"
 
     action:
-    - service: input_text.set_value
-      target:
-        entity_id: input_text.{{ trigger.to_state.object_id }}_last_action
-      data:
-        value: "{{ trigger.from_state.state }}"
+      - service: input_text.set_value
+        target:
+          entity_id: input_text.{{ trigger.to_state.object_id }}_last_action
+        data:
+          value: "{{ trigger.from_state.state }}"
 
 # Scripts ###########################################################
 script:
@@ -74,19 +74,19 @@ script:
     alias: Management cover with one button
     mode: parallel
     sequence:
-    - service: >
-        {% if is_state("cover." ~ entity_id, "opening") or
-              is_state("cover." ~ entity_id, "closing") %}
-          cover.stop_cover
-        {% elif is_state('input_text.' ~ entity_id ~ '_last_action', 'closing') %}
-          cover.open_cover
-        {% elif is_state('input_text.' ~ entity_id ~ '_last_action', 'opening') %}
-          cover.close_cover
-        {% else %}
-          cover.stop_cover
-        {% endif %}
-      target:
-        entity_id: cover.{{ entity_id }}
+      - service: >
+          {% if is_state("cover." ~ entity_id, "opening") or
+                is_state("cover." ~ entity_id, "closing") %}
+            cover.stop_cover
+          {% elif is_state('input_text.' ~ entity_id ~ '_last_action', 'closing') %}
+            cover.open_cover
+          {% elif is_state('input_text.' ~ entity_id ~ '_last_action', 'opening') %}
+            cover.close_cover
+          {% else %}
+            cover.stop_cover
+          {% endif %}
+        target:
+          entity_id: cover.{{ entity_id }}
 
   #######################################
   # Script to management covers with two
@@ -101,19 +101,19 @@ script:
     alias: Cover open add start stop option
     mode: parallel
     sequence:
-    - service: >
-        {% if is_state("cover." ~ entity_id, "opening") or
-              is_state("cover." ~ entity_id, "closing") %}
-          cover.stop_cover
-        {% elif mode == "open" %}
-          cover.open_cover
-        {% elif mode == "close" %}
-          cover.close_cover
-        {% else %}
-          cover.stop_cover
-        {% endif %}
-      target:
-        entity_id: cover.{{ entity_id }}
+      - service: >
+          {% if is_state("cover." ~ entity_id, "opening") or
+                is_state("cover." ~ entity_id, "closing") %}
+            cover.stop_cover
+          {% elif mode == "open" %}
+            cover.open_cover
+          {% elif mode == "close" %}
+            cover.close_cover
+          {% else %}
+            cover.stop_cover
+          {% endif %}
+        target:
+          entity_id: cover.{{ entity_id }}
 
 # Customize #########################################################
 homeassistant:

@@ -1,11 +1,11 @@
 # Xiaomi Roborock S50
 
 # Integration #######################################################
-#vacuum:
-#  - platform: xiaomi_miio
-#    name: "Robi"
-#    host: !secret robi_ip
-#    token: !secret robi_token
+# vacuum:
+#   - platform: xiaomi_miio
+#     name: "Robi"
+#     host: !secret robi_ip
+#     token: !secret robi_token
 
 # Recorder ##########################################################
 recorder:
@@ -35,7 +35,7 @@ logbook:
 
 homeassistant:
   customize:
-# Sensors ###################
+    # Sensors ###################
     sensor.robi_start_time_weekdays:
       friendly_name: "Startzeit (Wochentage)"
     sensor.robi_start_time_weekend:
@@ -56,99 +56,99 @@ homeassistant:
 # Sensor  ###########################################################
 template:
   - sensor:
-  # States ####################
-    - name: "robi_start_time_weekdays"
-      unique_id: robi_start_time_weekdays
-      state: "{{ '%0.02d:%0.02d' | format(states('input_number.robi_start_hour_weekdays') | int(0), states('input_number.robi_start_minutes_weekdays') | int(0)) }}"
-      icon: mdi:clock-start
+      # States ####################
+      - name: "robi_start_time_weekdays"
+        unique_id: robi_start_time_weekdays
+        state: "{{ '%0.02d:%0.02d' | format(states('input_number.robi_start_hour_weekdays') | int(0), states('input_number.robi_start_minutes_weekdays') | int(0)) }}"
+        icon: mdi:clock-start
 
-    - name: "robi_start_time_weekend"
-      unique_id: robi_start_time_weekend
-      state: "{{ '%0.02d:%0.02d' | format(states('input_number.robi_start_hour_weekend') | int(0), states('input_number.robi_start_minutes_weekend') | int(0)) }}"
-      icon: mdi:clock-start
+      - name: "robi_start_time_weekend"
+        unique_id: robi_start_time_weekend
+        state: "{{ '%0.02d:%0.02d' | format(states('input_number.robi_start_hour_weekend') | int(0), states('input_number.robi_start_minutes_weekend') | int(0)) }}"
+        icon: mdi:clock-start
 
-    - name: "robi_battery"
-      unique_id: robi_battery
-      state: "{{ state_attr('vacuum.robi','battery_level') | int(0) }}"
-      device_class: battery
-      unit_of_measurement: "%"
+      - name: "robi_battery"
+        unique_id: robi_battery
+        state: "{{ state_attr('vacuum.robi','battery_level') | int(0) }}"
+        device_class: battery
+        unit_of_measurement: "%"
 
-  # Accesories ################
-    # Main brush
-    - name: Robi main brush left fmt
-      unique_id: robi_main_brush_left_fmt
-      state: "{{ (states('sensor.robi_main_brush_left') | int(0) / 3600) | round(1) }}"
-      icon: mdi:broom
-      unit_of_measurement: "Std."
+      # Accesories ################
+      # Main brush
+      - name: Robi main brush left fmt
+        unique_id: robi_main_brush_left_fmt
+        state: "{{ (states('sensor.robi_main_brush_left') | int(0) / 3600) | round(1) }}"
+        icon: mdi:broom
+        unit_of_measurement: "Std."
 
-    - name: Robi main brush pct
-      unique_id: robi_main_brush_pct
-      state: "{{ (states('sensor.robi_main_brush_left_fmt') | int(0) / 3) | round(0) }}"
-      icon: mdi:broom
-      unit_of_measurement: "%"
+      - name: Robi main brush pct
+        unique_id: robi_main_brush_pct
+        state: "{{ (states('sensor.robi_main_brush_left_fmt') | int(0) / 3) | round(0) }}"
+        icon: mdi:broom
+        unit_of_measurement: "%"
 
-    # Side brush
-    - name: Robi side brush left fmt
-      unique_id: robi_side_brush_left_fmt
-      state: "{{ (states('sensor.robi_side_brush_left') | int(0) / 3600) | round(1) }}"
-      icon: mdi:multiplication
-      unit_of_measurement: "Std."
+      # Side brush
+      - name: Robi side brush left fmt
+        unique_id: robi_side_brush_left_fmt
+        state: "{{ (states('sensor.robi_side_brush_left') | int(0) / 3600) | round(1) }}"
+        icon: mdi:multiplication
+        unit_of_measurement: "Std."
 
-    - name: "robi_side_brush_pct"
-      unique_id: robi_side_brush_pct
-      state: "{{ (states('sensor.robi_side_brush_left_fmt') | int(0) / 2) | round(0) }}"
-      icon: mdi:multiplication
-      unit_of_measurement: "%"
+      - name: "robi_side_brush_pct"
+        unique_id: robi_side_brush_pct
+        state: "{{ (states('sensor.robi_side_brush_left_fmt') | int(0) / 2) | round(0) }}"
+        icon: mdi:multiplication
+        unit_of_measurement: "%"
 
-    # Filter
-    - name: Robi filter left fmt
-      unique_id: robi_filter_left_fmt
-      state: "{{ (states('sensor.robi_filter_left') | int(0) / 3600) | round(1) }}"
-      icon: mdi:air-filter
-      unit_of_measurement: "Std."
+      # Filter
+      - name: Robi filter left fmt
+        unique_id: robi_filter_left_fmt
+        state: "{{ (states('sensor.robi_filter_left') | int(0) / 3600) | round(1) }}"
+        icon: mdi:air-filter
+        unit_of_measurement: "Std."
 
-    - name: Robi filter left pct
-      unique_id: robi_filter_left_pct
-      state: "{{ (states('sensor.robi_filter_left_fmt') | int(0) / 1.5) | round(0) }}"
-      icon: mdi:air-filter
-      unit_of_measurement: "%"
+      - name: Robi filter left pct
+        unique_id: robi_filter_left_pct
+        state: "{{ (states('sensor.robi_filter_left_fmt') | int(0) / 1.5) | round(0) }}"
+        icon: mdi:air-filter
+        unit_of_measurement: "%"
 
-    # Sensor dirty
-    - name: Robi sensor dirty left fmt
-      unique_id: robi_sensor_dirty_left_fmt
-      state: "{{ (states('sensor.robi_sensor_dirty_left') | int(0) / 3600) | round(1) }}"
-      icon: mdi:eye-outline
-      unit_of_measurement: "Std."
+      # Sensor dirty
+      - name: Robi sensor dirty left fmt
+        unique_id: robi_sensor_dirty_left_fmt
+        state: "{{ (states('sensor.robi_sensor_dirty_left') | int(0) / 3600) | round(1) }}"
+        icon: mdi:eye-outline
+        unit_of_measurement: "Std."
 
-    - name: "robi_sensor_pct"
-      unique_id: robi_sensor_pct
-      state: "{{ (states('sensor.robi_sensor_dirty_left_fmt') | int(0) / 0.3) | round(0) }}"
-      icon: mdi:eye-outline
-      unit_of_measurement: "%"
+      - name: "robi_sensor_pct"
+        unique_id: robi_sensor_pct
+        state: "{{ (states('sensor.robi_sensor_dirty_left_fmt') | int(0) / 0.3) | round(0) }}"
+        icon: mdi:eye-outline
+        unit_of_measurement: "%"
 
-  # Statistik #################
-    - name: Robi total duration fmt
-      unique_id: robi_total_duration_fmt
-      state: >-
-        {%- set time = states('sensor.robi_total_duration') | int(0) -%}
-        {%- set seconds = (time % 60) | int(0) -%}
-        {%- set minutes = ((time % 3600) / 60) | int(0) -%}
-        {%- set hours = ((time % 86400) / 3600) | int(0) -%}
-        {%- set days = (time / 86400) | int(0) -%}
-        {{ days }} Tagen {{ '{:02}:{:02}:{:02}'.format(hours, minutes, seconds) }}
-      icon: mdi:clock-fast
-      unit_of_measurement: ""
+      # Statistik #################
+      - name: Robi total duration fmt
+        unique_id: robi_total_duration_fmt
+        state: >-
+          {%- set time = states('sensor.robi_total_duration') | int(0) -%}
+          {%- set seconds = (time % 60) | int(0) -%}
+          {%- set minutes = ((time % 3600) / 60) | int(0) -%}
+          {%- set hours = ((time % 86400) / 3600) | int(0) -%}
+          {%- set days = (time / 86400) | int(0) -%}
+          {{ days }} Tagen {{ '{:02}:{:02}:{:02}'.format(hours, minutes, seconds) }}
+        icon: mdi:clock-fast
+        unit_of_measurement: ""
 
-    - name: Robi last clean duration fmt
-      unique_id: robi_last_clean_duration_fmt
-      state: >-
-        {%- set time = states('sensor.robi_last_clean_duration') | int(0) -%}
-        {%- set seconds = (time % 60) | int(0) -%}
-        {%- set minutes = ((time % 3600) / 60) | int(0) -%}
-        {%- set hours = ((time % 86400) / 3600) | int(0) -%}
-        {{ '{:02}:{:02}:{:02}'.format(hours, minutes, seconds) }}
-      icon: mdi:clock-fast
-      unit_of_measurement: ""
+      - name: Robi last clean duration fmt
+        unique_id: robi_last_clean_duration_fmt
+        state: >-
+          {%- set time = states('sensor.robi_last_clean_duration') | int(0) -%}
+          {%- set seconds = (time % 60) | int(0) -%}
+          {%- set minutes = ((time % 3600) / 60) | int(0) -%}
+          {%- set hours = ((time % 86400) / 3600) | int(0) -%}
+          {{ '{:02}:{:02}:{:02}'.format(hours, minutes, seconds) }}
+        icon: mdi:clock-fast
+        unit_of_measurement: ""
 
 #   - platform: rest
 #     resource: !secret robi_resource_map
@@ -179,11 +179,11 @@ input_select:
     name: Reinigungsmodus
     icon: mdi:fan
     options:
-    - Wischen
-    - Leise
-    - Standart
-    - Turbo
-    - Maximum
+      - Wischen
+      - Leise
+      - Standart
+      - Turbo
+      - Maximum
 
   robi_zone:
     name: Was muss reinigen?
@@ -325,63 +325,63 @@ automation:
     alias: Robi Schedule cleaning on weekdays
     initial_state: false
     trigger:
-    - platform: template
-      value_template: "{{ states('sensor.robi_start_time_weekdays') == states('sensor.time') }}"
+      - platform: template
+        value_template: "{{ states('sensor.robi_start_time_weekdays') == states('sensor.time') }}"
 
     condition:
-    - condition: time
-      weekday:
-      - mon
-      - tue
-      - wed
-      - thu
-      - fri
+      - condition: time
+        weekday:
+          - mon
+          - tue
+          - wed
+          - thu
+          - fri
 
     action:
-    - service: vacuum.start
-      data:
-        entity_id: vacuum.robi
+      - service: vacuum.start
+        data:
+          entity_id: vacuum.robi
 
   # Планировка запуска в выходные
   - id: robi_schedule_cleaning_on_weekends
     alias: Robi Schedule cleaning on weekends
     initial_state: false
     trigger:
-    - platform: template
-      value_template: "{{ states('sensor.robi_start_time_weekend') == states('sensor.time') }}"
+      - platform: template
+        value_template: "{{ states('sensor.robi_start_time_weekend') == states('sensor.time') }}"
 
     condition:
-    - condition: time
-      weekday:
-      - sat
-      - sun
+      - condition: time
+        weekday:
+          - sat
+          - sun
 
     action:
-    - service: vacuum.start
-      data:
-        entity_id: vacuum.robi
+      - service: vacuum.start
+        data:
+          entity_id: vacuum.robi
 
   # Notifictaion ##############
   - id: robi__notify
     alias: Robi Notify
     trigger:
-    - platform: state
-      entity_id: vacuum.robi
-      for:
-        hours: 0
-        minutes: 0
-        seconds: 4
-        milliseconds: 0
+      - platform: state
+        entity_id: vacuum.robi
+        for:
+          hours: 0
+          minutes: 0
+          seconds: 4
+          milliseconds: 0
 
     condition:
-    - condition: template
-      value_template: "{{ trigger.to_state.state != trigger.from_state.state }}"
+      - condition: template
+        value_template: "{{ trigger.to_state.state != trigger.from_state.state }}"
 
     action:
-    - service: notify.telegram_schick_home
-      data:
-        title: 🐁 Robi
-        message: "{{ states('vacuum.robi') }}, {{ state_attr('vacuum.robi','status') }}"
+      - service: notify.telegram_schick_home
+        data:
+          title: 🐁 Robi
+          message: "{{ states('vacuum.robi') }}, {{ state_attr('vacuum.robi','status') }}"
 
 # ZONE ##############################################################
 # Küche oben links - Area: Süd, Ost, Nord, West [left, bottom, right, top]
@@ -416,16 +416,15 @@ automation:
 
 # Script ############################################################
 script:
-
   robi_home:
     alias: Robi - Reinigen
     icon: mdi:floor-plan
     sequence:
-    - service: xiaomi_miio.vacuum_clean_zone
-      data:
-        entity_id: vacuum.robi
-        repeats: "{{ states('input_number.robi_passes') | int(0) }}"
-        zone: [[5000, 5000, 50000, 50000]]
+      - service: xiaomi_miio.vacuum_clean_zone
+        data:
+          entity_id: vacuum.robi
+          repeats: "{{ states('input_number.robi_passes') | int(0) }}"
+          zone: [[5000, 5000, 50000, 50000]]
     #     zone: [[20800, 16000, 31000, 26500]]
     # - service: script.robi_alert_start
 
@@ -433,11 +432,11 @@ script:
     alias: Robi - Küche reinigen
     icon: mdi:silverware-fork-knife
     sequence:
-    - service: xiaomi_miio.vacuum_clean_zone
-      data:
-        entity_id: vacuum.robi
-        repeats: "{{ states('input_number.robi_passes') | int(0) }}"
-        zone: [[28000, 16800, 31000, 21700]]
+      - service: xiaomi_miio.vacuum_clean_zone
+        data:
+          entity_id: vacuum.robi
+          repeats: "{{ states('input_number.robi_passes') | int(0) }}"
+          zone: [[28000, 16800, 31000, 21700]]
     #     zone: [[20000, 29500, 23200, 34200]]
     # - service: script.robi_alert_start
 
@@ -445,11 +444,11 @@ script:
     alias: Robi - Wohnzimmer reinigen
     icon: mdi:sofa
     sequence:
-    - service: xiaomi_miio.vacuum_clean_zone
-      data:
-        entity_id: vacuum.robi
-        repeats: "{{ states('input_number.robi_passes') | int(0) }}"
-        zone: [[20800, 16000, 28100, 21950]]
+      - service: xiaomi_miio.vacuum_clean_zone
+        data:
+          entity_id: vacuum.robi
+          repeats: "{{ states('input_number.robi_passes') | int(0) }}"
+          zone: [[20800, 16000, 28100, 21950]]
     #     zone: [[23000, 29300, 30000, 35000]]
     # - service: script.robi_alert_start
 
@@ -457,11 +456,11 @@ script:
     alias: Robi - Stube reinigen
     icon: mdi:broom
     sequence:
-    - service: xiaomi_miio.vacuum_clean_zone
-      data:
-        entity_id: vacuum.robi
-        repeats: "{{ states('input_number.robi_passes') | int(0) }}"
-        zone: [[20800, 16000, 31000, 21700]]
+      - service: xiaomi_miio.vacuum_clean_zone
+        data:
+          entity_id: vacuum.robi
+          repeats: "{{ states('input_number.robi_passes') | int(0) }}"
+          zone: [[20800, 16000, 31000, 21700]]
     #     zone: [[20000, 29300, 30000, 35000]]
     # - service: script.robi_alert_start
 
@@ -469,11 +468,11 @@ script:
     alias: Robi - Schlafzimmer reinigen
     icon: mdi:bed-empty
     sequence:
-    - service: xiaomi_miio.vacuum_clean_zone
-      data:
-        entity_id: vacuum.robi
-        repeats: "{{ states('input_number.robi_passes') | int(0) }}"
-        zone: [[20800, 22000, 25100, 26500]]
+      - service: xiaomi_miio.vacuum_clean_zone
+        data:
+          entity_id: vacuum.robi
+          repeats: "{{ states('input_number.robi_passes') | int(0) }}"
+          zone: [[20800, 22000, 25100, 26500]]
     #     zone: [[26500, 23500, 30000, 29300]]
     # - service: script.robi_alert_start
 
@@ -481,11 +480,11 @@ script:
     alias: Robi - Flur reinigen
     icon: mdi:broom
     sequence:
-    - service: xiaomi_miio.vacuum_clean_zone
-      data:
-        entity_id: vacuum.robi
-        repeats: "{{ states('input_number.robi_passes') | int(0) }}"
-        zone: [[25100, 21940, 27850, 26500]]
+      - service: xiaomi_miio.vacuum_clean_zone
+        data:
+          entity_id: vacuum.robi
+          repeats: "{{ states('input_number.robi_passes') | int(0) }}"
+          zone: [[25100, 21940, 27850, 26500]]
     #     zone: [[23100, 23500, 26000, 29200]]
     # - service: script.robi_alert_start
 
@@ -493,11 +492,11 @@ script:
     alias: Robi - HWR reinigen
     icon: mdi:broom
     sequence:
-    - service: xiaomi_miio.vacuum_clean_zone
-      data:
-        entity_id: vacuum.robi
-        repeats: "{{ states('input_number.robi_passes') | int(0) }}"
-        params: [[27830, 21940, 31000, 24400]]
+      - service: xiaomi_miio.vacuum_clean_zone
+        data:
+          entity_id: vacuum.robi
+          repeats: "{{ states('input_number.robi_passes') | int(0) }}"
+          params: [[27830, 21940, 31000, 24400]]
     #     params: [[20000, 26500, 22500, 29200]]
     # - service: script.robi_alert_start
 
@@ -505,11 +504,11 @@ script:
     alias: Robi - WC reinigen
     icon: mdi:broom
     sequence:
-    - service: xiaomi_miio.vacuum_clean_zone
-      data:
-        entity_id: vacuum.robi
-        repeats: "{{ states('input_number.robi_passes') | int(0) }}"
-        zone: [[27820, 24500, 31000, 26500]]
+      - service: xiaomi_miio.vacuum_clean_zone
+        data:
+          entity_id: vacuum.robi
+          repeats: "{{ states('input_number.robi_passes') | int(0) }}"
+          zone: [[27820, 24500, 31000, 26500]]
     #     zone: [[20000, 23500, 23000, 26500]]
     # - service: script.robi_alert_start
 
@@ -517,13 +516,12 @@ script:
     alias: Robi - Komm mal her
     icon: mdi:shoe-print
     sequence:
-    - service: xiaomi_miio.vacuum_goto
-      data:
-        entity_id: vacuum.robi
-        x_coord: 24500
-        y_coord: 20300
+      - service: xiaomi_miio.vacuum_goto
+        data:
+          entity_id: vacuum.robi
+          x_coord: 24500
+          y_coord: 20300
     # - service: script.robi_alert_start
-
 # Alerts ############################################################
 #  robi_alert_start:
 #    alias: Vacuum alert start

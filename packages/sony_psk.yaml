@@ -4,9 +4,9 @@ media_player:
     psk: !secret sonytv_psk
     mac: !secret sonytv_mac
     name: Sony Bravia KD55X8505B
-#    amp: True
-#    android: True
-#    sourcefilter:
-#      - ' HD'
-#      - HDMI
-#    name: SonyTV
+    # amp: True
+    # android: True
+    # sourcefilter:
+    #   - ' HD'
+    #   - HDMI
+    # name: SonyTV

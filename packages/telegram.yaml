@@ -1,7 +1,7 @@
 # Example configuration.yaml entry for the Telegram Bot
 telegram_bot:
   - platform: polling
-#  - platform: broadcast
+    #  - platform: broadcast
     api_key: !secret telegram_api_key
     allowed_chat_ids:
       - !secret telegram_channel
@@ -39,105 +39,105 @@ notify:
 
 # Automation ########################################################
 automation:
-# Start
-- id: telegram_start
-  alias: "Telegram start"
-  trigger:
-  - platform: event
-    event_type: telegram_command
-    event_data:
-      command: "/start"
+  # Start
+  - id: telegram_start
+    alias: "Telegram start"
+    trigger:
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: "/start"
 
-  - platform: event
-    event_type: telegram_callback
-    event_data:
-      command: "/start"
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          command: "/start"
 
-  action:
-  - service: telegram_bot.send_message
-    data:
-      target: "{{ trigger.event.data.user_id }}"
-      message: |
-        Hallo, hier kannst du unser Zuhause verwalten.
-        Wähle das Symbol [/] unten und dann eine Aktion aus.
-        /start - Zeigt diese Nachricht
-        /commands - Zeigt Control Panel
-        /help - Zeigt eine Nachricht mit Befehlen an
-      keyboard:
-        - "/wandlicht, /wohnlicht, /ambiente_wohnen"
-        - "/kuechenlicht, /ambiente_kueche, /rollade_hinten"
-        - "/rollade_1, /rollade_2, /rollade_3"
-        - "/start, /commands, /help, /tor"
+    action:
+      - service: telegram_bot.send_message
+        data:
+          target: "{{ trigger.event.data.user_id }}"
+          message: |
+            Hallo, hier kannst du unser Zuhause verwalten.
+            Wähle das Symbol [/] unten und dann eine Aktion aus.
+            /start - Zeigt diese Nachricht
+            /commands - Zeigt Control Panel
+            /help - Zeigt eine Nachricht mit Befehlen an
+          keyboard:
+            - "/wandlicht, /wohnlicht, /ambiente_wohnen"
+            - "/kuechenlicht, /ambiente_kueche, /rollade_hinten"
+            - "/rollade_1, /rollade_2, /rollade_3"
+            - "/start, /commands, /help, /tor"
 
-# Commands
-- id: telegram_commands
-  alias: "Telegram commands"
-  trigger:
-  - platform: event
-    event_type: telegram_command
-    event_data:
-      command: "/commands"
+  # Commands
+  - id: telegram_commands
+    alias: "Telegram commands"
+    trigger:
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: "/commands"
 
-  - platform: event
-    event_type: telegram_callback
-    event_data:
-      command: "/commands"
-  
-  action:
-  - service: telegram_bot.send_message
-    data:
-      target: "{{ trigger.event.data.user_id }}"
-      message: Wähle eine Aktion aus
-      inline_keyboard:
-        - "Tor:/tor, Home:/start, Hilfe:/help"
-        - "Wandlicht:/wandlicht, Wohnlicht:/wohnlicht, Ambiente Wohnzimmer:/ambiente_wohnen"
-        - "Küchenlicht:/kuechenlicht, Ambiente Küche:/ambiente_kueche, Rollade Hinten:/rollade_hinten"
-        - "Rollade 1:/rollade_1, Rollade 2:/rollade_2, Rollade 3:/rollade_3"
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          command: "/commands"
 
-# Help
-- id: telegram_help
-  alias: "Telegram help"
-  trigger:
-  - platform: event
-    event_type: telegram_command
-    event_data:
-      command: "/help"
+    action:
+      - service: telegram_bot.send_message
+        data:
+          target: "{{ trigger.event.data.user_id }}"
+          message: Wähle eine Aktion aus
+          inline_keyboard:
+            - "Tor:/tor, Home:/start, Hilfe:/help"
+            - "Wandlicht:/wandlicht, Wohnlicht:/wohnlicht, Ambiente Wohnzimmer:/ambiente_wohnen"
+            - "Küchenlicht:/kuechenlicht, Ambiente Küche:/ambiente_kueche, Rollade Hinten:/rollade_hinten"
+            - "Rollade 1:/rollade_1, Rollade 2:/rollade_2, Rollade 3:/rollade_3"
 
-  - platform: event
-    event_type: telegram_callback
-    event_data:
-      command: "/help"
-  
-  action:
-  - service: telegram_bot.answer_callback_query
-    data:
-      callback_query_id: "{{ trigger.event.data.id }}"
-      message: "Bitte schön"
+  # Help
+  - id: telegram_help
+    alias: "Telegram help"
+    trigger:
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: "/help"
 
-  - service: telegram_bot.send_message
-    data:
-      target: "{{ trigger.event.data.user_id }}"
-      message: |-
-        *Tor öffnen/schliessen:*
-        - /tor - Garage öffnen/schliessen
-        
-        *Licht ein/aus:*
-        - /wandlicht - Wandlicht
-        - /wohnlicht - Wohnlicht
-        - /ambiente\_wohnen - Ambiente Wohnzimmer
-        - /kuechenlicht - Küchenlicht
-        - /ambiente\_kueche - Ambiente Küche
-        
-        *Rollade öffnen/schliessen:*
-        - /rollade\_hinten - Rollade Hinten
-        - /rollade\_1 - Rollade 1
-        - /rollade\_2 - Rollade 2
-        - /rollade\_3 - Rollade 3
-        
-        *Allgemein:*
-        - /start - Zeigt die Begrüßungsnachricht
-        - /commands - Zeigt Control Panel
-        - /help - Zeigt eine Nachricht mit Befehlen an
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          command: "/help"
+
+    action:
+      - service: telegram_bot.answer_callback_query
+        data:
+          callback_query_id: "{{ trigger.event.data.id }}"
+          message: "Bitte schön"
+
+      - service: telegram_bot.send_message
+        data:
+          target: "{{ trigger.event.data.user_id }}"
+          message: |-
+            *Tor öffnen/schliessen:*
+            - /tor - Garage öffnen/schliessen
+
+            *Licht ein/aus:*
+            - /wandlicht - Wandlicht
+            - /wohnlicht - Wohnlicht
+            - /ambiente\_wohnen - Ambiente Wohnzimmer
+            - /kuechenlicht - Küchenlicht
+            - /ambiente\_kueche - Ambiente Küche
+
+            *Rollade öffnen/schliessen:*
+            - /rollade\_hinten - Rollade Hinten
+            - /rollade\_1 - Rollade 1
+            - /rollade\_2 - Rollade 2
+            - /rollade\_3 - Rollade 3
+
+            *Allgemein:*
+            - /start - Zeigt die Begrüßungsnachricht
+            - /commands - Zeigt Control Panel
+            - /help - Zeigt eine Nachricht mit Befehlen an
 
 #     data:
 #        keyboard:
@@ -180,14 +180,13 @@ automation:
 #        notify.telegram_schick_home
 #      {% endif %}
 
-
 # Scripts ###########################################################
 script:
-#######################################
-# Script to run command
-# is passed:
-#   {{ cycle }}
-#######################################
+  #######################################
+  # Script to run command
+  # is passed:
+  #   {{ cycle }}
+  #######################################
   telegram_run_command:
     mode: parallel
     fields:
@@ -204,7 +203,6 @@ script:
         description: "The entity to check the state entity"
         example: cover.tor
     sequence:
-
       - service: "{{ service }}"
         data:
           entity_id: "{{ entity_id }}"
@@ -217,15 +215,15 @@ script:
         timeout: "5"
         continue_on_timeout: true
 
-#      - wait_for_trigger:
-#        - platform: event
-#          event_type: state_changed
-#          event_data:
-#            entity_id: "{{ entity_id_state }}"
-##        - platform: state
-##          entity_id: entity_id_state
-#        timeout: 5
-#        continue_on_timeout: true
+      #      - wait_for_trigger:
+      #        - platform: event
+      #          event_type: state_changed
+      #          event_data:
+      #            entity_id: "{{ entity_id_state }}"
+      ##        - platform: state
+      ##          entity_id: entity_id_state
+      #        timeout: 5
+      #        continue_on_timeout: true
 
       - service: >
           {% if user == "Barmalej" %}
@@ -243,7 +241,6 @@ script:
         data:
           message: >
             {{ state_attr(entity_id, "friendly_name") }} ist {{ states(entity_id_state) }}
-
 
 #tor - Garage öffnen/schliessen
 #wandlicht - Wandlicht ein/aus

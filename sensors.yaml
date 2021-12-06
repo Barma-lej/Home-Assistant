@@ -9,7 +9,7 @@
     sunrise:
       friendly_name: "Sonnenaufgang"
       value_template: "{{ states.sun.sun.attributes.next_rising }}"
-# Text ##############################################################
+    # Text ##############################################################
     only_text:
       friendly_name: " "
       value_template: ""
@@ -17,7 +17,7 @@
 # Date Time #########################################################
 - platform: time_date
   display_options:
-      - 'time'
-      - 'date'
-      - 'date_time'
-#      - 'time_date'
+    - "time"
+    - "date"
+    - "date_time"
+    # - 'time_date'

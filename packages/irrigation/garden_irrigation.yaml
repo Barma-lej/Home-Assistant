@@ -1,4 +1,3 @@
-
 ## Customize #########################################################
 #homeassistant:
 #  customize:
@@ -8,11 +7,9 @@
 #    sensor.zone5_valve:
 #      unit_of_measurement: '%'
 
-
 # Automations #######################################################
 automation:
-
-# Set next run time when schedule enabled or time changed ###########
+  # Set next run time when schedule enabled or time changed ###########
   - id: irrigation_set_next_run_time_when_schedule_enabled_or_time_changed
     alias: Irrigation - Set Next Run Time When Schedule Enabled Or Time Changed
     # initial_state: on
@@ -21,7 +18,7 @@ automation:
         entity_id:
           - input_boolean.cycle1_enable
           - input_boolean.cycle2_enable
-        to: 'on'
+        to: "on"
 
       - platform: state
         entity_id:
@@ -60,40 +57,40 @@ automation:
               {{ states('input_select.cycle2_schedule_time') }}
             {% endif %}
 
-# Run irrigation cycles at the right time and on the right days #####
-# Cycle 1 #############################
+  # Run irrigation cycles at the right time and on the right days #####
+  # Cycle 1 #############################
   - id: irrigation_run_cycle_1
     alias: Irrigation - Run Cycle 1
     trigger:
-    - platform: time_pattern
-      minutes: /15
-#      seconds: '0'
+      - platform: time_pattern
+        minutes: /15
+    #      seconds: '0'
 
     condition:
-    - condition: template
-      value_template: '{{ now().strftime("%Y-%m-%d %H:%M:00") == states("input_datetime.cycle1_next_run_time") }}'
+      - condition: template
+        value_template: '{{ now().strftime("%Y-%m-%d %H:%M:00") == states("input_datetime.cycle1_next_run_time") }}'
 
-    - condition: state
-      entity_id: input_boolean.cycle1_enable
-      state: 'on'
+      - condition: state
+        entity_id: input_boolean.cycle1_enable
+        state: "on"
 
     action:
-    - service: script.irrigation_check_a_sensor_data
-      data:
-        cycle: '1'
+      - service: script.irrigation_check_a_sensor_data
+        data:
+          cycle: "1"
 
-    - service: script.update_next_runtime
-      data:
-        cycle: '1'
+      - service: script.update_next_runtime
+        data:
+          cycle: "1"
 
-# Cycle 2 #############################
+  # Cycle 2 #############################
   - id: irrigation_run_cycle_2
     alias: Irrigation - Run Cycle 2
-#    initial_state: on
+    #    initial_state: on
     trigger:
-    - platform: time_pattern
-      minutes: /15
-#      seconds: 00
+      - platform: time_pattern
+        minutes: /15
+    #      seconds: 00
 
     condition:
       - condition: template
@@ -101,16 +98,16 @@ automation:
 
       - condition: state
         entity_id: input_boolean.cycle2_enable
-        state: 'on'
+        state: "on"
 
     action:
       - service: script.irrigation_check_a_sensor_data
         data:
-          cycle: '2'
+          cycle: "2"
 
       - service: script.update_next_runtime
         data:
-          cycle: '2'
+          cycle: "2"
 
   # Run A Cycle Manually ############################################
   - id: irrigation_run_a_cycle_manually
@@ -119,10 +116,10 @@ automation:
     trigger:
       - platform: state
         entity_id:
-        - input_boolean.cycle1_manual_run
-        - input_boolean.cycle2_manual_run
-        from: 'off'
-        to: 'on'
+          - input_boolean.cycle1_manual_run
+          - input_boolean.cycle2_manual_run
+        from: "off"
+        to: "on"
 
     condition:
       # Don't run if the other cycle is already running
@@ -139,7 +136,7 @@ automation:
       - service: input_text.set_value
         data:
           entity_id: input_text.current_zone
-          value: 'Initialising...'
+          value: "Initialising..."
 
       # Make sure nothing in the system is running
       # Turn off valves
@@ -176,8 +173,8 @@ automation:
       # Disable both programmes
       - service: homeassistant.turn_off
         entity_id:
-        - input_boolean.cycle1_enable
-        - input_boolean.cycle2_enable
+          - input_boolean.cycle1_enable
+          - input_boolean.cycle2_enable
 
       # Run a cycle
       - service: script.irrigation_run_a_cycle
@@ -195,8 +192,8 @@ automation:
       # Turn off both manual run booleans (in case one was turned on while the other was already running)
       - service: homeassistant.turn_off
         entity_id:
-        - input_boolean.cycle1_manual_run
-        - input_boolean.cycle2_manual_run
+          - input_boolean.cycle1_manual_run
+          - input_boolean.cycle2_manual_run
 
       # Restore the previous state of both cycle_enabled booleans
       - service: >
@@ -217,76 +214,76 @@ automation:
         data:
           entity_id: input_boolean.cycle2_enable
 
-# Cancel A Manual Cycle #############################################
+  # Cancel A Manual Cycle #############################################
   - id: irrigation_cancel_a_manual_cycle
     alias: Irrigation - Cancel A Manual Cycle
     # initial_state: on
     trigger:
-    - platform: state
-      entity_id:
-      - input_boolean.cycle1_manual_run
-      - input_boolean.cycle2_manual_run
-      from: 'on'
-      to: 'off'
+      - platform: state
+        entity_id:
+          - input_boolean.cycle1_manual_run
+          - input_boolean.cycle2_manual_run
+        from: "on"
+        to: "off"
 
     action:
-# Turn off valves #####################
-    - service: homeassistant.turn_off
-      data:
-        entity_id: group.irrigation_switches
+      # Turn off valves #####################
+      - service: homeassistant.turn_off
+        data:
+          entity_id: group.irrigation_switches
 
-# Turn off scripts ####################
-    - service: homeassistant.turn_off
-      entity_id: script.irrigation_run_a_cycle
+      # Turn off scripts ####################
+      - service: homeassistant.turn_off
+        entity_id: script.irrigation_run_a_cycle
 
-    - service: homeassistant.turn_off
-      entity_id: script.irrigation_irrigate_a_zone
+      - service: homeassistant.turn_off
+        entity_id: script.irrigation_irrigate_a_zone
 
-# Cancel the timer ####################
-    - service: timer.cancel
-      data:
-        entity_id: timer.zone_duration
+      # Cancel the timer ####################
+      - service: timer.cancel
+        data:
+          entity_id: timer.zone_duration
 
-# Update progress in ui ###############
-    - service: homeassistant.turn_off
-      data:
-        entity_id: >
-          {% if trigger.entity_id == 'input_boolean.cycle1_manual_run' %}
-            input_boolean.cycle1_running
-          {% else %}
-            input_boolean.cycle2_running
-          {% endif %}
+      # Update progress in ui ###############
+      - service: homeassistant.turn_off
+        data:
+          entity_id: >
+            {% if trigger.entity_id == 'input_boolean.cycle1_manual_run' %}
+              input_boolean.cycle1_running
+            {% else %}
+              input_boolean.cycle2_running
+            {% endif %}
 
-    - service: input_text.set_value
-      data:
-        entity_id: input_text.current_zone
-        value: '-'
+      - service: input_text.set_value
+        data:
+          entity_id: input_text.current_zone
+          value: "-"
 
-# Cancel an irrigation if it rains ####
+  # Cancel an irrigation if it rains ####
   - id: irrigation_cancel_if_it_rains
     alias: Irrigation - Cancel if it rains
     mode: single
 
     trigger:
-    - platform: state
-      entity_id: sensor.landroid_mower_error
-      attribute: error_id
-      to: '5'
+      - platform: state
+        entity_id: sensor.landroid_mower_error
+        attribute: error_id
+        to: "5"
 
     action:
-    - service: timer.cancel
-      entity_id: timer.zone_duration
+      - service: timer.cancel
+        entity_id: timer.zone_duration
 
 # Scripts ###########################################################
 script:
-#######################################
-# Script to check a sensor data
-# is passed:
-#   {{ cycle }}
-#######################################
+  #######################################
+  # Script to check a sensor data
+  # is passed:
+  #   {{ cycle }}
+  #######################################
   irrigation_check_a_sensor_data:
     sequence:
-# Only continue if equals a sensor data
+      # Only continue if equals a sensor data
       - condition: template
         value_template: >
           {% if is_state('input_boolean.cycle1_use_sensor_data', 'on') -%}
@@ -296,7 +293,7 @@ script:
             True
           {%- endif %}
 
-# Only continue if it is no rain
+      # Only continue if it is no rain
       - condition: template
         value_template: >
           {{ is_state('input_boolean.cycle' ~ cycle ~ '_use_sensor_data', 'on') and
@@ -304,115 +301,113 @@ script:
 
       - service: script.irrigation_run_a_cycle
         data:
-          cycle: '{{ cycle }}'
+          cycle: "{{ cycle }}"
 
-#######################################
-# Script to run a cycle
-# is passed:
-#   {{ cycle }}
-#######################################
+  #######################################
+  # Script to run a cycle
+  # is passed:
+  #   {{ cycle }}
+  #######################################
   irrigation_run_a_cycle:
     sequence:
-
-# Only continue if no cycle is running
+      # Only continue if no cycle is running
       - condition: state
-        entity_id: 'input_boolean.cycle1_running'
-        state: 'off'
+        entity_id: "input_boolean.cycle1_running"
+        state: "off"
 
       - condition: state
-        entity_id: 'input_boolean.cycle2_running'
-        state: 'off'
+        entity_id: "input_boolean.cycle2_running"
+        state: "off"
 
-# Update ui to show cycle is running ##
+      # Update ui to show cycle is running ##
       - service: homeassistant.turn_on
         data:
           entity_id: input_boolean.cycle{{ cycle }}_running
 
-# Call the script to irrigate zone 1 ##
+      # Call the script to irrigate zone 1 ##
       - service: script.irrigation_irrigate_a_zone
         data:
-          cycle: '{{ cycle }}'
-          zone: '1'
+          cycle: "{{ cycle }}"
+          zone: "1"
 
-# Wait for script.irrigation_irrigate_a_zone to end
+      # Wait for script.irrigation_irrigate_a_zone to end
       - wait_template: "{{ is_state('script.irrigation_irrigate_a_zone', 'off') }}"
 
-# Call the script to irrigate zone 2 ##
+      # Call the script to irrigate zone 2 ##
       - service: script.irrigation_irrigate_a_zone
         data:
-          cycle: '{{ cycle }}'
-          zone: '2'
+          cycle: "{{ cycle }}"
+          zone: "2"
 
-# Wait for script.irrigation_irrigate_a_zone to end
+      # Wait for script.irrigation_irrigate_a_zone to end
       - wait_template: "{{ is_state('script.irrigation_irrigate_a_zone', 'off') }}"
 
-# Update progress in ui ###############
+      # Update progress in ui ###############
       - service: input_text.set_value
         data:
           entity_id: input_text.current_zone
-          value: '-'
+          value: "-"
 
       - service: homeassistant.turn_off
         data:
           entity_id: input_boolean.cycle{{ cycle }}_running
 
-# Turn off schedule if run 'Once' selected
+      # Turn off schedule if run 'Once' selected
       - service: >
-            {% if states('input_select.cycle' ~ cycle ~ '_watering_days') == 'Einmal' %}
-              input_boolean.turn_off
-            {% else %}
-              input_boolean.turn_on
-            {% endif %}
+          {% if states('input_select.cycle' ~ cycle ~ '_watering_days') == 'Einmal' %}
+            input_boolean.turn_off
+          {% else %}
+            input_boolean.turn_on
+          {% endif %}
         data:
           entity_id: input_boolean.cycle{{ cycle }}_enable
 
-#######################################
-# Script to irrigate a zone
-# is passed:
-#   {{ cycle }}
-#   {{ zone }}
-#######################################
+  #######################################
+  # Script to irrigate a zone
+  # is passed:
+  #   {{ cycle }}
+  #   {{ zone }}
+  #######################################
 
   irrigation_irrigate_a_zone:
     sequence:
-
-# Don't continue if switch is unavailable
+      # Don't continue if switch is unavailable
       - condition: template
         value_template: >
           {{ states('switch.zone' ~ zone ~ '_valve') != 'unavailable' }}
 
-# Don't continue if duration is zero
+      # Don't continue if duration is zero
       - condition: template
         value_template: >
-            {% set n = states('input_number.cycle' ~ cycle ~ '_zone' ~ zone ~ '_duration') | int(0) %}
-            {{ n != 0 }}
+          {% set n = states('input_number.cycle' ~ cycle ~ '_zone' ~ zone ~ '_duration') | int(0) %}
+          {{ n != 0 }}
 
-# Don't continue if it rains (Если дождь пошёл во время полива)
+      # Don't continue if it rains (Если дождь пошёл во время полива)
       - condition: template
         value_template: >
           {{ is_state('input_boolean.cycle' ~ cycle ~ '_use_sensor_data', 'on') and
             not is_state_attr('sensor.landroid_mower_error', 'error_id', 5) }}
 
-# Call the script to set the Tasmota PULSETIME
+      # Call the script to set the Tasmota PULSETIME
       - service: script.set_tasmota_pulsetime
         data:
-          cycle: '{{ cycle }}'
-          zone: '{{ zone }}'
+          cycle: "{{ cycle }}"
+          zone: "{{ zone }}"
 
-# Wait 2 seconds for good measure to ensure previous zone is completly finished
+      # Wait 2 seconds for good measure to ensure previous zone is completly finished
       - delay: "00:00:02"
 
-# Update progress in ui ###############
+      # Update progress in ui ###############
       - service: input_text.set_value
         data:
           entity_id: input_text.current_zone
-          value: '{{ zone }}'
+          value: "{{ zone }}"
 
       - service: switch.turn_on
         data:
           entity_id: switch.zone{{ zone }}_valve
 
-# Start timer for zone duration #######
+      # Start timer for zone duration #######
       - service: timer.start
         data:
           entity_id: timer.zone_duration
@@ -430,22 +425,22 @@ script:
         data:
           entity_id: switch.zone{{ zone }}_valve
 
-# Update progress in ui ###############
+      # Update progress in ui ###############
       - service: input_text.set_value
         data:
           entity_id: input_text.current_zone
-          value: 'Changing zone...'
+          value: "Changing zone..."
 
-# Be sure the current zone switch is off
+      # Be sure the current zone switch is off
       - wait_template: >
           {% set entity = 'switch.zone' ~ zone ~ '_valve' %}
           {{ is_state(entity , 'off') }}
 
-#######################################
-# Script to update next runtime
-# is passed:
-#   {{ cycle }}
-#######################################
+  #######################################
+  # Script to update next runtime
+  # is passed:
+  #   {{ cycle }}
+  #######################################
   update_next_runtime:
     sequence:
       - service: input_datetime.set_datetime
@@ -464,19 +459,19 @@ script:
           time: >
             {{ states('input_select.cycle' ~ cycle ~ '_schedule_time') }}
 
-#####################################################################
-# Set Tasmota PULSETIME to 30 seconds longer than the zone runtime
-# is passed:
-#   {{ cycle }}
-#   {{ zone }}
-#
-# This acts as a fail safe in the event of any communication failure
-# between HA and the Sonoff. The Sonoff will switch off under its own
-# control so closing the valve.
-#
-# Note: From the Tasmota wiki, for a Pulsetime greater than 11 seconds
-#       it should be set to 100 + (minutes * 60)
-#####################################################################
+  #####################################################################
+  # Set Tasmota PULSETIME to 30 seconds longer than the zone runtime
+  # is passed:
+  #   {{ cycle }}
+  #   {{ zone }}
+  #
+  # This acts as a fail safe in the event of any communication failure
+  # between HA and the Sonoff. The Sonoff will switch off under its own
+  # control so closing the valve.
+  #
+  # Note: From the Tasmota wiki, for a Pulsetime greater than 11 seconds
+  #       it should be set to 100 + (minutes * 60)
+  #####################################################################
 
   set_tasmota_pulsetime:
     sequence:
@@ -491,7 +486,7 @@ script:
             {% set duration = states('input_number.cycle' ~ cycle ~ '_zone' ~ zone ~ '_duration') | float(0) %}
             {% set payload = 100 + (duration * 60) + 30 %}
             {{ payload | int(0) }}
-# Set pump
+      # Set pump
       - service: mqtt.publish
         data:
           topic: sonoff4ch/cmnd/pulsetime4
@@ -499,4 +494,3 @@ script:
             {% set duration = states('input_number.cycle' ~ cycle ~ '_zone' ~ zone ~ '_duration') | float(0) %}
             {% set payload = 100 + (duration * 60) + 30 %}
             {{ payload | int(0) }}
-

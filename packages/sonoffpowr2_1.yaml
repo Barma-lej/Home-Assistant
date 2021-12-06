@@ -3,9 +3,9 @@
 
 # Sensor ############################################################
 utility_meter:
-#  sonoffpow_01_energy_d:
-#    source: sensor.sonoffpow_01_energy_total
-#    cycle: daily
+  #  sonoffpow_01_energy_d:
+  #    source: sensor.sonoffpow_01_energy_total
+  #    cycle: daily
 
   sonoffpow_01_energy_m:
     source: sensor.sonoffpow_01_energy_total
@@ -17,42 +17,42 @@ utility_meter:
 
 # Automation ########################################################
 automation:
-- id: telegram_sonoffpow_01
-  alias: "Telegram sonoffpow_01"
-  mode: parallel
-  trigger:
-  - platform: event
-    event_type: telegram_command
-    event_data:
-      command: "/wandlicht"
+  - id: telegram_sonoffpow_01
+    alias: "Telegram sonoffpow_01"
+    mode: parallel
+    trigger:
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: "/wandlicht"
 
-  - platform: event
-    event_type: telegram_callback
-    event_data:
-      command: "/wandlicht"
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          command: "/wandlicht"
 
-  action:
-    - service: light.toggle
-      data:
-        entity_id: light.sonoffpow_01
+    action:
+      - service: light.toggle
+        data:
+          entity_id: light.sonoffpow_01
 
-    - wait_for_trigger:
-      - platform: state
-        entity_id: light.sonoffpow_01
-      timeout: 5
-      continue_on_timeout: true
+      - wait_for_trigger:
+          - platform: state
+            entity_id: light.sonoffpow_01
+        timeout: 5
+        continue_on_timeout: true
 
-    - service: telegram_bot.send_message
-      data:
-        target: "{{ trigger.event.data.user_id }}"
-        message: "💡 {{ state_attr('light.sonoffpow_01', 'friendly_name') }} ist {{ states('light.sonoffpow_01') }}"
+      - service: telegram_bot.send_message
+        data:
+          target: "{{ trigger.event.data.user_id }}"
+          message: "💡 {{ state_attr('light.sonoffpow_01', 'friendly_name') }} ist {{ states('light.sonoffpow_01') }}"
 
 #  Service ist {{ trigger.event }}"
 
 # Customize #########################################################
 homeassistant:
   customize:
-# Sensor ##########
+    # Sensor ##########
     sensor.sonoffpow_01_energy_total:
       friendly_name: Verbrauch Total (Wandlicht)
       icon: mdi:lightning-bolt
@@ -66,9 +66,9 @@ homeassistant:
       friendly_name: Verbrauch Heute (Wandlicht)
       icon: mdi:lightning-bolt
 
-#    sensor.sonoffpow_01_energy_d:
-#      friendly_name: Verbrauch Heute (Wandlicht)
-#      icon: mdi:lightning-bolt
+    #    sensor.sonoffpow_01_energy_d:
+    #      friendly_name: Verbrauch Heute (Wandlicht)
+    #      icon: mdi:lightning-bolt
 
     sensor.sonoffpow_01_energy_m:
       friendly_name: Verbrauch im Monat (Wandlicht)

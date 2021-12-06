@@ -1,9 +1,9 @@
 # Sonoff BN-SZ01 LED Light
 # Tasmota
 
+# Customize #########################################################
 homeassistant:
-  customization:
+  customize:
     light.sonoffbnsz01:
       friendly_name: Garage LED
       icon: mdi:wall-sconce-flat-outline
-

@@ -28,25 +28,25 @@ automation:
       value_template: "{{ '.mp4' in trigger.event.data.path }}"
 
     action:
-    - delay: 00:00:55 # Чтобы файл успел записаться
-    - service: notify.telegram_schick_home
-      data:
-        title: Surveillance
-        message: "Bewegung erkannt!"
+      - delay: 00:00:55 # Чтобы файл успел записаться
+      - service: notify.telegram_schick_home
         data:
-          video:
-            - file: "{{ trigger.event.data.path }}"
-              caption: >-
-                {% if 'cam1' in trigger.event.data.folder %}
-                  🏃 *Terrasse* Bewegung
-                {% elif 'cam2' in trigger.event.data.folder %}
-                  🚗 *Garage* Bewegung
-                {% elif 'cam3' in trigger.event.data.folder %}
-                  🏠 *Einfahrt* Bewegung
-                {% else %}
-                  🏃 *Bewegung erkannt!*
-                {% endif -%}
-              timeout: 1000
+          title: Surveillance
+          message: "Bewegung erkannt!"
+          data:
+            video:
+              - file: "{{ trigger.event.data.path }}"
+                caption: >-
+                  {% if 'cam1' in trigger.event.data.folder %}
+                    🏃 *Terrasse* Bewegung
+                  {% elif 'cam2' in trigger.event.data.folder %}
+                    🚗 *Garage* Bewegung
+                  {% elif 'cam3' in trigger.event.data.folder %}
+                    🏠 *Einfahrt* Bewegung
+                  {% else %}
+                    🏃 *Bewegung erkannt!*
+                  {% endif -%}
+                timeout: 1000
 
   # Отправка снимка в Telegram
   - id: automation.camera_upload_picture_to_telegram
@@ -64,63 +64,63 @@ automation:
       value_template: "{{ '.jpg' in trigger.event.data.path }}"
 
     action:
-    - service: notify.telegram_schick_home
-      data:
-        title: Surveillance
-        message: "Bewegung erkannt!"
+      - service: notify.telegram_schick_home
         data:
-          photo:
-            - file: "{{ trigger.event.data.path }}"
-              caption: >-
-                {% if 'cam1' in trigger.event.data.folder %}
-                  🏃 *Terrasse* Bewegung
-                {% elif 'cam2' in trigger.event.data.folder %}
-                  🚗 *Garage* Bewegung
-                {% elif 'cam3' in trigger.event.data.folder %}
-                  🏠 *Einfahrt* Bewegung
-                {% else %}
-                  🏃 *Bewegung erkannt!*
-                {% endif -%}
+          title: Surveillance
+          message: "Bewegung erkannt!"
+          data:
+            photo:
+              - file: "{{ trigger.event.data.path }}"
+                caption: >-
+                  {% if 'cam1' in trigger.event.data.folder %}
+                    🏃 *Terrasse* Bewegung
+                  {% elif 'cam2' in trigger.event.data.folder %}
+                    🚗 *Garage* Bewegung
+                  {% elif 'cam3' in trigger.event.data.folder %}
+                    🏠 *Einfahrt* Bewegung
+                  {% else %}
+                    🏃 *Bewegung erkannt!*
+                  {% endif -%}
     # - service: shell_command.delete_file
     #   data:
     #     file_path: "{{ trigger.event.data.path }}"
 
   # Направление камеры в зависимости от положения гаражных ворот
-  - id: 'camera_garage_richtung'
+  - id: "camera_garage_richtung"
     alias: Camera Garage Richtung
     description: Направление камеры в зависимости от положения гаражных ворот
     mode: single
     trigger:
-    - platform: state
-      entity_id: binary_sensor.tor_offen
-      to: 'off'
-      for:
-        hours: 0
-        minutes: 0
-        seconds: 1
-        milliseconds: 0
+      - platform: state
+        entity_id: binary_sensor.tor_offen
+        to: "off"
+        for:
+          hours: 0
+          minutes: 0
+          seconds: 1
+          milliseconds: 0
 
-    - platform: state
-      entity_id: binary_sensor.tor_offen
-      to: 'on'
-      for:
-        hours: 0
-        minutes: 0
-        seconds: 1
-        milliseconds: 0
+      - platform: state
+        entity_id: binary_sensor.tor_offen
+        to: "on"
+        for:
+          hours: 0
+          minutes: 0
+          seconds: 1
+          milliseconds: 0
 
     action:
-    - service: onvif.ptz
-      target:
-        entity_id: camera.reolink_e1_zoom_profile000_mainstream
-      data:
-        move_mode: GotoPreset
-        preset: >-
-          {% if is_state('binary_sensor.tor_offen','on') %}
-            000
-          {% else %}
-            001
-          {% endif %}
+      - service: onvif.ptz
+        target:
+          entity_id: camera.reolink_e1_zoom_profile000_mainstream
+        data:
+          move_mode: GotoPreset
+          preset: >-
+            {% if is_state('binary_sensor.tor_offen','on') %}
+              000
+            {% else %}
+              001
+            {% endif %}
 
 # Script ############################################################
 #script:
