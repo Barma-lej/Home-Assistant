@@ -7,7 +7,7 @@ automation:
   - id: "camera_garage_richtung"
     alias: Camera Garage Richtung
     description: Направление камеры в зависимости от положения гаражных ворот
-    mode: single
+    mode: parallel
     trigger:
       - platform: state
         entity_id: binary_sensor.tor_offen
