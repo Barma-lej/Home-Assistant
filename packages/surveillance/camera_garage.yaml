@@ -1,21 +1,87 @@
 # Reolink E1 Zoom
 # IPC_515BSD6
 
+# Automations #######################################################
+automation:
+  # Направление камеры в зависимости от положения гаражных ворот
+  - id: "camera_garage_richtung"
+    alias: Camera Garage Richtung
+    description: Направление камеры в зависимости от положения гаражных ворот
+    mode: single
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.tor_offen
+        to: "off"
+        for:
+          hours: 0
+          minutes: 0
+          seconds: 1
+          milliseconds: 0
+
+      - platform: state
+        entity_id: binary_sensor.tor_offen
+        to: "on"
+        for:
+          hours: 0
+          minutes: 0
+          seconds: 1
+          milliseconds: 0
+
+    action:
+      - service: reolink_dev.ptz_control
+        data:
+          entity_id: camera.garage
+          command: TOPOS
+          preset: >-
+            {% if is_state('binary_sensor.tor_offen','on') %}
+              1
+            {% else %}
+              2
+            {% endif %}
+
+    # action:
+    #   - service: onvif.ptz
+    #     target:
+    #       entity_id: camera.reolink_e1_zoom_profile000_mainstream
+    #     data:
+    #       move_mode: GotoPreset
+    #       preset: >-
+    #         {% if is_state('binary_sensor.tor_offen','on') %}
+    #           000
+    #         {% else %}
+    #           001
+    #         {% endif %}
+
 # Scripts ###########################################################
 script:
-  camera_garage_gate_view:
-    alias: Camera-Garage Toransicht
+  camera_ptz:
+    alias: Camera PTZ Control
     sequence:
-      - service: onvif.ptz
+      - service: reolink_dev.ptz_control
         data:
-          entity_id: camera.reolink_e1_zoom_profile000_mainstream
-          preset: "000"
-          move_mode: GotoPreset
-  camera_garage_door_view:
-    alias: Camera-Garage Türansicht
-    sequence:
-      - service: onvif.ptz
+          entity_id: "{{ entity_id }}"
+          command: "{{ command }}"
+
+      - delay: 1
+
+      - service: reolink_dev.ptz_control
         data:
-          entity_id: camera.reolink_e1_zoom_profile000_mainstream
-          preset: "001"
-          move_mode: GotoPreset
+          entity_id: "{{ entity_id }}"
+          command: STOP
+
+  # camera_garage_gate_view:
+  #   alias: Camera-Garage Toransicht
+  #   sequence:
+  #     - service: onvif.ptz
+  #       data:
+  #         entity_id: camera.reolink_e1_zoom_profile000_mainstream
+  #         preset: "000"
+  #         move_mode: GotoPreset
+  # camera_garage_door_view:
+  #   alias: Camera-Garage Türansicht
+  #   sequence:
+  #     - service: onvif.ptz
+  #       data:
+  #         entity_id: camera.reolink_e1_zoom_profile000_mainstream
+  #         preset: "001"
+  #         move_mode: GotoPreset

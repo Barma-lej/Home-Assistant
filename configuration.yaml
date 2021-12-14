@@ -64,6 +64,7 @@ logger:
   #  default: critical
   default: warning
   logs:
+    homeassistant.components.onvif: info
     homeassistant.components.http.ban: warn
     homeassistant.components.device_tracker: warn
     homeassistant.components.camera: warn
@@ -168,7 +169,7 @@ tts:
 #  - platform: google
 
 ## FFMPEG ############################################################
-# ffmpeg:
+ffmpeg:
 ##  ffmpeg_bin: /usr/bin/ffmpeg
 
 stream:

@@ -18,7 +18,7 @@ group:
       # - switch.sonoffs20_1
       # - switch.sonoffs20_2
       # - switch.sonoffs26_1
-      - switch.sonoffs26_2
+      # - switch.sonoffs26_2
 
 # Automations #######################################################
 automation:
@@ -85,9 +85,9 @@ automation:
     alias: Weihnachten Licht Aus
     trigger:
       - platform: time
-        at: "00:00:00"
-      - platform: time
-        at: "09:30:00"
+        at:
+          - "00:00:00"
+          - "09:30:00"
       - platform: sun
         event: sunrise
         offset: "00:15:00"

@@ -416,7 +416,7 @@ automation:
 
   # Sum daily and total statistics
   - id: irrigation_daily_to_total
-    alias: Irrigation daily to total
+    alias: Irrigation - Daily to total
     trigger:
       - platform: time
         at: "23:59:55"

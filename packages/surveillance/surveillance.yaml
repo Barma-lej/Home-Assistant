@@ -85,43 +85,6 @@ automation:
     #   data:
     #     file_path: "{{ trigger.event.data.path }}"
 
-  # Направление камеры в зависимости от положения гаражных ворот
-  - id: "camera_garage_richtung"
-    alias: Camera Garage Richtung
-    description: Направление камеры в зависимости от положения гаражных ворот
-    mode: single
-    trigger:
-      - platform: state
-        entity_id: binary_sensor.tor_offen
-        to: "off"
-        for:
-          hours: 0
-          minutes: 0
-          seconds: 1
-          milliseconds: 0
-
-      - platform: state
-        entity_id: binary_sensor.tor_offen
-        to: "on"
-        for:
-          hours: 0
-          minutes: 0
-          seconds: 1
-          milliseconds: 0
-
-    action:
-      - service: onvif.ptz
-        target:
-          entity_id: camera.reolink_e1_zoom_profile000_mainstream
-        data:
-          move_mode: GotoPreset
-          preset: >-
-            {% if is_state('binary_sensor.tor_offen','on') %}
-              000
-            {% else %}
-              001
-            {% endif %}
-
 # Script ############################################################
 #script:
 ########################################

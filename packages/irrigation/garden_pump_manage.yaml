@@ -1,8 +1,8 @@
 # Automations #######################################################
 automation:
   # Отключение насоса, при отключении автоматизации полива
-  - id: irrigation_failsafe_pump_master_control_switch
-    alias: Irrigation Failsafe - Pump Master Control Switch
+  - id: irrigation_failsafe_pump_control_switch
+    alias: Irrigation Failsafe - Pump Control Switch
     description: "Отключение насоса, при отключении автоматизации полива"
 
     trigger:

@@ -364,24 +364,23 @@ automation:
   # Notifictaion ##############
   - id: robi__notify
     alias: Robi Notify
+    mode: parallel
     trigger:
       - platform: state
         entity_id: vacuum.robi
-        for:
-          hours: 0
-          minutes: 0
-          seconds: 4
-          milliseconds: 0
 
     condition:
-      - condition: template
-        value_template: "{{ trigger.to_state.state != trigger.from_state.state }}"
+      condition: and
+      conditions:
+        - "{{ trigger.to_state.state != trigger.from_state.state }}"
+        - "{{ trigger.from_state.state != 'unavailable' }}"
+        - "{{ trigger.to_state.state != 'unavailable' }}"
 
     action:
       - service: notify.telegram_schick_home
         data:
           title: 🐁 Robi
-          message: "{{ states('vacuum.robi') }}, {{ state_attr('vacuum.robi','status') }}"
+          message: "{{ states('vacuum.robi') }}, {{ state_attr('vacuum.robi','status') }}, {{ trigger.to_state.state }} <- {{ trigger.from_state.state }}"
 
 # ZONE ##############################################################
 # Küche oben links - Area: Süd, Ost, Nord, West [left, bottom, right, top]
@@ -412,7 +411,6 @@ automation:
 #   command: app_goto_target
 #   params: [24500,29500]
 #   params: [(север->юг) слева направо - убывает, (восток->запад) сверху вниз - возрастает]
-#
 
 # Script ############################################################
 script:
