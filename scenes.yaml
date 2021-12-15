@@ -1,0 +1,50 @@
+- id: "romantic"
+  name: Romantic
+  icon: mdi:flower-tulip
+  entities:
+    light.sonoffpowr2_1: "off"
+    light.light.shellyswitch25_10c7c3_channel_1: "off"
+    light.sonoffpowr2_2: "on"
+    light.sonoffpowr2_4: "on"
+- id: "1639602425779"
+  name: Новая сцена
+  entities:
+    light.kristinas_licht:
+      min_mireds: 153
+      max_mireds: 370
+      effect_list:
+        - Slow Temp
+        - Stop
+      supported_color_modes:
+        - color_temp
+      flowing: false
+      music_mode: false
+      night_light: true
+      friendly_name: Kristinas Licht
+      supported_features: 44
+      state: "off"
+    light.kristinas_licht_nightlight:
+      supported_color_modes:
+        - brightness
+      flowing: false
+      music_mode: false
+      night_light: true
+      icon: mdi:weather-night
+      friendly_name: Kristinas Licht Nightlight
+      supported_features: 0
+      state: "off"
+    automation.irrigation_cancel_a_manual_cycle:
+      last_triggered: "2021-08-15T20:30:23.332633+00:00"
+      mode: single
+      current: 0
+      id: irrigation_cancel_a_manual_cycle
+      friendly_name: Irrigation - Cancel A Manual Cycle
+      state: "off"
+    automation.radio_stream:
+      last_triggered: "2021-11-27T18:32:14.325977+00:00"
+      mode: single
+      current: 0
+      id: radio_stream
+      friendly_name: Radio - Stream
+      state: "on"
+  icon: mdi:account-plus
