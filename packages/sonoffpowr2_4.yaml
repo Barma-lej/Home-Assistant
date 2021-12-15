@@ -18,7 +18,7 @@ utility_meter:
 # Automation ########################################################
 automation:
   - id: telegram_sonoffpow_04
-    alias: "Telegram sonoffpow_04"
+    alias: "Telegram - Sonoffpow_04"
     mode: parallel
     trigger:
       - platform: event

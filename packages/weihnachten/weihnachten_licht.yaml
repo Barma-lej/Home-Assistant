@@ -23,7 +23,7 @@ group:
 # Automations #######################################################
 automation:
   - id: weihnachten_licht_an
-    alias: Weihnachten Licht An
+    alias: Weihnachten - Licht An
     trigger:
       # 15 minutes before sunset
       - platform: sun
@@ -37,7 +37,7 @@ automation:
 
     # Anatolij Arbeit
   - id: weihnachten_licht_an_anatolij
-    alias: Weihnachten Licht An Anatolij
+    alias: Weihnachten - Licht An Anatolij
     trigger:
       - platform: time
         at: "08:20:00"
@@ -66,7 +66,7 @@ automation:
 
   # Einschalten wenn Natalja hat Dienst
   - id: weihnachten_licht_an_natalja
-    alias: Weihnachten Licht An Natalja
+    alias: Weihnachten - Licht An Natalja
     trigger:
       - platform: time
         at: "06:45:00"
@@ -82,7 +82,7 @@ automation:
           entity_id: group.weihnachten_licht
 
   - id: weihnachten_licht_aus
-    alias: Weihnachten Licht Aus
+    alias: Weihnachten - Licht Aus
     trigger:
       - platform: time
         at:
@@ -98,7 +98,7 @@ automation:
         service: switch.turn_off
 
   - id: weihnachten_licht_draussen_an
-    alias: Weihnachten Licht Draussen An
+    alias: Weihnachten - Licht Draussen An
     trigger:
       - platform: sun
         event: sunset
@@ -110,7 +110,7 @@ automation:
           entity_id: group.weihnachten_licht_draussen
 
   - id: weihnachten_licht_draussen_aus
-    alias: Weihnachten Licht Draussen Aus
+    alias: Weihnachten - Licht Draussen Aus
     trigger:
       - platform: time
         at: "23:00:00"

@@ -27,7 +27,7 @@ input_boolean:
 # Automations #######################################################
 automation:
   - id: "torteiloffnung_on"
-    alias: Torteiloffnung ON
+    alias: Garage - Torteiloffnung ON
     trigger:
       - platform: state
         entity_id: switch.torteil
@@ -64,7 +64,7 @@ automation:
   #      entity_id: input_boolean.torteil
 
   - id: telegram_tor
-    alias: "Telegram tor"
+    alias: "Telegram - Tor"
     mode: restart
     trigger:
       platform: event

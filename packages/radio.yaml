@@ -85,7 +85,7 @@ group:
 automation:
   # Stops the radio #
   - id: radio_stop
-    alias: Radio Stop
+    alias: Radio - Stop
     trigger:
       - platform: state
         entity_id: input_select.radio_station
@@ -96,7 +96,7 @@ automation:
   # Streaming the radio
   # home_group определяем в Google Home APP
   - id: radio_stream
-    alias: Radio Stream
+    alias: Radio - Stream
     trigger:
       platform: state
       entity_id: input_select.radio_station
@@ -105,7 +105,7 @@ automation:
 
   # Set radio volume
   - id: radio_volume
-    alias: Radio Volume
+    alias: Radio - Volume
     trigger:
       platform: state
       entity_id: input_number.radio_volume
@@ -131,7 +131,7 @@ automation:
 script:
   # Plays the radio
   radio:
-    alias: Radio an
+    alias: Radio - Wiedergabe
     icon: mdi:play
     sequence:
       #      - service: media_player.volume_set
@@ -179,7 +179,7 @@ script:
           media_content_type: "music"
 
   radio_stop:
-    alias: Radio Stop
+    alias: Radio - Stop
     icon: mdi:stop
     sequence:
       - service: media_player.volume_set

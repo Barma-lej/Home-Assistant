@@ -18,7 +18,7 @@ utility_meter:
 # Automation ########################################################
 automation:
   - id: telegram_wohnlicht
-    alias: "Telegram Wohnlicht"
+    alias: "Telegram - Wohnlicht"
     mode: parallel
     trigger:
       - platform: event

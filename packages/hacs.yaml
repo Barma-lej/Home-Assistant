@@ -7,7 +7,7 @@
 ## Automation ########################################################
 automation:
   - id: "hacs_updates"
-    alias: Hacs Update Available Notifications
+    alias: HACS - Update Available Notifications
     trigger:
       - platform: numeric_state
         entity_id: sensor.hacs

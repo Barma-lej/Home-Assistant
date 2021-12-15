@@ -322,7 +322,7 @@ automation:
 
   # Планировка запуска в рабочие дни
   - id: robi_schedule_cleaning_on_weekdays
-    alias: Robi Schedule cleaning on weekdays
+    alias: Robi - Schedule cleaning on weekdays
     initial_state: false
     trigger:
       - platform: template
@@ -344,7 +344,7 @@ automation:
 
   # Планировка запуска в выходные
   - id: robi_schedule_cleaning_on_weekends
-    alias: Robi Schedule cleaning on weekends
+    alias: Robi - Schedule cleaning on weekends
     initial_state: false
     trigger:
       - platform: template
@@ -363,7 +363,7 @@ automation:
 
   # Notifictaion ##############
   - id: robi__notify
-    alias: Robi Notify
+    alias: Robi - Notify
     mode: parallel
     trigger:
       - platform: state

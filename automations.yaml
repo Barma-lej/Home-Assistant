@@ -1,133 +1,129 @@
 - id: updateavailable
-  alias: Update Available Notifications
+  alias: HA - Update Available Notifications
   trigger:
-    - entity_id: binary_sensor.updater
-      platform: state
-      to: "on"
+  - entity_id: binary_sensor.updater
+    platform: state
+    to: 'on'
   action:
-    - data:
-        title: Aktualisierung verfügbar
-        message:
-          Home Assistant {{ state_attr('binary_sensor.updater', 'newest_version')
-          }} is available. [See releases](https://github.com/home-assistant/home-assistant/releases)
-      service: persistent_notification.create
+  - data:
+      title: Aktualisierung verfügbar
+      message: Home Assistant {{ state_attr('binary_sensor.updater', 'newest_version')
+        }} is available. [See releases](https://github.com/home-assistant/home-assistant/releases)
+    service: persistent_notification.create
 - id: tasmota_state_on_startup
-  alias: Power state on HA start-up
+  alias: Tasmota - Power state on HA startup
   trigger:
-    - event: start
-      platform: homeassistant
+  - event: start
+    platform: homeassistant
   action:
-    - data:
-        payload: "1"
-        topic: sonoffs/cmnd/state
-      service: mqtt.publish
-    - data:
-        payload: "1"
-        topic: sonoffs/tele/STATE
-      service: mqtt.publish
+  - data:
+      payload: '1'
+      topic: sonoffs/cmnd/state
+    service: mqtt.publish
+  - data:
+      payload: '1'
+      topic: sonoffs/tele/STATE
+    service: mqtt.publish
 - id: rolladen_auf
-  alias: Rolladen auf
-  description: ""
+  alias: Rolladen - Auf
+  description: ''
   trigger:
-    - event: sunrise
-      offset: 03:00:00
-      platform: sun
+  - event: sunrise
+    offset: 03:00:00
+    platform: sun
   condition: []
   action:
-    - data:
-        entity_id: cover.rolladen
-        position: 100
-      service: cover.set_cover_position
-    - data:
-        message: Rolladen geöffnet
-        title: 🔼 Rolladen
-      service: notify.telegram_schick_home
+  - data:
+      entity_id: cover.rolladen
+      position: 100
+    service: cover.set_cover_position
+  - data:
+      message: Rolladen geöffnet
+      title: 🔼 Rolladen
+    service: notify.telegram_schick_home
   mode: single
 - id: rolladen_zu
-  alias: Rolladen zu
-  description: ""
-  mode: single
+  alias: Rolladen - Zu
+  description: ''
   trigger:
-    - event: sunset
-      offset: 01:30:00
-      platform: sun
+  - event: sunset
+    offset: 01:30:00
+    platform: sun
   condition: []
   action:
-    - data:
-        entity_id: cover.rolladen
-        position: 0
-      service: cover.set_cover_position
-    - data:
-        message: Rolladen geschlossen
-        title: 🔽 Rolladen
-      service: notify.telegram_schick_home
-- id: "garagenlicht_einschalten"
-  alias: Garagenlicht einschalten
-  description:
-    Garagenlicht einschalten nach der Sonnenunregang oder wenn es dunkel
+  - data:
+      entity_id: cover.rolladen
+      position: 0
+    service: cover.set_cover_position
+  - data:
+      message: Rolladen geschlossen
+      title: 🔽 Rolladen
+    service: notify.telegram_schick_home
+  mode: single
+- id: garagenlicht_einschalten
+  alias: Garage - Licht einschalten
+  description: Garagenlicht einschalten nach der Sonnenunregang oder wenn es dunkel
     ist
   trigger:
-    - type: value
-      platform: device
-      device_id: db8b13c767d84865a607aca77975a221
-      entity_id: sensor.torposition
-      domain: sensor
-      above: 50
-      for:
-        hours: 0
-        minutes: 0
-        seconds: 5
-        milliseconds: 0
+  - type: value
+    platform: device
+    device_id: db8b13c767d84865a607aca77975a221
+    entity_id: sensor.torposition
+    domain: sensor
+    above: 50
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
   condition:
-    - condition: or
-      conditions:
-        - condition: sun
-          before: sunrise
-          before_offset: 00:15:00
-          after: sunset
-        - condition: sun
-          after: sunset
-          after_offset: -00:15:00
+  - condition: or
+    conditions:
+    - condition: sun
+      before: sunrise
+      before_offset: 00:15:00
+      after: sunset
+    - condition: sun
+      after: sunset
+      after_offset: -00:15:00
   action:
-    - type: turn_on
-      device_id: 63713a671de1472e84d5832bcb399f0e
-      entity_id: light.sonoffbnsz01
-      domain: light
-      brightness_pct: 100
-    - delay:
-        hours: 0
-        minutes: 10
-        seconds: 0
-        milliseconds: 0
-    - type: turn_off
-      device_id: 63713a671de1472e84d5832bcb399f0e
-      entity_id: light.sonoffbnsz01
-      domain: light
+  - type: turn_on
+    device_id: 63713a671de1472e84d5832bcb399f0e
+    entity_id: light.sonoffbnsz01
+    domain: light
+    brightness_pct: 100
+  - delay:
+      hours: 0
+      minutes: 10
+      seconds: 0
+      milliseconds: 0
+  - type: turn_off
+    device_id: 63713a671de1472e84d5832bcb399f0e
+    entity_id: light.sonoffbnsz01
+    domain: light
   mode: restart
-- id: "garagenlicht_ausschalten"
-  alias: Garagenlicht ausschalten
+- id: garagenlicht_ausschalten
+  alias: Garage - Licht ausschalten
   description: Garagenlicht ausschalten wenn das Garagentor geschlossen wurde
   trigger:
-    - platform: state
-      entity_id: binary_sensor.tor_offen
-      to: "off"
-      for:
-        hours: 0
-        minutes: 0
-        seconds: 5
-        milliseconds: 0
-    - platform: state
-      entity_id: input_boolean.torteil
-      to: "on"
-      for:
-        hours: 0
-        minutes: 0
-        seconds: 5
-        milliseconds: 0
+  - platform: state
+    entity_id: binary_sensor.tor_offen
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 5
+  - platform: state
+    entity_id: input_boolean.torteil
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 5
   condition: []
   action:
-    - type: turn_off
-      device_id: 63713a671de1472e84d5832bcb399f0e
-      entity_id: light.sonoffbnsz01
-      domain: light
+  - type: turn_off
+    device_id: 63713a671de1472e84d5832bcb399f0e
+    entity_id: light.sonoffbnsz01
+    domain: light
   mode: restart

@@ -38,7 +38,7 @@ input_text:
 automation:
   # Rolladen group last action
   - id: set_rolladen_last_action
-    alias: Set rolladen last action
+    alias: Rolladen - Set last action
     mode: parallel
     trigger:
       - platform: state
@@ -65,13 +65,13 @@ automation:
 # Scripts ###########################################################
 script:
   #######################################
-  # Script to management covers with one button.
+  # Script to control covers with one button.
   # Open -> Stop -> Close -> Stop -> Open
   # is passed:
   #   {{ entity_id }}
   #######################################
   cover_one_button:
-    alias: Management cover with one button
+    alias: Cover - One button control
     mode: parallel
     sequence:
       - service: >
@@ -89,8 +89,8 @@ script:
           entity_id: cover.{{ entity_id }}
 
   #######################################
-  # Script to management covers with two
-  # buttons (open and close). If cover
+  # Script to control covers with two
+  # buttons (open and close). If cover is
   # opening or closing and one of buttons
   # is pressed then cover stopped
   # is passed:
@@ -98,7 +98,7 @@ script:
   #   {{ mode }}
   #######################################
   cover_start_stop:
-    alias: Cover open add start stop option
+    alias: Cover - Two buttons control
     mode: parallel
     sequence:
       - service: >

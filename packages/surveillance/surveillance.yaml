@@ -13,8 +13,8 @@
 # Automations #######################################################
 automation:
   # Отправка видео в Telegram
-  - id: automation.camera_upload_video_to_telegram
-    alias: Camera Upload Video to Telegram
+  - id: camera_upload_video_to_telegram
+    alias: Camera - Upload Video to Telegram
     description: Отправка видео в Telegram
     mode: parallel
     trigger:
@@ -49,8 +49,8 @@ automation:
                 timeout: 1000
 
   # Отправка снимка в Telegram
-  - id: automation.camera_upload_picture_to_telegram
-    alias: Camera Upload Picture to Telegram
+  - id: camera_upload_picture_to_telegram
+    alias: Camera - Upload Picture to Telegram
     description: Отправка снимка в Telegram
     mode: parallel
     trigger:

@@ -41,7 +41,7 @@ notify:
 automation:
   # Start
   - id: telegram_start
-    alias: "Telegram start"
+    alias: "Telegram - Start"
     trigger:
       - platform: event
         event_type: telegram_command
@@ -71,7 +71,7 @@ automation:
 
   # Commands
   - id: telegram_commands
-    alias: "Telegram commands"
+    alias: "Telegram - Commands"
     trigger:
       - platform: event
         event_type: telegram_command
@@ -96,7 +96,7 @@ automation:
 
   # Help
   - id: telegram_help
-    alias: "Telegram help"
+    alias: "Telegram - Help"
     trigger:
       - platform: event
         event_type: telegram_command

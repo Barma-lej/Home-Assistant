@@ -5,7 +5,7 @@
 automation:
   # Направление камеры в зависимости от положения гаражных ворот
   - id: "camera_garage_richtung"
-    alias: Camera Garage Richtung
+    alias: Camera - Garage Richtung
     description: Направление камеры в зависимости от положения гаражных ворот
     mode: parallel
     trigger:
@@ -55,7 +55,7 @@ automation:
 # Scripts ###########################################################
 script:
   camera_ptz:
-    alias: Camera PTZ Control
+    alias: Camera - PTZ Control
     sequence:
       - service: reolink_dev.ptz_control
         data:

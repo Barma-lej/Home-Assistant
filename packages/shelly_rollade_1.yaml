@@ -18,7 +18,7 @@ utility_meter:
 # Automation ########################################################
 automation:
   - id: telegram_rollade_1
-    alias: "Telegram Rollade 1"
+    alias: "Telegram - Rollade 1"
     mode: parallel
     trigger:
       - platform: event

@@ -30,7 +30,7 @@ utility_meter:
 # Automation ########################################################
 automation:
   - id: telegram_kueche
-    alias: "Telegram Kueche"
+    alias: "Telegram - Kueche"
     mode: parallel
     trigger:
       - platform: event

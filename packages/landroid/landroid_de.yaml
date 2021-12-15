@@ -133,14 +133,14 @@ homeassistant:
 
     # Automations ########
     automation.mower_notify_status:
-      friendly_name: Statusbenachrichtigung
+      friendly_name: Mower - Statusbenachrichtigung
       icon: mdi:bell
     automation.mower_notify_error:
-      friendly_name: Fehlerbenachrichtigung
+      friendly_name: Mower - Fehlerbenachrichtigung
       icon: mdi:bell
 
     automation.mower_sync_values:
-      friendly_name: Datensynchronisation
+      friendly_name: Mower - Datensynchronisation
       icon: mdi:sync
 
     #automation.mower_views_switch:
@@ -149,17 +149,17 @@ homeassistant:
 
     # Scripts #########
     script.mower_set_config:
-      friendly_name: Konfiguration speichern
+      friendly_name: Mower - Konfiguration speichern
       icon: mdi:content-save-settings
 
     script.mower_setzone:
-      friendly_name: Zonenauswahl
+      friendly_name: Mower - Zonenauswahl
       icon: mdi:vector-difference
 
     script.mower_setzones:
-      friendly_name: Multizone übernehmen
+      friendly_name: Mower - Multizone übernehmen
       icon: mdi:content-save-settings
 
     script.mower_views_toggle:
-      friendly_name: Registerkarten umschalten
+      friendly_name: Mower - Registerkarten umschalten
       icon: mdi:tab

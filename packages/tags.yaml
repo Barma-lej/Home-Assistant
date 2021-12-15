@@ -6,7 +6,8 @@
 
 # for https://www.home-assistant.io/tag/4d4d9d64-59ff-4a65-8d8c-d1a088f46599
 automation:
-  - alias: Unlock the Door
+  - id: tags_wandlicht_toggle
+    alias: Tags - Wandlicht toggle
     trigger:
       platform: event
       event_type: tag_scanned
