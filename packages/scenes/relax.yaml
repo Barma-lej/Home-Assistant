@@ -1,0 +1,70 @@
+scene:
+  - id: "relax"
+    name: Relax
+    icon: mdi:seat-recline-extra
+    entities:
+      light.sonoffpow_02: "on"
+      light.sonoffpow_04: "on"
+      light.sonoffpow_01: "off"
+      light.shellyswitch25_10c7c3_channel_1: "off"
+      light.shellyswitch25_10a36d_channel_1: "off"
+      light.shellyswitch25_10a36d_channel_2: "off"
+
+script:
+  scene_relax:
+    alias: Scene - Relax
+    mode: single
+    sequence:
+      - service: scene.turn_on
+        target:
+          entity_id: scene.relax
+        data:
+          transition: 2.5
+      - service: media_player.play_media
+        target:
+          entity_id: media_player.chromecast
+        data:
+          media_content_id: ' { "app_name": "youtube", "media_id": "_zWlJpP-ptA" }'
+          media_content_type: cast
+
+  scene_tv:
+    alias: Scene - TV
+    mode: single
+    sequence:
+      - service: scene.turn_on
+        target:
+          entity_id: scene.relax
+        data:
+          transition: 2.5
+      - service: media_player.turn_on
+        target:
+          entity_id: media_player.sony_bravia_kd55x8505b
+      - wait_for_trigger:
+          - platform: state
+            entity_id: media_player.sony_bravia_kd55x8505b
+            to: "on"
+            for: 10
+        timeout: "00:00:20"
+        continue_on_timeout: true
+      - service: media_player.select_source
+        target:
+          entity_id: media_player.sony_bravia_kd55x8505b
+        data:
+          source: "HDMI 2/MHL"
+
+google_assistant:
+  entity_config:
+    scene.relax:
+      name: Ablauf Relax
+      room: Wohnzimmer
+      expose: true
+
+    script.scene_relax:
+      name: Relax
+      room: Wohnzimmer
+      expose: true
+
+    script.scene_tv:
+      name: TV_HDMI2
+      room: Wohnzimmer
+      expose: true

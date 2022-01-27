@@ -82,7 +82,6 @@
     - condition: sun
       before: sunrise
       before_offset: 00:15:00
-      after: sunset
     - condition: sun
       after: sunset
       after_offset: -00:15:00

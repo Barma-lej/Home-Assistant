@@ -34,6 +34,11 @@ entity_config:
     room: Ambiente
     expose: true
 
+  scene.romantic:
+    name: Romantic
+    room: Wohnzimmer
+    expose: true
+
   switch.sonoffs26_1:
     name: TV-Board
     room: Wohnzimmer
