@@ -164,17 +164,17 @@ script:
           media_content_id: >
             {% if is_state("input_select.radio_station","Europa Plus") %} http://ep256.hostingradio.ru:8052/europaplus256.mp3
             {% elif is_state("input_select.radio_station","Русское радио") %} https://rusradio.hostingradio.ru/rusradio96.aacp
-            {% elif is_state("input_select.radio_station","Comedy Radio") %} http://ic3.101.ru:8000/v11_1
-            {% elif is_state("input_select.radio_station","Авторадио") %} http://ic4.101.ru:8000/a100
-            {% elif is_state("input_select.radio_station","Relax Natur") %} http://ic7.101.ru:8000/c19_1
-            {% elif is_state("input_select.radio_station","Relax FM") %} http://ic4.101.ru:8000/a200
-            {% elif is_state("input_select.radio_station","Relax Gold") %} http://ic7.101.ru:8000/c19_4
-            {% elif is_state("input_select.radio_station","New Age") %} http://ic7.101.ru:8000/a120
-            {% elif is_state("input_select.radio_station","Pink Floyd") %} http://ic4.101.ru:8000/a53
-            {% elif is_state("input_select.radio_station","Enigma") %} http://ic4.101.ru:8000/a175
-            {% elif is_state("input_select.radio_station","Mainstream") %} http://ic4.101.ru:8000/a87
+            {% elif is_state("input_select.radio_station","Comedy Radio") %} https://pub0202.101.ru:8443/stream/air/aac/64/202
+            {% elif is_state("input_select.radio_station","Авторадио") %} https://pub0202.101.ru:8443/stream/air/aac/64/100
+            {% elif is_state("input_select.radio_station","Relax Natur") %} https://pub0101.101.ru/stream/trust/mp3/128/263
+            {% elif is_state("input_select.radio_station","Relax FM") %} https://pub0202.101.ru:8443/stream/air/aac/64/200
+            {% elif is_state("input_select.radio_station","Relax Gold") %} https://pub0201.101.ru/stream/trust/mp3/128/266
+            {% elif is_state("input_select.radio_station","New Age") %} https://pub0101.101.ru/stream/pro/aac/64/120
+            {% elif is_state("input_select.radio_station","Pink Floyd") %} https://pub0202.101.ru:8443/stream/pro/aac/64/53
+            {% elif is_state("input_select.radio_station","Enigma") %} https://pub0201.101.ru/stream/pro/aac/64/175
+            {% elif is_state("input_select.radio_station","Mainstream") %} https://pub0201.101.ru/stream/pro/aac/64/87
             {% elif is_state("input_select.radio_station","Маруся ФМ") %} http://radio-holding.ru:9000/marusya_aac_64
-            {% elif is_state("input_select.radio_station","Sex") %} http://ic4.101.ru:8000/a27
+            {% elif is_state("input_select.radio_station","Sex") %} https://pub0202.101.ru:8443/stream/pro/aac/64/27
             {% endif %}
           media_content_type: "music"
 
