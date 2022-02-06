@@ -47,6 +47,11 @@ input_select:
       - Русское радио
       - Comedy Radio
       - Авторадио
+      - Deep House
+      - Tropical House
+      - Trans House Deep
+      - Lo-fi Chillhop
+      - Office Lounge
       - Relax Natur
       - Relax FM
       - Relax Gold
@@ -68,6 +73,7 @@ input_select:
       - Home Mini Kristina
       - Home Mini
       - Überall
+      - Erdgeschoss
     initial: Nest Mini
     icon: mdi:speaker-wireless
 
@@ -119,13 +125,9 @@ automation:
           {% elif is_state("input_select.radio_player","Home Mini Flur") %} media_player.flur
           {% elif is_state("input_select.radio_player","Home Mini Kristina") %} media_player.kristina
           {% elif is_state("input_select.radio_player","Überall") %} media_player.home_group
+          {% elif is_state("input_select.radio_player","Erdgeschoss") %} media_player.erdgeschoss
           {% endif %}
         volume_level: "{{ states('input_number.radio_volume') }}"
-
-#- id: radio_timer
-#{
-#  "entity_id": "media_player.radio_group","media_content_id":"http://ic3.101.ru:8000/v11_1","media_content_type":"audio/mp4"
-#}
 
 # Scripts ###########################################################
 script:
@@ -160,12 +162,18 @@ script:
             {% elif is_state("input_select.radio_player","Home Mini Flur") %} media_player.flur
             {% elif is_state("input_select.radio_player","Home Mini Kristina") %} media_player.kristina
             {% elif is_state("input_select.radio_player","Überall") %} media_player.home_group
+            {% elif is_state("input_select.radio_player","Erdgeschoss") %} media_player.erdgeschoss
             {% endif %}
           media_content_id: >
             {% if is_state("input_select.radio_station","Europa Plus") %} http://ep256.hostingradio.ru:8052/europaplus256.mp3
             {% elif is_state("input_select.radio_station","Русское радио") %} https://rusradio.hostingradio.ru/rusradio96.aacp
             {% elif is_state("input_select.radio_station","Comedy Radio") %} https://pub0202.101.ru:8443/stream/air/aac/64/202
             {% elif is_state("input_select.radio_station","Авторадио") %} https://pub0202.101.ru:8443/stream/air/aac/64/100
+            {% elif is_state("input_select.radio_station","Deep House") %} https://pub0101.101.ru/stream/trust/mp3/128/173
+            {% elif is_state("input_select.radio_station","Tropical House") %} https://pub0201.101.ru/stream/pro/aac/64/364
+            {% elif is_state("input_select.radio_station","Trans House Deep") %} https://pub0302.101.ru:8443/stream/personal/aacp/64/1691459
+            {% elif is_state("input_select.radio_station","Lo-fi Chillhop") %} https://pub0201.101.ru/stream/pro/aac/64/358
+            {% elif is_state("input_select.radio_station","Office Lounge") %} https://pub0201.101.ru/stream/pro/aac/64/30
             {% elif is_state("input_select.radio_station","Relax Natur") %} https://pub0101.101.ru/stream/trust/mp3/128/263
             {% elif is_state("input_select.radio_station","Relax FM") %} https://pub0202.101.ru:8443/stream/air/aac/64/200
             {% elif is_state("input_select.radio_station","Relax Gold") %} https://pub0201.101.ru/stream/trust/mp3/128/266
@@ -182,26 +190,26 @@ script:
     alias: Radio - Stop
     icon: mdi:stop
     sequence:
-      - service: media_player.volume_set
-        data:
-          entity_id: media_player.nest_mini
-          volume_level: "0.25"
-      - service: media_player.volume_set
-        data:
-          entity_id: media_player.google_home
-          volume_level: "0.25"
-      - service: media_player.volume_set
-        data:
-          entity_id: media_player.soundblaster
-          volume_level: "0.25"
-      - service: media_player.volume_set
-        data:
-          entity_id: media_player.flur
-          volume_level: "0.25"
-      - service: media_player.volume_set
-        data:
-          entity_id: media_player.kristina
-          volume_level: "0.25"
+      # - service: media_player.volume_set
+      #   data:
+      #     entity_id: media_player.nest_mini
+      #     volume_level: "0.25"
+      # - service: media_player.volume_set
+      #   data:
+      #     entity_id: media_player.google_home
+      #     volume_level: "0.25"
+      # - service: media_player.volume_set
+      #   data:
+      #     entity_id: media_player.soundblaster
+      #     volume_level: "0.25"
+      # - service: media_player.volume_set
+      #   data:
+      #     entity_id: media_player.flur
+      #     volume_level: "0.25"
+      # - service: media_player.volume_set
+      #   data:
+      #     entity_id: media_player.kristina
+      #     volume_level: "0.25"
       - service: media_player.turn_off
         data:
           entity_id: >
