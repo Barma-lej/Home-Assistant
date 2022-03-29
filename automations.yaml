@@ -1,15 +1,3 @@
-- id: updateavailable
-  alias: HA - Update Available Notifications
-  trigger:
-  - entity_id: binary_sensor.updater
-    platform: state
-    to: 'on'
-  action:
-  - data:
-      title: Aktualisierung verfügbar
-      message: Home Assistant {{ state_attr('binary_sensor.updater', 'newest_version')
-        }} is available. [See releases](https://github.com/home-assistant/home-assistant/releases)
-    service: persistent_notification.create
 - id: tasmota_state_on_startup
   alias: Tasmota - Power state on HA startup
   trigger:
@@ -125,4 +113,83 @@
     device_id: 63713a671de1472e84d5832bcb399f0e
     entity_id: light.sonoffbnsz01
     domain: light
+  mode: restart
+- id: camera_garage_richtung
+  alias: Camera - Garage Richtung
+  description: Направление камеры в зависимости от положения гаражных ворот
+  trigger:
+  - type: value
+    platform: device
+    device_id: db8b13c767d84865a607aca77975a221
+    entity_id: sensor.torposition
+    domain: sensor
+    above: 30
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 5
+  - type: value
+    platform: device
+    device_id: db8b13c767d84865a607aca77975a221
+    entity_id: sensor.torposition
+    domain: sensor
+    below: 20
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 5
+  - platform: state
+    entity_id: binary_sensor.tor_offen
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 3
+  - platform: state
+    entity_id: input_boolean.torteil
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 5
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - type: is_value
+        condition: device
+        device_id: db8b13c767d84865a607aca77975a221
+        entity_id: sensor.torposition
+        domain: sensor
+        above: 30
+      sequence:
+      - service: reolink_dev.ptz_control
+        data:
+          entity_id: camera.garage
+          command: TOPOS
+          preset: 1
+    - conditions:
+      - type: is_value
+        condition: device
+        device_id: db8b13c767d84865a607aca77975a221
+        entity_id: sensor.tor_distanz
+        domain: sensor
+        below: 20
+      sequence:
+      - service: reolink_dev.ptz_control
+        data:
+          entity_id: camera.garage
+          command: TOPOS
+          preset: 2
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 30
+          milliseconds: 0
+      - service: reolink_dev.ptz_control
+        data:
+          entity_id: camera.garage
+          command: TOPOS
+          preset: 2
+    default: []
   mode: restart
