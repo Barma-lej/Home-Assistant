@@ -9,36 +9,40 @@ homeassistant:
   internal_url: !secret ha_internal_url
   packages: !include_dir_named packages
   customize: !include customize.yaml
-
   # allowlist_external_dirs:
-  #   - /mnt/sdb1/cam1
-  #   - /mnt/sdb1/cam2
-  #   - /mnt/sdb1/cam3
+  #   - /mnt/sdb1/cams
 
   media_dirs:
     local: /media
-    # recording: /mnt/sdb1
 
-#default_config:
+# Enables ###########################################################
+api:
+# cloud:
+config:
+conversation: # Allows you to issue voice commands from the frontend in enabled browsers
+# default_config:
+dhcp:
 energy:
+# map: # A map on the frontend to display the location of tracked devices.
 media_source:
+mobile_app:
+my: # This integration handles redirects from the My Home Assistant service.
+notify:
+sun: # Track the sun
+system_health: # System Health integration data can be viewed in Developer Tools on the “Info” tab.
+websocket_api:
 
 panel_iframe: !include panel_iframe.yaml
 
 folder_watcher:
-  - folder: /media/cam1
-  - folder: /media/cam2
-  - folder: /media/cam3
-##    patterns:
-##      - '*.mkv'
+  - folder: /media/cams
 
 # Show links to resources in log and frontend
-#introduction:
+# introduction:
 
 # Enables the frontend ##############################################
 frontend:
   themes: !include_dir_merge_named themes
-# Enables configuration UI ##########################################
 
 # HTTP ##############################################################
 http:
@@ -47,21 +51,8 @@ http:
   ip_ban_enabled: true
   login_attempts_threshold: 15
 
-#  ssl_certificate: !secret http_ssl_certificate
-#  ssl_key: !secret http_ssl_key
-##  api_password: !secret api_pass
-#  ip_ban_enabled: true
-##  - platform: rest
-##    resource: !secret url
-##    headers:
-##      authorization: !secret along_token
-
-websocket_api:
-
-mobile_app:
-
 logger:
-  #  default: critical
+  # default: critical
   default: warning
   logs:
     homeassistant.components.onvif: info
@@ -79,15 +70,10 @@ logger:
 
 # Recorder ##########################################################
 recorder:
-  #  purge_interval: 1
-  purge_keep_days: 30
-  #  db_url: !secret db_url
+  purge_keep_days: 120
   exclude:
     domains:
-      #      - automation
       - calendar
-      #      - script
-      - updater
       - weblink
     entity_globs:
       - sensor.weather_*
@@ -104,10 +90,7 @@ recorder:
 logbook:
   exclude:
     domains:
-      #      - automation
       - calendar
-      #      - script
-      - updater
       - weblink
     entities:
       - sun.sun
@@ -118,18 +101,9 @@ logbook:
       - sensor.sunrise
       - sensor.only_text
 
-notify:
-
-# Checks for available updates
-# Note: This component will send some information about your system to
-# the developers to assist with development of Home Assistant.
-# For more information, please see:
-# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
-updater:
-#  include_used_components: true # Optional, allows Home Assistant developers to focus on popular components.
-
-# Discover some devices automatically ###############################
+# Discover some devices automatically
 discovery:
+  # Disable discovering
   ignore:
     - songpal
     - yeelight
@@ -142,21 +116,6 @@ history:
       - calendar
       - sun
 
-# Enables ###########################################################
-api:
-#cloud:
-config:
-conversation: # Allows you to issue voice commands from the frontend in enabled browsers
-dhcp:
-#map: # A map on the frontend to display the location of tracked devices.
-sun: # Track the sun
-system_health: # System Health integration data can be viewed in Developer Tools on the “Info” tab.
-my: # This integration handles redirects from the My Home Assistant service.
-
-# Lovelace ##########################################################
-#lovelace:
-#  mode: yaml
-
 # TTS ###############################################################
 tts:
   - platform: yandextts
@@ -166,26 +125,26 @@ tts:
     voice: oksana
     emotion: good
     speed: 0.9
-#  - platform: google
+  - platform: google_translate
 
 ## FFMPEG ############################################################
 ffmpeg:
-##  ffmpeg_bin: /usr/bin/ffmpeg
+  # ffmpeg_bin: /usr/bin/ffmpeg
 
 stream:
 
 # MQTT ##############################################################
-mqtt:
-  broker: !secret mqtt_brocker
-  port: 8883
-  client_id: hass-nuc
-  username: !secret mqtt_user
-  password: !secret mqtt_pass
-  tls_insecure: true
-  discovery: true
-  discovery_prefix: homeassistant
-  certificate: auto
-#  certificate: !secret http_ssl_cert
+# mqtt:
+#   broker: !secret mqtt_brocker
+#   port: 8883
+#   client_id: hass-nuc
+#   username: !secret mqtt_user
+#   password: !secret mqtt_pass
+#   tls_insecure: true
+#   discovery: true
+#   discovery_prefix: homeassistant
+#   # certificate: auto
+#   certificate: !secret http_ssl_cert
 
 # Google ############################################################
 google:
@@ -197,8 +156,9 @@ google:
 device_tracker:
   - platform: google_maps
     username: !secret my_email
-#    password: !secret google_pass
+    # password: !secret google_pass
 
+# Includes ##########################################################
 automation: !include automations.yaml
 google_assistant: !include google_assistant.yaml
 group: !include groups.yaml
@@ -206,4 +166,4 @@ scene: !include scenes.yaml
 script: !include scripts.yaml
 sensor: !include sensors.yaml
 shell_command: !include shell_commands.yaml
-#zone: !include zones.yaml
+# zone: !include zones.yaml
