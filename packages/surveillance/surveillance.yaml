@@ -12,46 +12,10 @@
 
 # Automations #######################################################
 automation:
-  # Отправка видео в Telegram
-  - id: camera_upload_video_to_telegram
-    alias: Camera - Upload Video to Telegram
-    description: Отправка видео в Telegram
-    mode: parallel
-    trigger:
-      platform: event
-      event_type: folder_watcher
-      event_data:
-        event_type: created
-
-    condition:
-      condition: template
-      value_template: "{{ '.mp4' in trigger.event.data.path }}"
-
-    action:
-      - delay: 00:00:55 # Чтобы файл успел записаться
-      - service: notify.telegram_schick_home
-        data:
-          title: Surveillance
-          message: "Bewegung erkannt!"
-          data:
-            video:
-              - file: "{{ trigger.event.data.path }}"
-                caption: >-
-                  {% if 'cam1' in trigger.event.data.folder %}
-                    🏃 *Terrasse* Bewegung
-                  {% elif 'cam2' in trigger.event.data.folder %}
-                    🚗 *Garage* Bewegung
-                  {% elif 'cam3' in trigger.event.data.folder %}
-                    🏠 *Einfahrt* Bewegung
-                  {% else %}
-                    🏃 *Bewegung erkannt!*
-                  {% endif -%}
-                timeout: 1000
-
-  # Отправка снимка в Telegram
-  - id: camera_upload_picture_to_telegram
-    alias: Camera - Upload Picture to Telegram
-    description: Отправка снимка в Telegram
+  # Отправка файлов в Telegram
+  - id: camera_upload_to_telegram
+    alias: Camera - Upload to Telegram
+    description: Отправка файлов в Telegram
     mode: parallel
     trigger:
       platform: event
@@ -61,29 +25,69 @@ automation:
 
     condition:
       condition: template
-      value_template: "{{ '.jpg' in trigger.event.data.path }}"
+      value_template: "{{ 'cams' in trigger.event.data.path }}"
 
     action:
-      - service: notify.telegram_schick_home
-        data:
-          title: Surveillance
-          message: "Bewegung erkannt!"
-          data:
-            photo:
-              - file: "{{ trigger.event.data.path }}"
-                caption: >-
-                  {% if 'cam1' in trigger.event.data.folder %}
-                    🏃 *Terrasse* Bewegung
-                  {% elif 'cam2' in trigger.event.data.folder %}
-                    🚗 *Garage* Bewegung
-                  {% elif 'cam3' in trigger.event.data.folder %}
-                    🏠 *Einfahrt* Bewegung
-                  {% else %}
-                    🏃 *Bewegung erkannt!*
-                  {% endif -%}
-    # - service: shell_command.delete_file
-    #   data:
-    #     file_path: "{{ trigger.event.data.path }}"
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: >
+                  {{ trigger.event.data.path is search("\d\.mp4$") }}
+            sequence:
+              - service: shell_command.cam_convert
+                data:
+                  file_in: "{{ trigger.event.data.path }}"
+                  file_out: >
+                    {{ trigger.event.data.path | regex_replace( find="\.mp4$", replace="e.mp4", ignorecase=False ) }}
+
+          - conditions:
+              - condition: template
+                value_template: "{{ 'e.mp4' in trigger.event.data.path }}"
+            sequence:
+              - service: notify.telegram_schick_home
+                data:
+                  title: Surveillance
+                  message: "Bewegung erkannt!"
+                  data:
+                    video:
+                      - file: "{{ trigger.event.data.path }}"
+                        caption: >-
+                          {% if 'cam1' in trigger.event.data.folder %}
+                            🏃 *Terrasse* Bewegung
+                          {% elif 'cam2' in trigger.event.data.folder %}
+                            🚗 *Garage* Bewegung
+                          {% elif 'cam3' in trigger.event.data.folder %}
+                            🏠 *Einfahrt* Bewegung
+                          {% else %}
+                            🏃 *Bewegung erkannt!*
+                          {% endif -%}
+                        timeout: 1000
+              - service: shell_command.cam_remove_file
+                data:
+                  file_in: >
+                    {{ trigger.event.data.path | regex_replace( find="e\.mp4$", replace=".mp4", ignorecase=False ) }}
+
+          - conditions:
+              - condition: template
+                value_template: "{{ '.jpg' in trigger.event.data.path }}"
+            sequence:
+              - service: notify.telegram_schick_home
+                data:
+                  title: Surveillance
+                  message: "Bewegung erkannt!"
+                  data:
+                    photo:
+                      - file: "{{ trigger.event.data.path }}"
+                        caption: >-
+                          {% if 'cam1' in trigger.event.data.folder %}
+                            🏃 *Terrasse* Bewegung
+                          {% elif 'cam2' in trigger.event.data.folder %}
+                            🚗 *Garage* Bewegung
+                          {% elif 'cam3' in trigger.event.data.folder %}
+                            🏠 *Einfahrt* Bewegung
+                          {% else %}
+                            🏃 *Bewegung erkannt!*
+                          {% endif -%}
 
 # Script ############################################################
 #script:
