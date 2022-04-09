@@ -62,7 +62,7 @@ script:
           entity_id: "{{ entity_id }}"
           command: "{{ command }}"
 
-      - delay: 1
+      - delay: "00:00:01"
 
       - service: reolink_dev.ptz_control
         data:

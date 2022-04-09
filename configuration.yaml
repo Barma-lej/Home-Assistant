@@ -125,9 +125,21 @@ tts:
     voice: oksana
     emotion: good
     speed: 0.9
+
   - platform: google_translate
 
-## FFMPEG ############################################################
+  - platform: microsoft
+    api_key: !secret msspeech_api_key
+    language: de-de
+    gender: Male
+    type: ConradNeural
+    rate: 0.8
+    volume: 100
+    pitch: x-low
+    # contour: (0, 0) (100, 100)
+    region: germanywestcentral
+
+# FFMPEG ############################################################
 ffmpeg:
   # ffmpeg_bin: /usr/bin/ffmpeg
 
