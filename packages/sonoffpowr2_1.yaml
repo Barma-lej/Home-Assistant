@@ -39,13 +39,14 @@ automation:
       - wait_for_trigger:
           - platform: state
             entity_id: light.sonoffpow_01
-        timeout: 5
+        timeout: "00:00:05"
         continue_on_timeout: true
 
-      - service: telegram_bot.send_message
+      - service: script.telegram_callback
         data:
-          target: "{{ trigger.event.data.user_id }}"
-          message: "💡 {{ state_attr('light.sonoffpow_01', 'friendly_name') }} ist {{ states('light.sonoffpow_01') }}"
+          target: "{{ trigger.event.data.chat_id }}"
+          message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
+          message: "💡 {{ state_attr('light.sonoffpow_01', 'friendly_name') }} - {{ states('light.sonoffpow_01') }}"
 
 #  Service ist {{ trigger.event }}"
 

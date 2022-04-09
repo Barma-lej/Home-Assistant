@@ -36,28 +36,62 @@ automation:
       - platform: event
         event_type: telegram_command
         event_data:
-          command: "/kueche"
-
+          command: "/kuechenlicht"
       - platform: event
         event_type: telegram_callback
         event_data:
-          command: "/kueche"
+          command: "/kuechenlicht"
+
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: "/essecke"
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          command: "/essecke"
 
     action:
-      - service: light.toggle
-        data:
-          entity_id: light.shellyswitch25_10a36d_channel_1
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ trigger.event.data.command == '/kuechenlicht' }}"
+            sequence:
+              - service: light.toggle
+                data:
+                  entity_id: light.shellyswitch25_10a36d_channel_1
 
-      - wait_for_trigger:
-          - platform: state
-            entity_id: light.shellyswitch25_10a36d_channel_1
-        timeout: 5
-        continue_on_timeout: true
+              - wait_for_trigger:
+                  - platform: state
+                    entity_id: light.shellyswitch25_10a36d_channel_1
+                continue_on_timeout: true
+                timeout: "00:00:01"
 
-      - service: telegram_bot.send_message
-        data:
-          target: "{{ trigger.event.data.user_id }}"
-          message: "💡 {{ state_attr('light.shellyswitch25_10a36d_channel_1', 'friendly_name') }} ist {{ states('light.shellyswitch25_10a36d_channel_1') }}"
+              - service: script.telegram_callback
+                data:
+                  target: "{{ trigger.event.data.chat_id }}"
+                  message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
+                  message: "💡 {{ state_attr('light.shellyswitch25_10a36d_channel_1', 'friendly_name') }} - {{ states('light.shellyswitch25_10a36d_channel_1') }}"
+
+          - conditions:
+              - condition: template
+                value_template: "{{ trigger.event.data.command == '/essecke' }}"
+            sequence:
+              - service: light.toggle
+                data:
+                  entity_id: light.shellyswitch25_10a36d_channel_2
+
+              - wait_for_trigger:
+                  - platform: state
+                    entity_id: light.shellyswitch25_10a36d_channel_2
+                continue_on_timeout: true
+                timeout: "00:00:01"
+
+              - service: script.telegram_callback
+                data:
+                  target: "{{ trigger.event.data.chat_id }}"
+                  message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
+                  message: "💡 {{ state_attr('light.shellyswitch25_10a36d_channel_2', 'friendly_name') }} - {{ states('light.shellyswitch25_10a36d_channel_2') }}"
 
 # Customize #########################################################
 homeassistant:

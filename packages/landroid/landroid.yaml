@@ -396,31 +396,34 @@ input_number:
     name: "Zone 0: Distance"
     initial: 0
     min: 0
-    max: 1000
+    max: 350
     step: 1
     unit_of_measurement: "m"
     icon: mdi:numeric-0-box-outline
+
   mower_zone1_distance:
     name: "Zone 1: Distance"
     initial: 0
     min: 0
-    max: 1000
+    max: 350
     step: 1
     unit_of_measurement: "m"
     icon: mdi:numeric-1-box-outline
+
   mower_zone2_distance:
     name: "Zone 2: Distance"
     initial: 0
     min: 0
-    max: 1000
+    max: 350
     step: 1
     unit_of_measurement: "m"
     icon: mdi:numeric-2-box-outline
+
   mower_zone3_distance:
     name: "Zone 3: Distance"
     initial: 0
     min: 0
-    max: 1000
+    max: 350
     step: 1
     unit_of_measurement: "m"
     icon: mdi:numeric-3-box-outline
@@ -433,6 +436,7 @@ input_number:
     step: 10
     unit_of_measurement: "%"
     icon: mdi:numeric-0-circle-outline
+
   mower_zone1_probability:
     name: "Zone 1: Probability"
     initial: 0
@@ -441,6 +445,7 @@ input_number:
     step: 10
     unit_of_measurement: "%"
     icon: mdi:numeric-1-circle-outline
+
   mower_zone2_probability:
     name: "Zone 2: Probability"
     initial: 0
@@ -449,6 +454,7 @@ input_number:
     step: 10
     unit_of_measurement: "%"
     icon: mdi:numeric-2-circle-outline
+
   mower_zone3_probability:
     name: "Zone 3: Probability"
     initial: 0
@@ -484,73 +490,73 @@ input_boolean:
     name: Multizone
     icon: mdi:vector-difference
 
-  #mower_view_0:
-  #  name: Sun.
-  #  icon: mdi:calendar
-  #mower_view_1:
-  #  name: Mon.
-  #  icon: mdi:calendar-today
-  #mower_view_2:
-  #  name: Tue.
-  #  icon: mdi:calendar-minus
-  #mower_view_3:
-  #  name: Wed.
-  #  icon: mdi:calendar-range
-  #mower_view_4:
-  #  name: Thu.
-  #  icon: mdi:calendar-multiselect
-  #mower_view_5:
-  #  name: Fri.
-  #  icon: mdi:calendar-heart
-  #mower_view_6:
-  #  name: Sat.
-  #  icon: mdi:calendar-check
+  # mower_view_0:
+  #   name: Sun.
+  #   icon: mdi:calendar
+  # mower_view_1:
+  #   name: Mon.
+  #   icon: mdi:calendar-today
+  # mower_view_2:
+  #   name: Tue.
+  #   icon: mdi:calendar-minus
+  # mower_view_3:
+  #   name: Wed.
+  #   icon: mdi:calendar-range
+  # mower_view_4:
+  #   name: Thu.
+  #   icon: mdi:calendar-multiselect
+  # mower_view_5:
+  #   name: Fri.
+  #   icon: mdi:calendar-heart
+  # mower_view_6:
+  #   name: Sat.
+  #   icon: mdi:calendar-check
 
-# Enable scheduler on weekdays
-#mower_0_sched_enable:
-#  name: Sunday
-#  icon: mdi:calendar
-#mower_1_sched_enable:
-#  name: Monday
-#  icon: mdi:calendar-today
-#mower_2_sched_enable:
-#  name: Tuesday
-#  icon: mdi:calendar-minus
-#mower_3_sched_enable:
-#  name: Wednesday
-#  icon: mdi:calendar-range
-#mower_4_sched_enable:
-#  name: Thursday
-#  icon: mdi:calendar-multiselect
-#mower_5_sched_enable:
-#  name: Friday
-#  icon: mdi:calendar-heart
-#mower_6_sched_enable:
-#  name: Saturday
-#  icon: mdi:calendar-check
+  # # Enable scheduler on weekdays
+  # mower_0_sched_enable:
+  #   name: Sunday
+  #   icon: mdi:calendar
+  # mower_1_sched_enable:
+  #   name: Monday
+  #   icon: mdi:calendar-today
+  # mower_2_sched_enable:
+  #   name: Tuesday
+  #   icon: mdi:calendar-minus
+  # mower_3_sched_enable:
+  #   name: Wednesday
+  #   icon: mdi:calendar-range
+  # mower_4_sched_enable:
+  #   name: Thursday
+  #   icon: mdi:calendar-multiselect
+  # mower_5_sched_enable:
+  #   name: Friday
+  #   icon: mdi:calendar-heart
+  # mower_6_sched_enable:
+  #   name: Saturday
+  #   icon: mdi:calendar-check
 
-# Enable Cut to Edge on weekdays
-#mower_0_cuttoedge:
-#  name: Cut to Edge (0)
-#  icon: mdi:scissors-cutting
-#mower_1_cuttoedge:
-#  name: Cut to Edge (1)
-#  icon: mdi:scissors-cutting
-#mower_2_cuttoedge:
-#  name: Cut to Edge (2)
-#  icon: mdi:scissors-cutting
-#mower_3_cuttoedge:
-#  name: Cut to Edge (3)
-#  icon: mdi:scissors-cutting
-#mower_4_cuttoedge:
-#  name: Cut to Edge (4)
-#  icon: mdi:scissors-cutting
-#mower_5_cuttoedge:
-#  name: Cut to Edge (5)
-#  icon: mdi:scissors-cutting
-#mower_6_cuttoedge:
-#  name: Cut to Edge (6)
-#  icon: mdi:scissors-cutting
+  # # Enable Cut to Edge on weekdays
+  # mower_0_cuttoedge:
+  #   name: Cut to Edge (0)
+  #   icon: mdi:scissors-cutting
+  # mower_1_cuttoedge:
+  #   name: Cut to Edge (1)
+  #   icon: mdi:scissors-cutting
+  # mower_2_cuttoedge:
+  #   name: Cut to Edge (2)
+  #   icon: mdi:scissors-cutting
+  # mower_3_cuttoedge:
+  #   name: Cut to Edge (3)
+  #   icon: mdi:scissors-cutting
+  # mower_4_cuttoedge:
+  #   name: Cut to Edge (4)
+  #   icon: mdi:scissors-cutting
+  # mower_5_cuttoedge:
+  #   name: Cut to Edge (5)
+  #   icon: mdi:scissors-cutting
+  # mower_6_cuttoedge:
+  #   name: Cut to Edge (6)
+  #   icon: mdi:scissors-cutting
 
 # Automations #######################################################
 automation:
@@ -660,7 +666,6 @@ script:
       - service: landroid_cloud.setzone
         data:
           id: "{{ state_attr('sensor.landroid_mower_status','id') }}"
-          zone: "{{ states('input_select.mower_zone') | int(0) }}"
 
   mower_setzones:
     alias: Mower set multizone distances
@@ -679,10 +684,10 @@ script:
           {%- endif %}
         multizone_probabilities: >-
           {% if is_state('input_boolean.mower_zone_enable', 'on') -%}
-            [{{ ((states('input_number.mower_zone0_probability') | int(0) ) / 10)  | round(0) }},
-            {{ ((states('input_number.mower_zone1_probability') | int(0) ) / 10)  | round(0) }},
-            {{ ((states('input_number.mower_zone2_probability') | int(0) ) / 10)  | round(0) }},
-            {{ ((states('input_number.mower_zone3_probability') | int(0) ) / 10)  | round(0) }}]
+            [{{ ((states('input_number.mower_zone0_probability') | int(0) ) / 10) | round(0) }},
+            {{ ((states('input_number.mower_zone1_probability') | int(0) ) / 10) | round(0) }},
+            {{ ((states('input_number.mower_zone2_probability') | int(0) ) / 10) | round(0) }},
+            {{ ((states('input_number.mower_zone3_probability') | int(0) ) / 10) | round(0) }}]
           {%- else -%}
             [0,0,0,0]
           {%- endif %}

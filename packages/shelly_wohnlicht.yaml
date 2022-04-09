@@ -39,12 +39,13 @@ automation:
       - wait_for_trigger:
           - platform: state
             entity_id: light.shellyswitch25_10c7c3_channel_1
-        timeout: 5
+        timeout: 1
         continue_on_timeout: true
 
-      - service: telegram_bot.send_message
+      - service: script.telegram_callback
         data:
-          target: "{{ trigger.event.data.user_id }}"
+          target: "{{ trigger.event.data.chat_id }}"
+          message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
           message: "💡 {{ state_attr('light.shellyswitch25_10c7c3_channel_1', 'friendly_name') }} ist {{ states('light.shellyswitch25_10c7c3_channel_1') }}"
 
 # Customize #########################################################

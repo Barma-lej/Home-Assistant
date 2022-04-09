@@ -26,7 +26,7 @@ input_boolean:
 
 # Automations #######################################################
 automation:
-  - id: "torteiloffnung_on"
+  - id: torteiloffnung_on
     alias: Garage - Torteiloffnung ON
     trigger:
       - platform: state
@@ -67,26 +67,65 @@ automation:
     alias: "Telegram - Tor"
     mode: restart
     trigger:
-      platform: event
-      event_type: telegram_command
-      event_data:
-        command: "/tor"
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: "/tor"
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: "/torteil"
+
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          command: "/tor"
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          command: "/torteil"
 
     action:
-      - service: switch.toggle
-        data:
-          entity_id: switch.tor
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ trigger.event.data.command == '/tor' }}"
+            sequence:
+              - service: switch.toggle
+                data:
+                  entity_id: switch.tor
 
-      - wait_for_trigger:
-          - platform: state
-            entity_id: cover.tor
-        timeout: 30
-        continue_on_timeout: true
+              - wait_for_trigger:
+                  - platform: state
+                    entity_id: cover.tor
+                timeout: "00:00:05"
+                continue_on_timeout: true
 
-      - service: telegram_bot.send_message
-        data:
-          target: "{{ trigger.event.data.user_id }}"
-          message: "{{ state_attr('switch.tor', 'friendly_name') }} ist auf {{ state_attr('cover.tor', 'current_position') }}% geöffnet "
+              - service: script.telegram_callback
+                data:
+                  target: "{{ trigger.event.data.chat_id }}"
+                  message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
+                  message: "{{ state_attr('switch.tor', 'friendly_name') }} - {{ state_attr('cover.tor', 'current_position') }}%"
+
+          - conditions:
+              - condition: template
+                value_template: "{{ trigger.event.data.command == '/torteil' }}"
+            sequence:
+              - service: switch.toggle
+                data:
+                  entity_id: switch.torteil
+
+              - wait_for_trigger:
+                  - platform: state
+                    entity_id: cover.tor
+                timeout: "00:00:05"
+                continue_on_timeout: true
+
+              - service: script.telegram_callback
+                data:
+                  target: "{{ trigger.event.data.chat_id }}"
+                  message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
+                  message: "{{ state_attr('switch.torteil', 'friendly_name') }} - {{ state_attr('cover.tor', 'current_position') }}%"
 
 # Customize #########################################################
 homeassistant:

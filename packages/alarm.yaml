@@ -1,0 +1,165 @@
+switch:
+  - platform: template
+    switches:
+      alarm_play:
+        friendly_name: Sirene
+        value_template: "{{ is_state('input_boolean.alarm_indoor', 'on') }}"
+        turn_on:
+          - service: input_boolean.turn_on
+            target:
+              entity_id: input_boolean.alarm_indoor
+        turn_off:
+          - service: input_boolean.turn_off
+            target:
+              entity_id: input_boolean.alarm_indoor
+        icon_template: >-
+          {% if is_state('input_boolean.alarm_indoor', 'on') %}
+            mdi:alarm-light
+          {% else %}
+            mdi:alarm-light-off
+          {% endif %}
+
+input_boolean:
+  alarm_indoor:
+    name: "Alarm drinnen"
+    icon: mdi:alarm-light
+
+timer:
+  alarm_indoor:
+    duration: "00:00:05"
+
+automation:
+  - id: alarm_play_loop
+    alias: "Alarm - play loop"
+    description: "Alarm Widergabe"
+    mode: single
+    trigger:
+      - platform: event
+        event_type: timer.finished
+        event_data:
+          entity_id: timer.alarm_indoor
+      - platform: state
+        entity_id: input_boolean.alarm_indoor
+        from: "off"
+        to: "on"
+    condition:
+      - condition: state
+        entity_id: input_boolean.alarm_indoor
+        state: "on"
+    action:
+      - service: script.alarm_play
+      - service: timer.start
+        data:
+          duration: "0:00:05"
+        target:
+          entity_id: timer.alarm_indoor
+
+  - id: alarm_play_stop
+    alias: "Alarm - play stop"
+    description: "Alarm stoppen"
+    mode: single
+    trigger:
+      - platform: state
+        entity_id: input_boolean.alarm_indoor
+        from: "on"
+        to: "off"
+    action:
+      - service: switch.turn_off
+        target:
+          entity_id: switch.garage_siren
+      - service: timer.finish
+        target:
+          entity_id: timer.alarm_indoor
+      - service: media_player.media_stop
+        target:
+          entity_id: media_player.home_group
+      - service: homeassistant.turn_off
+        target:
+          entity_id: script.alarm_play
+      - service: media_player.volume_set
+        target:
+          entity_id: media_player.home_group
+        data:
+          volume_level: 0.2
+
+  # Alarm notify
+  - id: alarm_notify
+    alias: "Alarm - Notify"
+    mode: parallel
+    trigger:
+      - platform: state
+        entity_id: input_boolean.alarm_indoor
+        from: "off"
+        to: "on"
+
+    action:
+      - alias: "Repeat a few times"
+        repeat:
+          count: 4
+          sequence:
+            - service: notify.telegram_schick_home
+              data:
+                title: 🚨👮🆘 Alarm aufgelöst!!!
+                message: "Etwas passiert!!!"
+            - delay: 00:00:05
+
+  - id: telegram_alarm
+    alias: "Telegram - Alarm toggle"
+    mode: parallel
+    trigger:
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: "/alarm"
+
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          command: "/alarm"
+
+    action:
+      - service: switch.toggle
+        data:
+          entity_id: switch.alarm_play
+
+      - wait_for_trigger:
+          - platform: state
+            entity_id: switch.alarm_play
+        timeout: 5
+        continue_on_timeout: true
+
+      - service: script.telegram_callback
+        data:
+          target: "{{ trigger.event.data.user_id }}"
+          message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
+          message: "🚨 {{ state_attr('switch.alarm_play', 'friendly_name') }} - {{ states('switch.alarm_play') }}"
+
+script:
+  alarm_play:
+    sequence:
+      - service: switch.turn_on
+        target:
+          entity_id: switch.garage_siren
+
+      - service: media_player.volume_set
+        target:
+          entity_id: media_player.home_group
+        data:
+          volume_level: 1
+
+      - service: media_player.play_media
+        target:
+          entity_id: media_player.home_group
+        data:
+          media_content_type: music
+          media_content_id: "media-source://media_source/local/sounds/polizeisirene-martinshorn-KCD04046.mp3"
+          extra:
+            thumb: "/local/images/alarm_red.png"
+            title: HomeAssistantRadio
+
+      - delay: 00:00:10
+
+      - service: tts.microsoft_say
+        data:
+          entity_id: media_player.home_group
+          message: "Polizei wurde schon benachrichtigt, sind unterwegs und kommen sofort."
