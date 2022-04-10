@@ -126,16 +126,16 @@ logbook:
       # - input_boolean.mower_6_cuttoedge
 
       # Automations ######
-      - automation.mower_notify_status
-      - automation.mower_notify_error
-      - automation.mower_sync_values
-      - automation.mower_views_switch
+      # - automation.mower_notify_status
+      # - automation.mower_notify_error
+      # - automation.mower_sync_values
+      # - automation.mower_views_switch
 
       # Scripts ##########
-      - script.mower_set_config
-      - script.mower_setzone
-      - script.mower_setzones
-      - script.mower_views_toggle
+      # - script.mower_set_config
+      # - script.mower_setzone
+      # - script.mower_setzones
+      # - script.mower_views_toggle
 
 # Switch ############################################################
 switch:
