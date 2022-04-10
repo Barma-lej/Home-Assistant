@@ -666,6 +666,7 @@ script:
       - service: landroid_cloud.setzone
         data:
           id: "{{ state_attr('sensor.landroid_mower_status','id') }}"
+          zone: "{{ states('input_select.mower_zone') | int(0) }}"
 
   mower_setzones:
     alias: Mower set multizone distances
