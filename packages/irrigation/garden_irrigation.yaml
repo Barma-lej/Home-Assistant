@@ -385,8 +385,9 @@ script:
       # Don't continue if it rains (Если дождь пошёл во время полива)
       - condition: template
         value_template: >
-          {{ is_state('input_boolean.cycle' ~ cycle ~ '_use_sensor_data', 'on') and
-            not is_state_attr('sensor.landroid_mower_error', 'error_id', 5) }}
+          {{ is_state('input_boolean.cycle' ~ cycle ~ '_use_sensor_data', 'off')
+          or (is_state('input_boolean.cycle' ~ cycle ~ '_use_sensor_data', 'on')
+            and not is_state_attr('sensor.landroid_mower_error', 'error_id', 5)) }}
 
       # Call the script to set the Tasmota PULSETIME
       - service: script.set_tasmota_pulsetime
