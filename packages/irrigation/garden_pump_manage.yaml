@@ -50,9 +50,14 @@ automation:
         minutes: "/15"
 
     condition:
-      - condition: state
-        entity_id: group.irrigation_switches
-        state: "off"
+      - condition: or
+        conditions:
+          - condition: state
+            entity_id: group.irrigation_switches
+            state: "off"
+          - condition: state
+            entity_id: switch.zone3_valve
+            state: "off"
 
     action:
       - service: switch.turn_off
