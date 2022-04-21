@@ -1,0 +1,13 @@
+# Energy management
+
+# Input Number ######################################################
+input_number:
+  energy_cost:
+    name: Stromkosten
+    mode: box
+    initial: 0.29
+    min: 0
+    max: 1.5
+    step: 0.01
+    icon: mdi:currency-eur
+    unit_of_measurement: "EUR/kWh"
