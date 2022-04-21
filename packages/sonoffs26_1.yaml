@@ -1,6 +1,24 @@
 # Sonoff S26 1
 # Tasmota integration
 
+# Sensors ###########################################################
+template:
+  - sensor:
+      - name: TV Board power
+        unique_id: tv_board_power
+        state: "{{ 30 if is_state('switch.sonoffs26_1', 'on') else 0 }}"
+        unit_of_measurement: "W"
+        device_class: power
+
+sensor:
+  # Energy sensors
+  - platform: integration
+    name: TV Board energy
+    unique_id: tv_board_energy
+    source: sensor.tv_board_power
+    unit_prefix: k
+    round: 2
+
 # Automations #######################################################
 automation:
   # - id: tv_board_off

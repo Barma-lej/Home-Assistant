@@ -10,3 +10,21 @@ media_player:
     #   - ' HD'
     #   - HDMI
     # name: SonyTV
+
+# Sensors ###########################################################
+template:
+  - sensor:
+      - name: Sony Bravia KD55X8505B power
+        unique_id: sony_bravia_kd55x8505b_power
+        state: "{{ 130 if is_state('media_player.sony_bravia_kd55x8505b', 'on') else 0 }}"
+        unit_of_measurement: "W"
+        device_class: power
+
+sensor:
+  # Energy sensors
+  - platform: integration
+    name: Sony Bravia KD55X8505B energy
+    unique_id: sony_bravia_kd55x8505b_energy
+    source: sensor.sony_bravia_kd55x8505b_power
+    unit_prefix: k
+    round: 2
