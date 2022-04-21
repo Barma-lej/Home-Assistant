@@ -296,8 +296,9 @@ script:
       # Only continue if it is no rain
       - condition: template
         value_template: >
-          {{ is_state('input_boolean.cycle' ~ cycle ~ '_use_sensor_data', 'on') and
-            not is_state_attr('sensor.landroid_mower_error', 'error_id', 5) }}
+          {{ is_state('input_boolean.cycle' ~ cycle ~ '_use_sensor_data', 'off')
+          or (is_state('input_boolean.cycle' ~ cycle ~ '_use_sensor_data', 'on')
+          and not is_state_attr('sensor.landroid_mower_error', 'error_id', 5)) }}
 
       - service: script.irrigation_run_a_cycle
         data:
