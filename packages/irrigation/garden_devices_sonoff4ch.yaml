@@ -22,18 +22,3 @@ homeassistant:
   customize:
     sensor.irrigation_wifi:
       friendly_name: Bewässerung WLAN
-# Sensor ############################################################
-# sensor:
-#   - platform: template
-#     sensors:
-#       irrigation_wifi:
-#         friendly_name: "Bewässerung WLAN"
-#         unit_of_measurement: '%'
-#         value_template: "{{ states('sensor.sonoff4ch1_rssi') }}"
-#         icon_template: >-
-#           {% if states('sensor.sonoff4ch1_rssi')|float(0) > 80 -%}mdi:wifi-strength-4
-#           {% elif states('sensor.sonoff4ch1_rssi')|float(0) > 60 -%}mdi:wifi-strength-3
-#           {% elif states('sensor.sonoff4ch1_rssi')|float(0) > 40 -%}mdi:wifi-strength-2
-#           {% elif states('sensor.sonoff4ch1_rssi')|float(0) > 20 -%}mdi:wifi-strength-1
-#           {%- else -%}mdi:wifi-strength-outline
-#           {%- endif %}

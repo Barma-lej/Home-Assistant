@@ -433,68 +433,6 @@ template:
         state: "{{ states('input_text.current_zone') }}"
         icon: mdi:fountain
 
-# Sensors ###########################################################
-# sensor:
-# - platform: template
-#   sensors:
-
-# cycle1_next_run_time:
-#   friendly_name: "Next scheduled run time"
-#   value_template: >
-#     {% if is_state('input_boolean.cycle1_enable', 'on') %}
-#       {%- set date = state_attr('input_datetime.cycle1_next_run_time', 'timestamp') %}
-#       {% set weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"] %}
-#       {% set weekdays_short = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] %}
-#       {% set months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "Nowember", "Dezember"] %}
-#       {% set months_short = ["Jan", "Feb", "Mrz", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Now", "Dez"] %}
-#       {% set w = date | timestamp_custom("%w") | int(0) %}
-#       {% set m = date | timestamp_custom("%m") | int(0) -%}
-#       {{ weekdays_short[w] }} {{ date | timestamp_custom("%d") }} {{ months_short[m-1] }} um {{ date | timestamp_custom("%H:%M") }}
-#     {% else %}
-#       -
-#     {% endif %}
-#   icon_template: 'mdi:clock-start'
-
-# cycle2_next_run_time:
-#   friendly_name: "Next scheduled run time"
-#   value_template: >
-#     {% if is_state('input_boolean.cycle2_enable', 'on') %}
-#       {%- set date = state_attr('input_datetime.cycle2_next_run_time', 'timestamp') %}
-#       {% set weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"] %}
-#       {% set weekdays_short = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] %}
-#       {% set months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "Nowember", "Dezember"] %}
-#       {% set months_short = ["Jan", "Feb", "Mrz", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Now", "Dez"] %}
-#       {% set w = date | timestamp_custom("%w") | int(0) %}
-#       {% set m = date | timestamp_custom("%m") | int(0) -%}
-#       {{ weekdays_short[w] }} {{ date | timestamp_custom("%d") }} {{ months_short[m-1] }} um {{ date | timestamp_custom("%H:%M") }}
-#     {% else %}
-#       -
-#     {% endif %}
-#   icon_template: 'mdi:clock-start'
-
-# cycle_running:
-#   friendly_name: "Cycle Running"
-#   value_template: >
-#     {% if is_state('input_boolean.cycle1_running', 'on') %}
-#       Morgen
-#     {% elif is_state('input_boolean.cycle2_running', 'on') %}
-#       Abend
-#     {% else %}
-#       -
-#     {% endif %}
-#   icon_template: >
-#     {% if is_state('input_boolean.cycle1_running', 'on') or
-#           is_state('input_boolean.cycle2_running', 'on') %}
-#       mdi:water-pump
-#     {% else %}
-#       mdi:water-pump-off
-#     {% endif %}
-
-# zone_being_watered:
-#   friendly_name: "Zone being watered"
-#   value_template: "{{ states('input_text.current_zone') }}"
-#   icon_template: 'mdi:fountain'
-
 homeassistant:
   customize:
     group.irrigation_switches:
