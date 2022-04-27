@@ -36,10 +36,6 @@ logbook:
 homeassistant:
   customize:
     # Sensors ###################
-    sensor.robi_start_time_weekdays:
-      friendly_name: "Startzeit (Wochentage)"
-    sensor.robi_start_time_weekend:
-      friendly_name: "Startzeit (Wochenende)"
     sensor.robi_battery:
       friendly_name: "Robi - Akku"
     sensor.robi_main_brush_pct:
@@ -57,16 +53,6 @@ homeassistant:
 template:
   - sensor:
       # States ####################
-      - name: "robi_start_time_weekdays"
-        unique_id: robi_start_time_weekdays
-        state: "{{ '%0.02d:%0.02d' | format(states('input_number.robi_start_hour_weekdays') | int(0), states('input_number.robi_start_minutes_weekdays') | int(0)) }}"
-        icon: mdi:clock-start
-
-      - name: "robi_start_time_weekend"
-        unique_id: robi_start_time_weekend
-        state: "{{ '%0.02d:%0.02d' | format(states('input_number.robi_start_hour_weekend') | int(0), states('input_number.robi_start_minutes_weekend') | int(0)) }}"
-        icon: mdi:clock-start
-
       - name: "robi_battery"
         unique_id: robi_battery
         state: "{{ state_attr('vacuum.robi','battery_level') | int(0) }}"
@@ -202,9 +188,19 @@ input_select:
 # input Boolean #####################################################
 input_boolean:
   robi_zone_settings:
-    name: View zone settings
+    name: Zonenreinigung anzeigen
     initial: false
     icon: mdi:vector-selection
+
+  robi_info_toggle:
+    name: Informationen anzeigen
+    initial: false
+    icon: mdi:information
+
+  robi_filter_usage_toggle:
+    name: Filternutzung anzeigen
+    initial: false
+    icon: mdi:air-filter
 
 # input Number ######################################################
 input_number:
@@ -215,36 +211,20 @@ input_number:
     max: 3
     step: 1
     icon: mdi:shuffle-disabled
-  robi_start_minutes_weekend:
-    name: Start Minute
-    initial: 0
-    min: 0
-    max: 59
-    step: 1
-    mode: slider
-  robi_start_hour_weekend:
-    name: Start Stunde
-    initial: 13
-    min: 0
-    max: 23
-    step: 1
-    mode: slider
-  robi_start_minutes_weekdays:
-    name: Start Minute
-    initial: 0
-    min: 0
-    max: 59
-    step: 1
-    mode: slider
-  robi_start_hour_weekdays:
-    name: Start Stunde
-    initial: 15
-    min: 0
-    max: 23
-    step: 1
-    mode: slider
 
-# Automation ########################################################
+    # input Datetime ####################################################
+input_datetime:
+  robi_start_weekdays:
+    name: Robi - Reinigungsbegin an Wochentagen
+    has_time: true
+    icon: mdi:clock-start
+
+  robi_start_weekends:
+    name: Robi - Reinigungsbegin am Wochenende
+    has_time: true
+    icon: mdi:clock-start
+
+  # Automation ########################################################
 automation:
   # If you want to set the vacuum to mop mode, just like the app, here is a script for that:
   #   robi_set_mop:
@@ -325,8 +305,8 @@ automation:
     alias: Robi - Schedule cleaning on weekdays
     initial_state: false
     trigger:
-      - platform: template
-        value_template: "{{ states('sensor.robi_start_time_weekdays') == states('sensor.time') }}"
+      - platform: time
+        at: input_datetime.robi_start_weekdays
 
     condition:
       - condition: time
@@ -347,8 +327,8 @@ automation:
     alias: Robi - Schedule cleaning on weekends
     initial_state: false
     trigger:
-      - platform: template
-        value_template: "{{ states('sensor.robi_start_time_weekend') == states('sensor.time') }}"
+      - platform: time
+        at: input_datetime.robi_start_weekends
 
     condition:
       - condition: time
@@ -476,7 +456,7 @@ script:
 
   robi_flur:
     alias: Robi - Flur reinigen
-    icon: mdi:broom
+    icon: mdi:stairs
     sequence:
       - service: xiaomi_miio.vacuum_clean_zone
         data:
@@ -488,7 +468,7 @@ script:
 
   robi_hwr:
     alias: Robi - HWR reinigen
-    icon: mdi:broom
+    icon: mdi:washing-machine
     sequence:
       - service: xiaomi_miio.vacuum_clean_zone
         data:
@@ -500,7 +480,7 @@ script:
 
   robi_wc:
     alias: Robi - WC reinigen
-    icon: mdi:broom
+    icon: mdi:toilet
     sequence:
       - service: xiaomi_miio.vacuum_clean_zone
         data:
