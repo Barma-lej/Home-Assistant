@@ -474,7 +474,7 @@ script:
         data:
           entity_id: vacuum.robi
           repeats: "{{ states('input_number.robi_passes') | int(0) }}"
-          params: [[27830, 21940, 31000, 24400]]
+          zone: [[27830, 21940, 31000, 24400]]
     #     params: [[20000, 26500, 22500, 29200]]
     # - service: script.robi_alert_start
 
