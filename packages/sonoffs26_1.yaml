@@ -16,6 +16,7 @@ sensor:
     name: TV Board energy
     unique_id: tv_board_energy
     source: sensor.tv_board_power
+    method: left
     unit_prefix: k
     round: 2
 

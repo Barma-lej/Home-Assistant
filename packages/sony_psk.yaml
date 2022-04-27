@@ -26,5 +26,6 @@ sensor:
     name: Sony Bravia KD55X8505B energy
     unique_id: sony_bravia_kd55x8505b_energy
     source: sensor.sony_bravia_kd55x8505b_power
+    method: left
     unit_prefix: k
     round: 2
