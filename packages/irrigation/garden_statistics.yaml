@@ -24,46 +24,36 @@ group:
       - switch.sonoffs20_2
       - switch.sonoffs20_1
 
-# Recorder ##########################################################
-# recorder:
-#  exclude:
-#  entities:
-#  - sensor.irrigation_hs_zone1_daily
-#  - sensor.irrigation_hs_zone2_daily
-#  - sensor.irrigation_hs_zone3_daily
-#  - sensor.irrigation_hs_pump_daily
-#  - input_number.irrigation_ontime_zone1
-#  - input_number.irrigation_ontime_zone2
-#  - input_number.irrigation_ontime_zone3
-#  - input_number.irrigation_ontime_pump
-#  - automation.irrigation_set_start_time
-#  - automation.irrigation_daily_to_total
-#  - automation.irrigation_update_the_last_time_a_cycle_ended
-#  - automation.irrigation_notify
-
-## Logbook ###########################################################
-# logbook:
-#  exclude:
-#  entities:
-#  - group.irrigation_status_zone1
-#  - group.irrigation_status_zone2
-#  - group.irrigation_status_zone3
-#  - sensor.irrigation_hs_zone1_daily
-#  - sensor.irrigation_hs_zone2_daily
-#  - sensor.irrigation_hs_zone3_daily
-#  - sensor.irrigation_hs_pump_daily
-#  - input_number.irrigation_ontime_zone1
-#  - input_number.irrigation_ontime_zone2
-#  - input_number.irrigation_ontime_zone3
-#  - input_number.irrigation_ontime_pump
-#  - automation.irrigation_set_start_time
-#  - automation.irrigation_daily_to_total
-#  - automation.irrigation_update_the_last_time_a_cycle_ended
-#  - automation.irrigation_notify
-
 # Sensors ###########################################################
 template:
   - sensor:
+      - name: Irrigation - Stat Zone1 power
+        unique_id: irrigation_stat_zone1_power
+        state: "{{ 1020.0 if is_state('group.irrigation_status_zone1', 'on') else 0.0 }}"
+        unit_of_measurement: "W"
+        device_class: power
+
+      - name: Irrigation - Stat Zone2 power
+        unique_id: irrigation_stat_zone2_power
+        state: "{{ 1020.0 if is_state('group.irrigation_status_zone2', 'on') else 0.0 }}"
+        unit_of_measurement: "W"
+        device_class: power
+
+      - name: Irrigation - Stat Zone3 power
+        unique_id: irrigation_stat_zone3_power
+        state: "{{ 680.0 if is_state('group.irrigation_status_zone3', 'on') else 0.0 }}"
+        unit_of_measurement: "W"
+        device_class: power
+
+      - name: Irrigation - Stat Pump power
+        unique_id: irrigation_stat_pump_power
+        state: >
+          {{ (states('sensor.irrigation_stat_zone1_power') | float(0))
+          + (states('sensor.irrigation_stat_zone2_power') | float(0))
+          + (states('sensor.irrigation_stat_zone3_power') | float(0)) }}
+        unit_of_measurement: "W"
+        device_class: power
+
       # Daily ontime sensors
       - name: Irrigation ontime zone1 daily
         unique_id: irrigation_ontime_zone1_daily
@@ -174,8 +164,8 @@ template:
         attributes:
           last_start: "{{ state_attr('input_datetime.irrigation_last_start_zone3','timestamp') | timestamp_custom('%a %d.%m.%Y %H:%M:%S', true) }}"
           time_formatted: >
-            {%- set t = states('sensor.irrigation_ontime_zone3') | float(0) *60 %}
-            {% if t > 1440 -%}
+            {% set t = states('sensor.irrigation_ontime_zone3') | float(0) *60 -%}
+            {%- if t > 1440 -%}
               {{ '%0d Tg. %0.02d:%0.02d:00' | format(t // 1440, ((t % 1440) // 60), t % 60) }}
             {%- else -%}
               {{ '%0.02d:%0.02d:00' | format(((t % 1440) // 60), t % 60) }}
@@ -224,7 +214,40 @@ template:
         icon: mdi:update
 
 sensor:
-  # History sensors Zone Times
+  # Energy sensors
+  - platform: integration
+    name: Irrigation - Stat Zone1 energy
+    unique_id: irrigation_stat_zone1_energy
+    source: sensor.irrigation_stat_zone1_power
+    method: left
+    unit_prefix: k
+    round: 2
+
+  - platform: integration
+    name: Irrigation - Stat Zone2 energy
+    unique_id: irrigation_stat_zone2_energy
+    source: sensor.irrigation_stat_zone2_power
+    method: left
+    unit_prefix: k
+    round: 2
+
+  - platform: integration
+    name: Irrigation - Stat Zone3 energy
+    unique_id: irrigation_stat_zone3_energy
+    source: sensor.irrigation_stat_zone3_power
+    method: left
+    unit_prefix: k
+    round: 2
+
+  - platform: integration
+    name: Irrigation - Stat pump energy
+    unique_id: irrigation_stat_pump_energy
+    source: sensor.irrigation_stat_pump_power
+    method: left
+    unit_prefix: k
+    round: 2
+
+  # Watering durations
   - platform: history_stats
     name: irrigation_hs_zone1_daily
     entity_id: group.irrigation_status_zone1
@@ -256,6 +279,36 @@ sensor:
     type: time
     start: "{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}"
     end: "{{ now() }}"
+
+# Utility meter #####################################################
+utility_meter:
+  irrigation_stat_zone1_energy_daily:
+    source: sensor.irrigation_stat_zone1_energy
+    cycle: daily
+  irrigation_stat_zone1_energy_yearly:
+    source: sensor.irrigation_stat_zone1_energy
+    cycle: yearly
+
+  irrigation_stat_zone2_energy_daily:
+    source: sensor.irrigation_stat_zone2_energy
+    cycle: daily
+  irrigation_stat_zone2_energy_yearly:
+    source: sensor.irrigation_stat_zone2_energy
+    cycle: yearly
+
+  irrigation_stat_zone3_energy_daily:
+    source: sensor.irrigation_stat_zone3_energy
+    cycle: daily
+  irrigation_stat_zone3_energy_yearly:
+    source: sensor.irrigation_stat_zone3_energy
+    cycle: yearly
+
+  irrigation_stat_pump_energy_daily:
+    source: sensor.irrigation_stat_pump_energy
+    cycle: daily
+  irrigation_stat_pump_energy_yearly:
+    source: sensor.irrigation_stat_pump_energy
+    cycle: yearly
 
 # Input_Numbers #####################################################
 input_number:
@@ -531,3 +584,40 @@ homeassistant:
       friendly_name: "Vorderhof"
     group.irrigation_status_zone3:
       friendly_name: "Hahn"
+# Recorder ##########################################################
+# recorder:
+#  exclude:
+#  entities:
+#  - sensor.irrigation_hs_zone1_daily
+#  - sensor.irrigation_hs_zone2_daily
+#  - sensor.irrigation_hs_zone3_daily
+#  - sensor.irrigation_hs_pump_daily
+#  - input_number.irrigation_ontime_zone1
+#  - input_number.irrigation_ontime_zone2
+#  - input_number.irrigation_ontime_zone3
+#  - input_number.irrigation_ontime_pump
+#  - automation.irrigation_set_start_time
+#  - automation.irrigation_daily_to_total
+#  - automation.irrigation_update_the_last_time_a_cycle_ended
+#  - automation.irrigation_notify
+
+## Logbook ###########################################################
+# logbook:
+#  exclude:
+#  entities:
+#  - group.irrigation_status_zone1
+#  - group.irrigation_status_zone2
+#  - group.irrigation_status_zone3
+#  - sensor.irrigation_hs_zone1_daily
+#  - sensor.irrigation_hs_zone2_daily
+#  - sensor.irrigation_hs_zone3_daily
+#  - sensor.irrigation_hs_pump_daily
+#  - input_number.irrigation_ontime_zone1
+#  - input_number.irrigation_ontime_zone2
+#  - input_number.irrigation_ontime_zone3
+#  - input_number.irrigation_ontime_pump
+#  - automation.irrigation_set_start_time
+#  - automation.irrigation_daily_to_total
+#  - automation.irrigation_update_the_last_time_a_cycle_ended
+#  - automation.irrigation_notify
+
