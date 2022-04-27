@@ -50,7 +50,7 @@ automation:
         minutes: "/15"
 
     condition:
-      - condition: or
+      - condition: and
         conditions:
           - condition: state
             entity_id: group.irrigation_switches
