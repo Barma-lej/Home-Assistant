@@ -68,7 +68,7 @@ automation:
 
     condition:
       - condition: template
-        value_template: '{{ now().strftime("%Y-%m-%d %H:%M:00") == states("input_datetime.cycle1_next_run_time") }}'
+        value_template: "{{ now().strftime('%Y-%m-%d %H:%M:00') == states('input_datetime.cycle1_next_run_time') }}"
 
       - condition: state
         entity_id: input_boolean.cycle1_enable
