@@ -22,17 +22,9 @@ sensor:
 
 # Automations #######################################################
 automation:
-  # - id: tv_board_off
-  #   alias: "TV Board OFF"
-  #   initial_state: false
-  #   trigger:
-  #     platform: state
-  #     entity_id: group.family_wlan
-  #     to: "not_home"
-  #   action:
-  #     service: switch.turn_off
-  #     entity_id: switch.sonoffs26_1
-
+  # TV Board on  -> TV off -> Niemand Zuhause -> TV Board off
+  #                           Jemand Zuhause  -> Zeit ist zwischen 23:00 and 11:00 -> TV Board off
+  #          off -> Jemand Zuhause -> Zeit ist zwischen 11:00 and 23:00 -> TV Board on
   - id: tv_board_manage
     alias: "TV Board - Verwaltung"
     trigger:
@@ -40,57 +32,36 @@ automation:
         entity_id: group.family
         for: "00:04:00"
 
-      # - platform: state
-      #   entity_id: group.family_wlan
-      #   for: "00:05:00"
+      - platform: time_pattern
+        minutes: "/15"
 
-    # Two groups
-    # action:
-    #   - choose:
-    #       - conditions:
-    #           - condition: or
-    #             conditions:
-    #               - condition: state
-    #                 entity_id: group.family
-    #                 state: home
-    #               - condition: state
-    #                 entity_id: group.familie_wlan
-    #                 state: home
-    #         sequence:
-    #           - service: switch.turn_on
-    #             target:
-    #               entity_id: switch.sonoffs26_1
-
-    #       - conditions:
-    #           - condition: or
-    #             conditions:
-    #               - condition: state
-    #                 entity_id: group.family
-    #                 state: not_home
-    #               - condition: state
-    #                 entity_id: group.familie_wlan
-    #                 state: not_home
-    #         sequence:
-    #           - service: switch.turn_off
-    #             target:
-    #               entity_id: switch.sonoffs26_1
+    condition:
+      - condition: or
+        conditions:
+          - "{{ is_state('media_player.sony_bravia_kd55x8505b', 'off') }}"
 
     action:
-      - choose:
+      - alias: "Выбор условий для выключения и включения TV Board"
+        choose:
           - conditions:
-              - condition: state
-                entity_id: group.family
-                state: home
-            sequence:
-              - service: switch.turn_on
-                target:
-                  entity_id: switch.sonoffs26_1
-
-          - conditions:
-              - condition: state
-                entity_id: group.family
-                state: not_home
+              - "{{ is_state('switch.sonoffs26_1', 'on')
+                and is_state('group.family', 'not_home') }}"
             sequence:
               - service: switch.turn_off
+                target:
+                  entity_id: switch.sonoffs26_1
+          - conditions:
+              - "{{ is_state('switch.sonoffs26_1', 'on')
+                and (now().hour < 11 or now().hour > 22) }}"
+            sequence:
+              - service: switch.turn_off
+                target:
+                  entity_id: switch.sonoffs26_1
+          - conditions:
+              - "{{ is_state('switch.sonoffs26_1', 'off')
+                and is_state('group.family', 'home')
+                and (now().hour > 10 and now().hour < 23) }}"
+            sequence:
+              - service: switch.turn_on
                 target:
                   entity_id: switch.sonoffs26_1
