@@ -94,6 +94,16 @@ entity_config:
     room: Garage
     expose: true
 
+  switch.irrigation:
+    name: Bewässerung
+    aliases:
+      - bewässerung
+      - irrigation
+      - watering
+      - полив
+    room: Garten
+    expose: true
+
   # cover.tor:
   #   name: Tor
   #   aliases:
