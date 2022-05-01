@@ -52,7 +52,7 @@ automation:
                   entity_id: switch.sonoffs26_1
           - conditions:
               - "{{ is_state('switch.sonoffs26_1', 'on')
-                and (now().hour < 11 or now().hour > 22) }}"
+                and (now().hour < 12 or now().hour > 22) }}"
             sequence:
               - service: switch.turn_off
                 target:
@@ -60,7 +60,7 @@ automation:
           - conditions:
               - "{{ is_state('switch.sonoffs26_1', 'off')
                 and is_state('group.family', 'home')
-                and (now().hour > 10 and now().hour < 23) }}"
+                and (now().hour > 11 and now().hour < 23) }}"
             sequence:
               - service: switch.turn_on
                 target:
