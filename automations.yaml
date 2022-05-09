@@ -193,3 +193,27 @@
           preset: 2
     default: []
   mode: restart
+- id: '1651786976779'
+  alias: Update notifications
+  description: ''
+  use_blueprint:
+    path: mdegat01/update_notifications.yaml
+    input:
+      reminder_hours: '6'
+      update_entities:
+      - update.duck_dns_update
+      - update.esphome_update
+      - update.fritz_box_7490_fritz_os
+      - update.ftp_update
+      - update.home_assistant_core_update
+      - update.home_assistant_supervisor_update
+      - update.mosquitto_broker_update
+      - update.pi_hole_core_update_available
+      - update.pi_hole_ftl_update_available
+      - update.pi_hole_web_update_available
+      - update.samba_share_update
+      - update.sqlite_web_update
+      - update.studio_code_server_update
+      - update.tasmoadmin_update
+      mobile_app_device: 52dde1dbd0bd045e5b6181020e86c549
+      run_config_check: true
