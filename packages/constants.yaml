@@ -1,0 +1,36 @@
+# Energy management
+
+# Input Number ######################################################
+input_number:
+  energy_price:
+    name: Strompreis
+    mode: box
+    initial: 0.29
+    min: 0
+    max: 1.5
+    step: 0.01
+    icon: mdi:currency-eur
+    unit_of_measurement: "EUR/kWh"
+
+  water_price:
+    name: Wasserpreis
+    mode: box
+    initial: 3.85
+    min: 0
+    max: 6
+    step: 0.01
+    icon: mdi:currency-eur
+    unit_of_measurement: "EUR/m3"
+
+  # Gardena OS140
+  # 580 l/Std 3 Bar (https://www.roboter-forum.com/index.php?thread/37782-gardena-os-140/)
+  # 660 l/Std Max (https://www.bewaesserung-selbst-bauen.de/verbrauchswerte-gardena-regner-und-gardena-anschlusswerte-korrekt-in-liter-umrechnen.html)
+  os140_volume:
+    name: Wassermenge
+    mode: box
+    initial: 0.65
+    min: 0
+    max: 5
+    step: 0.01
+    icon: mdi:waves
+    unit_of_measurement: "m3/Std"
