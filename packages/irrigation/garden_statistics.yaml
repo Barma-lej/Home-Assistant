@@ -64,10 +64,13 @@ template:
           time_formatted: >
             {% set t = states('sensor.irrigation_ontime_zone1_daily') | float(0) *60 %}
             {{ '%0.02d:%0.02d:00' | format(t // 60, t % 60) }}
-          volume_m3: "{{ (states('sensor.irrigation_ontime_zone1_daily') | float(0) * (0.8 * 1.5)) | round(1) }}"
-          wasserkosten: "{{ (states('sensor.irrigation_ontime_zone1_daily') | float(0) * (0.8 * 1.5) * 3.94) | round(2) }}"
-          energy_kwh: "{{ (states('sensor.irrigation_ontime_zone1_daily') | float(0) * 1.02) | round(2) }}"
-          stromkosten: "{{ (states('sensor.irrigation_ontime_zone1_daily') | float(0) * 1.02 *0.32) | round(2) }}"
+          volume_m3: >-
+            {{ (states('sensor.irrigation_ontime_zone1_daily') | float(0)
+            * states('input_number.os140_volume') | float(0) * 1.5) | round(2) }}
+          wasserkosten: >-
+            {{ (state_attr('sensor.irrigation_ontime_zone1_daily','volume_m3') | float(0)
+            * states('input_number.os140_volume') | float(0)
+            * states('input_number.water_price') | float(0)) | round(2) }}
 
       - name: Irrigation ontime zone2 daily
         unique_id: irrigation_ontime_zone2_daily
@@ -78,10 +81,13 @@ template:
           time_formatted: >
             {% set t = states('sensor.irrigation_ontime_zone2_daily') | float(0) *60 %}
             {{ '%0.02d:%0.02d:00' | format(t // 60, t % 60) }}
-          volume_m3: "{{ (states('sensor.irrigation_ontime_zone2_daily') | float(0) * (0.8 * 2)) | round(1) }}"
-          wasserkosten: "{{ (states('sensor.irrigation_ontime_zone2_daily') | float(0) * (0.8 * 2) * 3.94) | round(2) }}"
-          energy_kwh: "{{ (states('sensor.irrigation_ontime_zone2_daily') | float(0) * 1.02) | round(2) }}"
-          stromkosten: "{{ (states('sensor.irrigation_ontime_zone2_daily') | float(0) * 1.02 *0.32) | round(2) }}"
+          volume_m3: >-
+            {{ (states('sensor.irrigation_ontime_zone2_daily') | float(0)
+            * states('input_number.os140_volume') | float(0) * 2) | round(2) }}
+          wasserkosten: >-
+            {{ (state_attr('sensor.irrigation_ontime_zone2_daily','volume_m3') | float(0)
+            * states('input_number.os140_volume') | float(0)
+            * states('input_number.water_price') | float(0)) | round(2) }}
 
       - name: Irrigation ontime zone3 daily
         unique_id: irrigation_ontime_zone3_daily
@@ -92,10 +98,13 @@ template:
           time_formatted: >
             {% set t = states('sensor.irrigation_ontime_zone3_daily') | float(0) *60 %}
             {{ '%0.02d:%0.02d:00' | format(t // 60, t % 60) }}
-          volume_m3: "{{ (states('sensor.irrigation_ontime_zone3_daily') | float(0) * 0.5) | round(1) }}"
-          wasserkosten: "{{ (states('sensor.irrigation_ontime_zone3_daily') | float(0) * 0.5 * 3.94) | round(2) }}"
-          energy_kwh: "{{ (states('sensor.irrigation_ontime_zone3_daily') | float(0) * 1.02) | round(2) }}"
-          stromkosten: "{{ (states('sensor.irrigation_ontime_zone3_daily') | float(0) * 1.02 *0.32) | round(2) }}"
+          volume_m3: >-
+            {{ (states('sensor.irrigation_ontime_zone3_daily') | float(0)
+            * states('input_number.os140_volume') | float(0) * 0.5) | round(2) }}
+          wasserkosten: >-
+            {{ (state_attr('sensor.irrigation_ontime_zone3_daily','volume_m3') | float(0)
+            * states('input_number.os140_volume') | float(0)
+            * states('input_number.water_price') | float(0)) | round(2) }}
 
       - name: Irrigation ontime pump daily
         unique_id: irrigation_ontime_pump_daily
@@ -107,15 +116,13 @@ template:
             {% set t = states('sensor.irrigation_ontime_pump_daily') | float(0) *60 %}
             {{ '%0.02d:%0.02d:00' | format(t // 60, t % 60) }}
           volume_m3: >
-            {{ (state_attr('sensor.irrigation_ontime_zone1_daily', 'volume_m3') | float(0) + 
-              state_attr('sensor.irrigation_ontime_zone2_daily', 'volume_m3') | float(0) + 
-              state_attr('sensor.irrigation_ontime_zone3_daily', 'volume_m3') | float(0)) | round(1) }}
+            {{ (state_attr('sensor.irrigation_ontime_zone1_daily', 'volume_m3') | float(0)
+            + state_attr('sensor.irrigation_ontime_zone2_daily', 'volume_m3') | float(0)
+            + state_attr('sensor.irrigation_ontime_zone3_daily', 'volume_m3') | float(0)) | round(1) }}
           wasserkosten: >
-            {{ ((state_attr('sensor.irrigation_ontime_zone1_daily', 'volume_m3') | float(0) + 
-              state_attr('sensor.irrigation_ontime_zone2_daily', 'volume_m3') | float(0) + 
-              state_attr('sensor.irrigation_ontime_zone3_daily', 'volume_m3') | float(0)) * 3.94) | round(2) }}
-          energy_kwh: "{{ (states('sensor.irrigation_ontime_pump_daily') | float(0) * 1.02) | round(2) }}"
-          stromkosten: "{{ (states('sensor.irrigation_ontime_pump_daily') | float(0) * 1.02 *0.32) | round(2) }}"
+            {{ (state_attr('sensor.irrigation_ontime_zone1_daily', 'wasserkosten') | float(0)
+            + state_attr('sensor.irrigation_ontime_zone2_daily', 'wasserkosten') | float(0)
+            + state_attr('sensor.irrigation_ontime_zone3_daily', 'wasserkosten') | float(0)) | round(2) }}
 
       # Ontime sensors
       - name: Irrigation ontime zone1
@@ -132,10 +139,13 @@ template:
             {%- else -%}
               {{ '%0.02d:%0.02d:00' | format(((t % 1440) // 60), t % 60) }}
             {%- endif %}
-          volume_m3: "{{ (states('sensor.irrigation_ontime_zone1') | float(0) * (0.8 * 1.5)) | round(1) }}"
-          wasserkosten: "{{ (states('sensor.irrigation_ontime_zone1') | float(0) * (0.8 * 1.5) * 3.94) | round(2) }}"
-          energy_kwh: "{{ (states('sensor.irrigation_ontime_zone1') | float(0) * 1.02) | round(2) }}"
-          stromkosten: "{{ (states('sensor.irrigation_ontime_zone1') | float(0) * 1.02 *0.32) | round(2) }}"
+          volume_m3: >-
+            {{ (states('sensor.irrigation_ontime_zone1') | float(0)
+            * states('input_number.os140_volume') | float(0) * 1.5) | round(2) }}
+          wasserkosten: >-
+            {{ (state_attr('sensor.irrigation_ontime_zone1','volume_m3') | float(0)
+            * states('input_number.os140_volume') | float(0)
+            * states('input_number.water_price') | float(0)) | round(2) }}
 
       - name: Irrigation ontime zone2
         unique_id: irrigation_ontime_zone2
@@ -151,10 +161,13 @@ template:
             {%- else -%}
               {{ '%0.02d:%0.02d:00' | format(((t % 1440) // 60), t % 60) }}
             {%- endif %}
-          volume_m3: "{{ (states('sensor.irrigation_ontime_zone2') | float(0) * (0.8 * 2)) | round(1) }}"
-          wasserkosten: "{{ (states('sensor.irrigation_ontime_zone2') | float(0) * (0.8 * 2) * 3.94) | round(2) }}"
-          energy_kwh: "{{ (states('sensor.irrigation_ontime_zone2') | float(0) * 1.02) | round(2) }}"
-          stromkosten: "{{ (states('sensor.irrigation_ontime_zone2') | float(0) * 1.02 *0.32) | round(2) }}"
+          volume_m3: >-
+            {{ (states('sensor.irrigation_ontime_zone2') | float(0)
+            * states('input_number.os140_volume') | float(0) * 2) | round(2) }}
+          wasserkosten: >-
+            {{ (state_attr('sensor.irrigation_ontime_zone2','volume_m3') | float(0)
+            * states('input_number.os140_volume') | float(0)
+            * states('input_number.water_price') | float(0)) | round(2) }}
 
       - name: Irrigation ontime zone3
         unique_id: irrigation_ontime_zone3
@@ -170,10 +183,13 @@ template:
             {%- else -%}
               {{ '%0.02d:%0.02d:00' | format(((t % 1440) // 60), t % 60) }}
             {%- endif %}
-          volume_m3: "{{ (states('sensor.irrigation_ontime_zone3') | float(0) * 0.5) | round(1) }}"
-          wasserkosten: "{{ (states('sensor.irrigation_ontime_zone3') | float(0) * 0.5 * 3.94) | round(2) }}"
-          energy_kwh: "{{ (states('sensor.irrigation_ontime_zone3') | float(0) * 0.5) | round(2) }}"
-          stromkosten: "{{ (states('sensor.irrigation_ontime_zone3') | float(0) * 0.5 *0.32) | round(2) }}"
+          volume_m3: >-
+            {{ (states('sensor.irrigation_ontime_zone3') | float(0)
+            * states('input_number.os140_volume') | float(0) * 0.5) | round(2) }}
+          wasserkosten: >-
+            {{ (state_attr('sensor.irrigation_ontime_zone3','volume_m3') | float(0)
+            * states('input_number.os140_volume') | float(0)
+            * states('input_number.water_price') | float(0)) | round(2) }}
 
       - name: Irrigation ontime pump
         unique_id: irrigation_ontime_pump
@@ -194,11 +210,9 @@ template:
               state_attr('sensor.irrigation_ontime_zone2', 'volume_m3') | float(0) + 
               state_attr('sensor.irrigation_ontime_zone3', 'volume_m3') | float(0)) | round(1) }}
           wasserkosten: >
-            {{ ((state_attr('sensor.irrigation_ontime_zone1', 'volume_m3') | float(0) + 
-              state_attr('sensor.irrigation_ontime_zone2', 'volume_m3') | float(0) + 
-              state_attr('sensor.irrigation_ontime_zone3', 'volume_m3') | float(0)) * 3.94) | round(2) }}
-          energy_kwh: "{{ (states('sensor.irrigation_ontime_pump') | float(0) * 1.02) | round(2) }}"
-          stromkosten: "{{ (states('sensor.irrigation_ontime_pump') | float(0) * 1.02 *0.32) | round(2) }}"
+            {{ (state_attr('sensor.irrigation_ontime_zone1', 'wasserkosten') | float(0) + 
+              state_attr('sensor.irrigation_ontime_zone2', 'wasserkosten') | float(0) + 
+              state_attr('sensor.irrigation_ontime_zone3', 'wasserkosten') | float(0)) | round(2) }}
 
       - name: Irrigation last irrigated time
         unique_id: irrigation_last_irrigated_time
@@ -253,7 +267,7 @@ sensor:
     entity_id: group.irrigation_status_zone1
     state: "on"
     type: time
-    start: "{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}"
+    start: "{{ now().replace(hour=0, minute=0, second=0, microsecond=0) }}"
     end: "{{ now() }}"
 
   - platform: history_stats
@@ -261,7 +275,7 @@ sensor:
     entity_id: group.irrigation_status_zone2
     state: "on"
     type: time
-    start: "{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}"
+    start: "{{ now().replace(hour=0, minute=0, second=0, microsecond=0) }}"
     end: "{{ now() }}"
 
   - platform: history_stats
@@ -269,7 +283,7 @@ sensor:
     entity_id: group.irrigation_status_zone3
     state: "on"
     type: time
-    start: "{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}"
+    start: "{{ now().replace(hour=0, minute=0, second=0, microsecond=0) }}"
     end: "{{ now() }}"
 
   - platform: history_stats
@@ -277,7 +291,7 @@ sensor:
     entity_id: switch.pump
     state: "on"
     type: time
-    start: "{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}"
+    start: "{{ now().replace(hour=0, minute=0, second=0, microsecond=0) }}"
     end: "{{ now() }}"
 
 # Utility meter #####################################################
