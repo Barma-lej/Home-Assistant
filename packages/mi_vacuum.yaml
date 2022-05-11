@@ -360,7 +360,8 @@ automation:
       - service: notify.telegram_schick_home
         data:
           title: 🐁 Robi
-          message: "{{ states('vacuum.robi') }}, {{ state_attr('vacuum.robi','status') }}, {{ trigger.to_state.state }} <- {{ trigger.from_state.state }}"
+          message: "{{ state_attr('vacuum.robi','status') }} <- {{ trigger.from_state.state }}"
+          # message: "{{ states('vacuum.robi') }}, {{ state_attr('vacuum.robi','status') }}, {{ trigger.to_state.state }} <- {{ trigger.from_state.state }}"
 
 # ZONE ##############################################################
 # Küche oben links - Area: Süd, Ost, Nord, West [left, bottom, right, top]
