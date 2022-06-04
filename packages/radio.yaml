@@ -71,7 +71,7 @@ input_select:
       - Sound Blaster
       - Home Mini Flur
       - Home Mini Kristina
-      - Home Mini
+      - Garten
       - Überall
       - Erdgeschoss
     initial: Nest Mini
@@ -119,7 +119,7 @@ automation:
       service: media_player.volume_set
       data:
         entity_id: >
-          {% if is_state("input_select.radio_player","Home Mini") %} media_player.google_home
+          {% if is_state("input_select.radio_player","Garten") %} media_player.googlehome9539
           {% elif is_state("input_select.radio_player","Nest Mini") %} media_player.nest_mini
           {% elif is_state("input_select.radio_player","Sound Blaster") %} media_player.soundblaster
           {% elif is_state("input_select.radio_player","Home Mini Flur") %} media_player.flur
@@ -156,7 +156,7 @@ script:
         #      - service: media_extractor.play_media
         data:
           entity_id: >
-            {% if is_state("input_select.radio_player","Home Mini") %} media_player.google_home
+            {% if is_state("input_select.radio_player","Garten") %} media_player.googlehome9539
             {% elif is_state("input_select.radio_player","Nest Mini") %} media_player.nest_mini
             {% elif is_state("input_select.radio_player","Sound Blaster") %} media_player.soundblaster
             {% elif is_state("input_select.radio_player","Home Mini Flur") %} media_player.flur
@@ -213,7 +213,7 @@ script:
       - service: media_player.turn_off
         data:
           entity_id: >
-            {% if is_state("input_select.radio_player", "Home Mini") %} media_player.google_home
+            {% if is_state("input_select.radio_player", "Garten") %} media_player.googlehome9539
             {% elif is_state("input_select.radio_player","Nest Mini") %} media_player.nest_mini
             {% elif is_state("input_select.radio_player","Sound Blaster") %} media_player.soundblaster
             {% elif is_state("input_select.radio_player","Home Mini Flur") %} media_player.flur
