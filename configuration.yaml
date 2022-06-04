@@ -159,10 +159,10 @@ stream:
 #   certificate: !secret http_ssl_cert
 
 # Google ############################################################
-google:
-  client_id: !secret google_client_id
-  client_secret: !secret google_client_secret
-  track_new_calendar: true
+# google:
+#   client_id: !secret google_client_id
+#   client_secret: !secret google_client_secret
+#   track_new_calendar: true
 
 # Device Tracker ####################################################
 device_tracker:
@@ -174,7 +174,7 @@ device_tracker:
 automation: !include automations.yaml
 google_assistant: !include google_assistant.yaml
 group: !include groups.yaml
-scene: !include scenes.yaml
+# scene: !include scenes.yaml
 script: !include scripts.yaml
 sensor: !include sensors.yaml
 shell_command: !include shell_commands.yaml
