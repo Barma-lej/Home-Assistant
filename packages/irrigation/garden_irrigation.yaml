@@ -266,9 +266,12 @@ automation:
 
     trigger:
       - platform: state
-        entity_id: sensor.landroid_mower_error
-        attribute: error_id
-        to: "5"
+        # entity_id: sensor.landroid_mower_error
+        # attribute: error_id
+        # to: "5"
+        entity_id: vacuum.mower
+        attribute: rain_sensor_triggered
+        to: "true"
 
     action:
       - service: timer.cancel
@@ -293,13 +296,13 @@ script:
             True
           {%- endif %}
 
-      # Only continue if it is no rain
+      # Only continue if it's no rain
       - condition: template
         value_template: >
           {{ is_state('input_boolean.cycle' ~ cycle ~ '_use_sensor_data', 'off')
           or (is_state('input_boolean.cycle' ~ cycle ~ '_use_sensor_data', 'on')
-          and not is_state_attr('sensor.landroid_mower_error', 'error_id', 5)) }}
-
+          and not is_state_attr('vacuum.mower', 'rain_sensor_triggered', 'true')) }}
+      # and not is_state_attr('sensor.landroid_mower_error', 'error_id', 5)) }}
       - service: script.irrigation_run_a_cycle
         data:
           cycle: "{{ cycle }}"
@@ -388,7 +391,8 @@ script:
         value_template: >
           {{ is_state('input_boolean.cycle' ~ cycle ~ '_use_sensor_data', 'off')
           or (is_state('input_boolean.cycle' ~ cycle ~ '_use_sensor_data', 'on')
-            and not is_state_attr('sensor.landroid_mower_error', 'error_id', 5)) }}
+          and not is_state_attr('vacuum.mower', 'rain_sensor_triggered', 'true')) }}
+        # and not is_state_attr('sensor.landroid_mower_error', 'error_id', 5)) }}
 
       # Call the script to set the Tasmota PULSETIME
       - service: script.set_tasmota_pulsetime
