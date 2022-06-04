@@ -1,14 +1,22 @@
-# Recorder ##########################################################
-#recorder:
-#  exclude:
-#    entities:
-#      - automation.camera_upload_video_to_telegram
-#
-## Logbook ###########################################################
-#logbook:
-#  exclude:
-#    entities:
-#      - automation.camera_upload_video_to_telegram
+# Manage a survilance system
+
+scene:
+  - id: "Camera - Detection on"
+    name: camera_detection_on
+    icon: mdi:cctv
+    entities:
+      switch.einfahrt_ftp: "on"
+      switch.einfahrt_push_notifications: "on"
+      switch.einfahrt_recording: "on"
+      switch.einfahrt_record_audio: "on"
+      switch.garage_ftp: "on"
+      switch.garage_push_notifications: "on"
+      switch.garage_recording: "on"
+      switch.garage_record_audio: "on"
+      switch.terrasse_ftp: "on"
+      switch.terrasse_push_notifications: "on"
+      switch.terrasse_recording: "on"
+      switch.terrasse_record_audio: "on"
 
 # Automations #######################################################
 automation:
@@ -89,6 +97,24 @@ automation:
                             🏃 *Bewegung erkannt!*
                           {% endif -%}
 
+  - id: camera_manage_sending_to_ftp
+    alias: "Camera - Manage sending to FTP"
+    trigger:
+      - platform: state
+        entity_id: group.family
+        for: "00:04:00"
+
+      - platform: time_pattern
+        minutes: "/15"
+
+    condition:
+      - "{{ (now().hour < 12 or now().hour > 22)
+        or is_state('group.family', 'not_home') }}"
+
+    action:
+      - service: scene.turn_on
+        target:
+          entity_id: scene.camera_detection_on
 # Script ############################################################
 #script:
 ########################################
