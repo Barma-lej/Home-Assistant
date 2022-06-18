@@ -1,9 +1,0 @@
-# Xiaomi Smartmi Standing Fan 2S
-
-# Integration #######################################################
-fan:
-  - platform: xiaomi_miio_fan
-    name: Ventilator
-    model: zhimi.fan.za4
-    host: !secret fan_ip
-    token: !secret fan_token
