@@ -376,13 +376,13 @@ input_number:
   zone1_moisture_threshold:
     name: Irrigation - Moisture threshold
     min: 5
-    max: 30
+    max: 45
     icon: mdi:water-percent
     unit_of_measurement: "%"
   zone2_moisture_threshold:
     name: Irrigation - Moisture threshold
     min: 5
-    max: 30
+    max: 45
     icon: mdi:water-percent
     unit_of_measurement: "%"
 
