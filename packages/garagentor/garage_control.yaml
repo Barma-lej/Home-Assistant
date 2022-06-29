@@ -21,7 +21,6 @@ logbook:
 input_boolean:
   torteil:
     name: "Tor Teiloffnung"
-    initial: off
     icon: mdi:garage-alert
 
 # Automations #######################################################
@@ -42,7 +41,7 @@ automation:
       - delay:
           seconds: 2
       - alias: ""
-        service: homeassistant.turn_on
+        service: input_boolean.turn_on
         data:
           entity_id: input_boolean.torteil
 
