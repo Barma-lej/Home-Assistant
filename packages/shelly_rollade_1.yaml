@@ -45,7 +45,7 @@ automation:
       - platform: numeric_state
         entity_id: sun.sun
         attribute: azimuth
-        above: 270
+        above: 265
         for:
           minutes: 1
 
@@ -54,7 +54,7 @@ automation:
       and:
         - condition: numeric_state
           entity_id: "sensor.rasen_temperature"
-          above: 26
+          above: 24
         - condition: numeric_state
           entity_id: "sensor.wetter_openweather_d_cloud_coverage"
           below: 40
