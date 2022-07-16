@@ -17,6 +17,7 @@ scene:
       switch.terrasse_push_notifications: "on"
       switch.terrasse_recording: "on"
       switch.terrasse_record_audio: "on"
+      switch.alfa03: "on"
 
 # Automations #######################################################
 automation:
