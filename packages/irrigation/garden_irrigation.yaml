@@ -270,8 +270,12 @@ automation:
         # attribute: error_id
         # to: "5"
         entity_id: vacuum.mower
-        attribute: rain_sensor_triggered
+        attribute: rain_sensor.triggered
         to: "true"
+
+      - platform: template
+        value_template: "{{ state_attr('vacuum.mower', 'rain_sensor').triggered == True }}"
+        for: "00:01:00"
 
     action:
       - service: timer.cancel
@@ -301,7 +305,7 @@ script:
         value_template: >
           {{ is_state('input_boolean.cycle' ~ cycle ~ '_use_sensor_data', 'off')
           or (is_state('input_boolean.cycle' ~ cycle ~ '_use_sensor_data', 'on')
-          and not is_state_attr('vacuum.mower', 'rain_sensor_triggered', 'true')) }}
+          and not state_attr('vacuum.mower', 'rain_sensor').triggered == True) }}
       # and not is_state_attr('sensor.landroid_mower_error', 'error_id', 5)) }}
       - service: script.irrigation_run_a_cycle
         data:
@@ -391,7 +395,7 @@ script:
         value_template: >
           {{ is_state('input_boolean.cycle' ~ cycle ~ '_use_sensor_data', 'off')
           or (is_state('input_boolean.cycle' ~ cycle ~ '_use_sensor_data', 'on')
-          and not is_state_attr('vacuum.mower', 'rain_sensor_triggered', 'true')) }}
+          and not state_attr('vacuum.mower', 'rain_sensor').triggered == True) }}
         # and not is_state_attr('sensor.landroid_mower_error', 'error_id', 5)) }}
 
       # Call the script to set the Tasmota PULSETIME
