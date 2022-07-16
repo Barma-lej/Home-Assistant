@@ -27,7 +27,7 @@
     service: cover.set_cover_position
   - data:
       message: Rolladen geöffnet
-      title: 🔼 Rolladen
+      title: "\U0001F53C Rolladen"
     service: notify.telegram_schick_home
   mode: single
 - id: rolladen_zu
@@ -45,7 +45,7 @@
     service: cover.set_cover_position
   - data:
       message: Rolladen geschlossen
-      title: 🔽 Rolladen
+      title: "\U0001F53D Rolladen"
     service: notify.telegram_schick_home
   mode: single
 - id: garagenlicht_einschalten
@@ -215,5 +215,8 @@
       - update.sqlite_web_update
       - update.studio_code_server_update
       - update.tasmoadmin_update
+      - update.wled_soundreactive_firmware
       mobile_app_device: 52dde1dbd0bd045e5b6181020e86c549
-      run_config_check: true
+      run_config_check: false
+      send_to_ha: true
+      take_backup: true
