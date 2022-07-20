@@ -108,7 +108,7 @@ automation:
                   - condition: numeric_state
                     entity_id: sun.sun
                     attribute: azimuth
-                    below: 270
+                    below: 265
                   - condition: numeric_state
                     entity_id: cover.shellyswitch25_10eaa4
                     attribute: current_position
@@ -125,7 +125,7 @@ automation:
                   - condition: numeric_state
                     entity_id: sun.sun
                     attribute: azimuth
-                    above: 269
+                    above: 264
                   - condition: numeric_state
                     entity_id: cover.shellyswitch25_10d315
                     attribute: current_position
