@@ -67,6 +67,7 @@ logger:
     fritzconnection: warn
     custom_components.xiaomi_miio_fan.fan: fatal
     miio.miioprotocol: fatal
+    custom_components.landroid_cloud: info
 
 # Recorder ##########################################################
 recorder:
