@@ -54,10 +54,10 @@ automation:
       and:
         - condition: numeric_state
           entity_id: "sensor.rasen_temperature"
-          above: 24
+          above: 22
         - condition: numeric_state
           entity_id: "sensor.wetter_openweather_d_cloud_coverage"
-          below: 40
+          below: 20
 
     action:
       - choose:
