@@ -1,4 +1,4 @@
-# Example configuration.yaml entry for the Telegram Bot
+# Telegram Bot configuration
 telegram_bot:
   - platform: polling
     # - platform: broadcast
