@@ -163,7 +163,7 @@
         domain: sensor
         above: 30
       sequence:
-      - service: reolink_dev.ptz_control
+      - service: reolink_cctv.ptz_control
         data:
           entity_id: camera.garage
           command: TOPOS
@@ -176,7 +176,7 @@
         domain: sensor
         below: 20
       sequence:
-      - service: reolink_dev.ptz_control
+      - service: reolink_cctv.ptz_control
         data:
           entity_id: camera.garage
           command: TOPOS
@@ -186,7 +186,7 @@
           minutes: 0
           seconds: 30
           milliseconds: 0
-      - service: reolink_dev.ptz_control
+      - service: reolink_cctv.ptz_control
         data:
           entity_id: camera.garage
           command: TOPOS
@@ -220,3 +220,29 @@
       run_config_check: false
       send_to_ha: true
       take_backup: true
+- id: '1661601350027'
+  alias: Считана метка Red
+  description: ''
+  trigger:
+  - platform: tag
+    tag_id: 4d4d9d64-59ff-4a65-8d8c-d1a088f46599
+  condition: []
+  action:
+  - service: switch.toggle
+    data: {}
+    target:
+      entity_id: switch.tor
+  mode: single
+- id: '1661607357549'
+  alias: Считана метка Green
+  description: ''
+  trigger:
+  - platform: tag
+    tag_id: 25cf4f63-039d-47b6-8012-32e9e6cb831d
+  condition: []
+  action:
+  - service: light.toggle
+    data: {}
+    target:
+      entity_id: light.sonoffpow_01
+  mode: single

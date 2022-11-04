@@ -28,7 +28,7 @@
 #           milliseconds: 0
 
 #     action:
-#       - service: reolink_dev.ptz_control
+#       - service: reolink_cctv.ptz_control
 #         data:
 #           entity_id: camera.garage
 #           command: TOPOS
@@ -57,14 +57,14 @@ script:
   camera_ptz:
     alias: Camera - PTZ Control
     sequence:
-      - service: reolink_dev.ptz_control
+      - service: reolink_cctv.ptz_control
         data:
           entity_id: "{{ entity_id }}"
           command: "{{ command }}"
 
       - delay: "00:00:01"
 
-      - service: reolink_dev.ptz_control
+      - service: reolink_cctv.ptz_control
         data:
           entity_id: "{{ entity_id }}"
           command: STOP
