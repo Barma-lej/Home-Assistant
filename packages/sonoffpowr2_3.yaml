@@ -1,0 +1,80 @@
+# Sonoff POW R2
+# Tasmota integration
+
+# Sensor ############################################################
+utility_meter:
+  #  sonoffpow_03_energy_d:
+  #    source: sensor.sonoffpow_03_energy_total
+  #    cycle: daily
+
+  sonoffpow_03_energy_m:
+    source: sensor.sonoffpow_03_energy_total
+    cycle: monthly
+
+  sonoffpow_03_energy_y:
+    source: sensor.sonoffpow_03_energy_total
+    cycle: yearly
+
+# Automation ########################################################
+automation:
+  - id: telegram_sonoffpow_03
+    alias: "Telegram - Sonoffpow_03"
+    mode: parallel
+    trigger:
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: "/terrassenlicht"
+
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          command: "/terrassenlicht"
+
+    action:
+      - service: light.toggle
+        data:
+          entity_id: light.sonoffpow_03
+
+      - wait_for_trigger:
+          - platform: state
+            entity_id: light.sonoffpow_03
+        timeout: "00:00:05"
+        continue_on_timeout: true
+
+      - service: script.telegram_callback
+        data:
+          target: "{{ trigger.event.data.chat_id }}"
+          message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
+          message: "💡 {{ state_attr('light.sonoffpow_03', 'friendly_name') }} - {{ states('light.sonoffpow_03') }}"
+
+#  Service ist {{ trigger.event }}"
+
+# Customize #########################################################
+homeassistant:
+  customize:
+    # Sensor ##########
+    sensor.sonoffpow_03_energy_total:
+      friendly_name: Verbrauch Total (Terrassenlicht)
+      icon: mdi:lightning-bolt
+
+    sensor.sonoffpow_03_energy_power:
+      friendly_name: Leistung (Terrassenlicht)
+      icon: hass:gauge
+      device_class: power
+
+    sensor.sonoffpow_03_energy_today:
+      friendly_name: Verbrauch Heute (Terrassenlicht)
+      icon: mdi:lightning-bolt
+
+    #    sensor.sonoffpow_03_energy_d:
+    #      friendly_name: Verbrauch Heute (Terrassenlicht)
+    #      icon: mdi:lightning-bolt
+
+    sensor.sonoffpow_03_energy_m:
+      friendly_name: Verbrauch im Monat (Terrassenlicht)
+      icon: mdi:lightning-bolt
+
+    sensor.sonoffpow_03_energy_y:
+      friendly_name: Verbrauch im Jahr (Terrassenlicht)
+      icon: mdi:lightning-bolt
