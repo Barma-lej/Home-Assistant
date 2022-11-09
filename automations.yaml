@@ -246,3 +246,59 @@
     target:
       entity_id: light.sonoffpow_01
   mode: single
+- id: '1668006470208'
+  alias: Garage - Coming home
+  description: Open tor if Tiguan is coming to home
+  trigger:
+  - platform: device
+    device_id: 52dde1dbd0bd045e5b6181020e86c549
+    domain: device_tracker
+    entity_id: device_tracker.sm_g996b
+    type: enters
+    zone: zone.home
+  condition:
+  - condition: state
+    entity_id: sensor.sm_g996b_bluetooth_connection
+    attribute: connected_paired_devices
+    state: B4:EC:02:94:8A:CF (VW BT 1505)
+    enabled: false
+  - condition: template
+    value_template: '{{ "B4:EC:02:94:8A:CF (VW BT 1505)" in state_attr("sensor.sm_g996b_bluetooth_connection",
+      "connected_paired_devices") }}'
+  - condition: numeric_state
+    entity_id: sensor.torposition
+    below: 10
+  action:
+  - service: switch.turn_on
+    data: {}
+    target:
+      entity_id: switch.tor
+  mode: single
+- id: '1668017327174'
+  alias: Garage - Leaving home
+  description: Close tor if Tiguan is leaving home
+  trigger:
+  - platform: device
+    device_id: 52dde1dbd0bd045e5b6181020e86c549
+    domain: device_tracker
+    entity_id: device_tracker.sm_g996b
+    type: leaves
+    zone: zone.home
+  condition:
+  - condition: state
+    entity_id: sensor.sm_g996b_bluetooth_connection
+    attribute: connected_paired_devices
+    state: B4:EC:02:94:8A:CF (VW BT 1505)
+    enabled: false
+  - condition: template
+    value_template: '{{ "B4:EC:02:94:8A:CF (VW BT 1505)" in state_attr("sensor.sm_g996b_bluetooth_connection",
+      "connected_paired_devices") }}'
+  - condition: numeric_state
+    entity_id: sensor.torposition
+    above: 5
+  action:
+  - service: switch.turn_on
+    data: {}
+    target:
+      entity_id: switch.tor
+  mode: single
