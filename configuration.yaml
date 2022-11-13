@@ -3,7 +3,7 @@ homeassistant:
   latitude: !secret ha_latitude
   longitude: !secret ha_longitude
   elevation: !secret ha_elevation
-  time_zone: !secret ha_time_zone
+#  time_zone: !secret ha_time_zone
   unit_system: metric
   external_url: !secret ha_external_url
   internal_url: !secret ha_internal_url
@@ -14,6 +14,14 @@ homeassistant:
 
   media_dirs:
     local: /media
+
+zone:
+  - name: Home
+    latitude: !secret ha_latitude
+    longitude: !secret ha_longitude
+    radius: 75
+    icon: mdi:home
+    passive: false
 
 # Enables ###########################################################
 api:

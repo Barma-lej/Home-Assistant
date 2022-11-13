@@ -1,9 +1,28 @@
 # Sonoff BN-SZ01 LED Light
 # Tasmota
+# https://planetcalc.ru/5992/ - Approximation of a function of one variable
 
-# Customize #########################################################
+# Customize ###########################
 homeassistant:
   customize:
     light.sonoffbnsz01:
       friendly_name: Garage LED
       icon: mdi:wall-sconce-flat-outline
+
+# Templates ###########################
+template:
+  - trigger:
+      - platform: state
+        entity_id: light.sonoffbnsz01
+    sensor:
+      - name: "SonoffBNSZ01 Power"
+        unique_id: sonoffbnsz01_power
+        state: >
+          {% set bright=state_attr('light.sonoffbnsz01','brightness') | int(0) %}
+          {{ bright | iif(
+            ((0.000001183*bright**3-0.000035*bright**2+0.006142*bright+0.763502) | float(0) | round(1)),
+            0
+          ) }}
+        state_class: measurement
+        device_class: power
+        unit_of_measurement: W
