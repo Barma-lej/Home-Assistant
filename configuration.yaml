@@ -1,12 +1,12 @@
 homeassistant:
-  name: !secret ha_name
-  latitude: !secret ha_latitude
-  longitude: !secret ha_longitude
-  elevation: !secret ha_elevation
-#  time_zone: !secret ha_time_zone
-  unit_system: metric
-  external_url: !secret ha_external_url
-  internal_url: !secret ha_internal_url
+  # name: !secret ha_name
+  # latitude: !secret ha_latitude
+  # longitude: !secret ha_longitude
+  # elevation: !secret ha_elevation
+  # #  time_zone: !secret ha_time_zone
+  # unit_system: metric
+  # external_url: !secret ha_external_url
+  # internal_url: !secret ha_internal_url
   packages: !include_dir_named packages
   customize: !include customize.yaml
   # allowlist_external_dirs:
@@ -40,8 +40,6 @@ sun: # Track the sun
 system_health: # System Health integration data can be viewed in Developer Tools on the “Info” tab.
 websocket_api:
 
-panel_iframe: !include panel_iframe.yaml
-
 folder_watcher:
   - folder: /media/cams
 
@@ -58,6 +56,10 @@ http:
   ssl_key: /ssl/privkey.pem
   ip_ban_enabled: true
   login_attempts_threshold: 15
+  # use_x_forwarded_for: true
+  # trusted_proxies:
+    # - 172.30.32.0/24
+    # - 172.30.33.0/24
 
 logger:
   # default: critical
@@ -73,9 +75,11 @@ logger:
     # homeassistant.components.rfxtrx: warn
     # homeassistant.components.websocket_api: debug
     fritzconnection: warn
-    custom_components.xiaomi_miio_fan.fan: fatal
     miio.miioprotocol: fatal
-    custom_components.landroid_cloud: info
+    # reolink_ip: debug
+    custom_components.landroid_cloud: warn
+    # custom_components.reolink_cctv: debug
+    custom_components.xiaomi_miio_fan.fan: fatal
 
 # Recorder ##########################################################
 recorder:
@@ -183,6 +187,7 @@ device_tracker:
 automation: !include automations.yaml
 google_assistant: !include google_assistant.yaml
 group: !include groups.yaml
+# panel_iframe: !include panel_iframe.yaml
 # scene: !include scenes.yaml
 script: !include scripts.yaml
 sensor: !include sensors.yaml
