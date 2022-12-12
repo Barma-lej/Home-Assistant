@@ -8,10 +8,12 @@ utility_meter:
   #    cycle: daily
 
   sonoffpow_01_energy_m:
+    unique_id: sonoffpow_01_energy_m
     source: sensor.sonoffpow_01_energy_total
     cycle: monthly
 
   sonoffpow_01_energy_y:
+    unique_id: sonoffpow_01_energy_y
     source: sensor.sonoffpow_01_energy_total
     cycle: yearly
 
