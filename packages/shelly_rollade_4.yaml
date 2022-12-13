@@ -4,14 +4,17 @@
 # Sensor ############################################################
 utility_meter:
   shelly_rollade_4_d:
+    unique_id: shelly_rollade_4_d
     source: sensor.shellyswitch25_10d315_energy
     cycle: daily
 
   shelly_rollade_4_m:
+    unique_id: shelly_rollade_4_m
     source: sensor.shellyswitch25_10d315_energy
     cycle: monthly
 
   shelly_rollade_4_y:
+    unique_id: shelly_rollade_4_y
     source: sensor.shellyswitch25_10d315_energy
     cycle: yearly
 

@@ -4,14 +4,17 @@
 # Sensor ############################################################
 utility_meter:
   shelly_wohnlicht_d:
+    unique_id: shelly_wohnlicht_d
     source: sensor.shellyswitch25_10c7c3_channel_1_energy
     cycle: daily
 
   shelly_wohnlicht_m:
+    unique_id: shelly_wohnlicht_m
     source: sensor.shellyswitch25_10c7c3_channel_1_energy
     cycle: monthly
 
   shelly_wohnlicht_y:
+    unique_id: shelly_wohnlicht_y
     source: sensor.shellyswitch25_10c7c3_channel_1_energy
     cycle: yearly
 
