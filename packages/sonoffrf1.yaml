@@ -15,25 +15,25 @@
 #     payload_not_available: "Offline"
 #     retain: false
 
-mqtt:
-  switch:
-    - name: "SonoffRF1"
-      state_topic: "sonoffrf1/stat/RESULT"
-      value_template: "{{ value_json.POWER }}"
-      command_topic: "sonoffrf1/cmnd/POWER"
-      availability_topic: "sonoffrf1/tele/LWT"
-      qos: 1
-      payload_on: "ON"
-      payload_off: "OFF"
-      payload_available: "Online"
-      payload_not_available: "Offline"
-      retain: false
+# mqtt:
+#   switch:
+#     - name: "SonoffRF1"
+#       state_topic: "sonoffrf1/stat/RESULT"
+#       value_template: "{{ value_json.POWER }}"
+#       command_topic: "sonoffrf1/cmnd/POWER"
+#       availability_topic: "sonoffrf1/tele/LWT"
+#       qos: 1
+#       payload_on: "ON"
+#       payload_off: "OFF"
+#       payload_available: "Online"
+#       payload_not_available: "Offline"
+#       retain: false
 
 # Light #############################################################
-light:
-  - platform: switch
-    name: "SonoffRF1"
-    entity_id: switch.sonoffrf1
+# light:
+#   - platform: switch
+#     name: "SonoffRF1"
+#     entity_id: switch.sonoffrf1
 
 # Customize #########################################################
 homeassistant:

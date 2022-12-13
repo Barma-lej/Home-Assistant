@@ -273,6 +273,15 @@
     data: {}
     target:
       entity_id: switch.tor
+  - service: notify.mobile_app_sm_g996b
+    data:
+      message: TTS
+      title: Garage
+      data:
+        ttl: 0
+        priority: high
+        media_stream: alarm_stream_max
+        tts_text: Die Garage öffnet
   mode: single
 - id: '1668017327174'
   alias: Garage - Leaving home
@@ -301,4 +310,36 @@
     data: {}
     target:
       entity_id: switch.tor
+  - service: notify.mobile_app_sm_g996b
+    data:
+      message: TTS
+      title: Garage
+      data:
+        ttl: 0
+        priority: high
+        media_stream: alarm_stream_max
+        tts_text: Die Garage schlisst
+  - wait_for_trigger:
+    - platform: numeric_state
+      entity_id: sensor.torposition
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 5
+      below: 6
+    timeout:
+      hours: 0
+      minutes: 0
+      seconds: 30
+      milliseconds: 0
+    continue_on_timeout: false
+  - service: notify.mobile_app_sm_g996b
+    data:
+      message: TTS
+      title: Garage
+      data:
+        ttl: 0
+        priority: high
+        media_stream: alarm_stream_max
+        tts_text: Die Garage ist geschlossen
   mode: single

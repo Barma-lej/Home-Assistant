@@ -1,0 +1,55 @@
+# Sonoff POW R2
+# Tasmota integration
+
+# Sensor ############################################################
+utility_meter:
+  #  haus_energy_d:
+  #    source: sensor.haus_energy_total
+  #    cycle: daily
+
+  haus_energy_m:
+    unique_id: haus_energy_m
+    source: sensor.haus_total_energy
+    cycle: monthly
+
+  haus_energy_y:
+    unique_id: haus_energy_y
+    source: sensor.haus_total_energy
+    cron: "0 0 1 5 *"
+
+  haus_energy_t:
+    unique_id: haus_energy_t
+    source: sensor.haus_total_energy
+
+# Customize #########################################################
+homeassistant:
+  customize:
+    # Sensor ##########
+    sensor.haus_total_energy:
+      friendly_name: Verbrauch Total (Haus)
+      icon: mdi:lightning-bolt
+
+    sensor.haus_power_consumption:
+      friendly_name: Leistung (Haus)
+      icon: hass:gauge
+      device_class: power
+
+    sensor.haus_daily_energy:
+      friendly_name: Verbrauch Heute (Haus)
+      icon: mdi:lightning-bolt
+
+    #    sensor.haus_energy_d:
+    #      friendly_name: Verbrauch Heute (Haus)
+    #      icon: mdi:lightning-bolt
+
+    sensor.haus_energy_m:
+      friendly_name: Verbrauch im Monat (Haus)
+      icon: mdi:lightning-bolt
+
+    sensor.haus_energy_y:
+      friendly_name: Verbrauch im Jahr (Haus)
+      icon: mdi:lightning-bolt
+
+    sensor.haus_energy_t:
+      friendly_name: Verbrauch Total (Haus)
+      icon: mdi:lightning-bolt
