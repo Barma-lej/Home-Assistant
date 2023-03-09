@@ -1,0 +1,68 @@
+# Tuya
+# https://github.com/rospogrigio/localtuya/issues/1148
+#
+
+# Sensors #######################################
+sensor:
+  - platform: integration
+    unique_id: tuyaplug5_energy
+    source: sensor.tuyaplug5_power
+    name: Tuyaplug5 Energy
+    unit_prefix: k
+    round: 2
+
+utility_meter:
+  tuyaplug5_energy_daily:
+    unique_id: tuyaplug5_energy_daily
+    source: sensor.tuyaplug5_energy
+    name: Tuyaplug5 Energy Daily
+    cycle: daily
+  tuyaplug5_energy_monthly:
+    unique_id: tuyaplug5_energy_monthly
+    source: sensor.tuyaplug5_energy
+    name: Tuyaplug5 Energy Monthly
+    cycle: monthly
+  tuyaplug5_energy_yearly:
+    unique_id: tuyaplug5_energy_yearly
+    source: sensor.tuyaplug5_energy
+    name: Tuyaplug5 Energy Yearly
+    cycle: yearly
+
+# Customize #####################################
+homeassistant:
+  customize:
+    # Switch ##########
+    switch.tuyaplug5:
+      friendly_name: Tuyaplug5
+      # icon: mdi:printer-3d
+    switch.tuyaplug5_childlock:
+      friendly_name: Kindersicherung ()
+      icon: mdi:account-lock
+    switch.tuyaplug5_overcharge:
+      friendly_name: Überladung ()
+      icon: mdi:battery-alert-variant
+
+    # Sensor ##########
+    sensor.tuyaplug5_current:
+      friendly_name: Stromstärke (Tuyaplug5)
+      # icon: mdi:current-ac
+
+    sensor.tuyaplug5_power:
+      friendly_name: Leistung (Tuyaplug5)
+      # icon: mdi:lightning-bolt
+
+    sensor.tuyaplug5_energy:
+      friendly_name: Verbrauch (Tuyaplug5)
+      # icon: mdi:counter
+
+    sensor.tuyaplug5_energy_daily:
+      friendly_name: Verbrauch Täglich (Tuyaplug5)
+      # icon: mdi:counter
+
+    sensor.tuyaplug5_energy_monthly:
+      friendly_name: Verbrauch Monatlich (Tuyaplug5)
+      # icon: mdi:counter
+
+    sensor.tuyaplug5_energy_yearly:
+      friendly_name: Verbrauch Jahrlich (Tuyaplug5)
+      # icon: mdi:counter

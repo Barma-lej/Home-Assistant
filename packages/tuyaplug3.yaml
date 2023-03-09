@@ -1,0 +1,105 @@
+# Tuya
+# https://github.com/rospogrigio/localtuya/issues/1148
+#
+
+# Sensors #######################################
+sensor:
+  - platform: integration
+    unique_id: tuyaplug3_energy
+    source: sensor.tuyaplug3_power
+    name: Tuyaplug3 Energy
+    unit_prefix: k
+    round: 2
+
+utility_meter:
+  tuyaplug3_energy_daily:
+    unique_id: tuyaplug3_energy_daily
+    source: sensor.tuyaplug3_energy
+    name: Tuyaplug3 Energy Daily
+    cycle: daily
+  tuyaplug3_energy_monthly:
+    unique_id: tuyaplug3_energy_monthly
+    source: sensor.tuyaplug3_energy
+    name: Tuyaplug3 Energy Monthly
+    cycle: monthly
+  tuyaplug3_energy_yearly:
+    unique_id: tuyaplug3_energy_yearly
+    source: sensor.tuyaplug3_energy
+    name: Tuyaplug3 Energy Yearly
+    cycle: yearly
+
+# Automation ########################################################
+automation:
+  - id: telegram_tuyaplug3
+    alias: "Telegram - Tuyaplug3"
+    mode: parallel
+    trigger:
+      - platform: event
+        event_type: telegram_command
+        event_data:
+          command: "/ambiente_wohnen"
+
+      - platform: event
+        event_type: telegram_callback
+        event_data:
+          command: "/ambiente_wohnen"
+
+    action:
+      - service: light.toggle
+        data:
+          entity_id: light.ambiente_wohnen
+
+      - wait_for_trigger:
+          - platform: state
+            entity_id: light.ambiente_wohnen
+        timeout: "00:00:05"
+        continue_on_timeout: true
+
+      - service: script.telegram_callback
+        data:
+          target: "{{ trigger.event.data.chat_id }}"
+          message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
+          message: "💡 {{ state_attr('light.ambiente_wohnen', 'friendly_name') }} - {{ states('light.ambiente_wohnen') }}"
+
+# Customize #####################################
+homeassistant:
+  customize:
+    # Switch ##########
+    switch.tuyaplug3:
+      friendly_name: Ambiente Wohnen
+      icon: mdi:television-ambient-light
+    switch.tuyaplug3_childlock:
+      friendly_name: Kindersicherung (Ambiente Wohnen)
+      icon: mdi:account-lock
+    switch.tuyaplug3_overcharge:
+      friendly_name: Überladung (Ambiente Wohnen)
+      icon: mdi:battery-alert-variant
+
+    # Switch ##########
+    light.tuyaplug3:
+      friendly_name: Ambiente Wohnen
+
+    # Sensor ##########
+    sensor.tuyaplug3_current:
+      friendly_name: Stromstärke (Ambiente Wohnen)
+      # icon: mdi:current-ac
+
+    sensor.tuyaplug3_power:
+      friendly_name: Leistung (Ambiente Wohnen)
+      # icon: mdi:lightning-bolt
+
+    sensor.tuyaplug3_energy:
+      friendly_name: Verbrauch (Ambiente Wohnen)
+      # icon: mdi:counter
+
+    sensor.tuyaplug3_energy_daily:
+      friendly_name: Verbrauch Täglich (Ambiente Wohnen)
+      # icon: mdi:counter
+
+    sensor.tuyaplug3_energy_monthly:
+      friendly_name: Verbrauch Monatlich (Ambiente Wohnen)
+      # icon: mdi:counter
+
+    sensor.tuyaplug3_energy_yearly:
+      friendly_name: Verbrauch Jahrlich (Ambiente Wohnen)
+      # icon: mdi:counter

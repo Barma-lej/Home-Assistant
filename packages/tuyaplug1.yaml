@@ -1,0 +1,68 @@
+# Tuya
+# https://github.com/rospogrigio/localtuya/issues/1148
+#
+
+# Sensors #######################################
+sensor:
+  - platform: integration
+    unique_id: tuyaplug1_energy
+    source: sensor.tuyaplug1_power
+    name: Tuyaplug1 Energy
+    unit_prefix: k
+    round: 2
+
+utility_meter:
+  tuyaplug1_energy_daily:
+    unique_id: tuyaplug1_energy_daily
+    source: sensor.tuyaplug1_energy
+    name: Tuyaplug1 Energy Daily
+    cycle: daily
+  tuyaplug1_energy_monthly:
+    unique_id: tuyaplug1_energy_monthly
+    source: sensor.tuyaplug1_energy
+    name: Tuyaplug1 Energy Monthly
+    cycle: monthly
+  tuyaplug1_energy_yearly:
+    unique_id: tuyaplug1_energy_yearly
+    source: sensor.tuyaplug1_energy
+    name: Tuyaplug1 Energy Yearly
+    cycle: yearly
+
+# Customize #####################################
+homeassistant:
+  customize:
+    # Switch ##########
+    switch.tuyaplug1:
+      friendly_name: 3D Drucker
+      icon: mdi:printer-3d
+    switch.tuyaplug1_childlock:
+      friendly_name: Kindersicherung (3D Drucker)
+      icon: mdi:account-lock
+    switch.tuyaplug1_overcharge:
+      friendly_name: Überladung (3D Drucker)
+      icon: mdi:battery-alert-variant
+
+    # Sensor ##########
+    sensor.tuyaplug1_current:
+      friendly_name: Stromstärke (3D Drucker)
+      # icon: mdi:current-ac
+
+    sensor.tuyaplug1_power:
+      friendly_name: Leistung (3D Drucker)
+      # icon: mdi:lightning-bolt
+
+    sensor.tuyaplug1_energy:
+      friendly_name: Verbrauch (3D Drucker)
+      # icon: mdi:counter
+
+    sensor.tuyaplug1_energy_daily:
+      friendly_name: Verbrauch Täglich (3D Drucker)
+      # icon: mdi:counter
+
+    sensor.tuyaplug1_energy_monthly:
+      friendly_name: Verbrauch Monatlich (3D Drucker)
+      # icon: mdi:counter
+
+    sensor.tuyaplug1_energy_yearly:
+      friendly_name: Verbrauch Jahrlich (3D Drucker)
+      # icon: mdi:counter
