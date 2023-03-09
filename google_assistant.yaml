@@ -39,10 +39,10 @@ entity_config:
     room: Wohnzimmer
     expose: true
 
-  switch.sonoffs26_1:
-    name: TV-Board
-    room: Wohnzimmer
-    expose: true
+  # switch.sonoffs26_1:
+  #   name: TV-Board
+  #   room: Wohnzimmer
+  #   expose: true
 
   switch.mower_mowing:
     name: Mähroboter
@@ -54,10 +54,10 @@ entity_config:
     room: Wohnzimmer
     expose: true
 
-  light.sonoffpow_02:
-    name: Wohnzimmerambient
-    room: Ambiente
-    expose: true
+  # light.sonoffpow_02:
+  #   name: Wohnzimmerambient
+  #   room: Ambiente
+  #   expose: true
 
   light.sonoffpow_03:
     name: Terrassenlicht
@@ -92,6 +92,16 @@ entity_config:
   light.esplight6f:
     name: LED
     room: Garage
+    expose: true
+
+  switch.tuyaplug2:
+    name: TV-Board
+    room: Wohnzimmer
+    expose: true
+
+  light.tuyaplug3:
+    name: Wohnzimmerambient
+    room: Ambiente
     expose: true
 
   switch.irrigation:
