@@ -159,7 +159,59 @@ script:
 
       - delay: 00:00:10
 
-      - service: tts.microsoft_say
+      - service: tts.amazon_polly_say
         data:
-          entity_id: media_player.home_group
-          message: "Polizei wurde schon benachrichtigt, sind unterwegs und kommen sofort."
+          entity_id: media_player.nest_mini
+          message: |-
+            <speak>
+              <prosody rate="90%">
+                  Polizei wurde schon benachrichtigt, sind unterwegs und <prosody rate="85%">kommen sofort!</prosody>
+              </prosody>
+            </speak>
+          # message: "Polizei wurde schon benachrichtigt, sind unterwegs und kommen sofort."
+
+  # alarm_test:
+  #   sequence:
+  #     - service: media_player.volume_set
+  #       target:
+  #         entity_id: media_player.nest_mini
+  #       data:
+  #         volume_level: 0.6
+
+  #     - service: media_player.play_media
+  #       target:
+  #         entity_id: media_player.nest_mini
+  #       data:
+  #         media_content_type: music
+  #         media_content_id: "media-source://media_source/local/sounds/polizeisirene-martinshorn-KCD04046.mp3"
+  #         extra:
+  #           thumb: "/local/images/alarm_red.png"
+  #           title: HomeAssistantRadio
+
+  #     - delay: 00:00:10
+
+  #     - service: tts.amazon_polly_say
+  #       data:
+  #         entity_id: media_player.nest_mini
+  #         message: |-
+  #           <speak>
+  #             <prosody rate="75%">
+  #                 Polizei wurde schon benachrichtigt, sind unterwegs und <prosody rate="70%">kommen sofort!</prosody>
+  #             </prosody>
+  #           </speak>
+
+  #     - service: tts.google_cloud_say
+  #       data:
+  #         entity_id: media_player.nest_mini
+  #         message: |-
+  #           <speak>
+  #             <audio src="local/sounds/polizeisirene-martinshorn-KCD04046.mp3">
+  #               <desc>Siren</desc>
+  #               UUAAUUAAUUAA
+  #             </audio>
+  #             <break time="1000ms"/>
+  #             <emphasis level="strong">Polizei wurde schon benachrichtigt, sind unterwegs und kommen sofort!</emphasis>
+  #             <break time="1000ms"/>
+  #           </speak>
+
+  #           message: "Polizei wurde schon benachrichtigt, sind unterwegs und kommen sofort."
