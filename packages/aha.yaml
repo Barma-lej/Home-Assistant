@@ -1,0 +1,8 @@
+sensor:
+  # aha region waste sensors
+  - platform: aha_region
+    gemeinde: !secret aha_gemeinde
+    strasse: !secret aha_strasse # value from dropdown
+    hausnr: !secret aha_hausnr
+    # hausnraddon: "a" # optional, remove if not needed for your address!
+    # abholplatz: "00726-0035 " # optional, remove if not needed for your address!
