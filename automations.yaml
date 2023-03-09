@@ -78,7 +78,7 @@
     device_id: 63713a671de1472e84d5832bcb399f0e
     entity_id: light.sonoffbnsz01
     domain: light
-    brightness_pct: 100
+    brightness_pct: 95
   - delay:
       hours: 0
       minutes: 10
@@ -343,3 +343,73 @@
         media_stream: alarm_stream_max
         tts_text: Die Garage ist geschlossen
   mode: single
+- id: '1674331541169'
+  alias: 3D - Druck ist fertig
+  description: ''
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.octoprint_job_percentage
+    above: 99.999999
+    enabled: false
+  - platform: state
+    entity_id:
+    - sensor.octoprint_print_status
+    from: Printing
+    to: Finishing
+  condition: []
+  action:
+  - service: notify.telegram_schick_home
+    data:
+      message: "\U0001F3ED 3D Druck ist fertig"
+      data:
+        photo:
+        - url: http://192.168.2.18/plugin/UltimakerFormatPackage/thumbnail/{{ states('sensor.octoprint_print_file')
+            | replace(' ','%20') | replace('gcode','png') }}
+          caption: "\U0001F3ED 3D Druck ist fertig"
+  - wait_for_trigger:
+    - platform: state
+      entity_id:
+      - sensor.octoprint_last_event
+      to: MovieDone
+    timeout:
+      hours: 0
+      minutes: 10
+      seconds: 0
+      milliseconds: 0
+  - wait_for_trigger:
+    - platform: numeric_state
+      entity_id: sensor.octoprint_actual_tool0_temp
+      below: 70
+    timeout:
+      hours: 0
+      minutes: 5
+      seconds: 0
+      milliseconds: 0
+  - if:
+    - condition: state
+      entity_id: sensor.octoprint_print_status
+      state: Operational
+    then:
+    - service: switch.turn_off
+      data: {}
+      target:
+        entity_id: switch.tuyaplug1
+    - service: notify.telegram_schick_home
+      data:
+        message: "\U0001F3ED 3D Druck ist ausgeschaltet"
+  mode: single
+- id: '1674336725023'
+  alias: Erinnerung - Mühlabfuhr
+  description: ''
+  use_blueprint:
+    path: westenberg/garbage-reminder.yaml
+    input:
+      garbage_sensor_1: sensor.bioabfall
+      garbage_sensor_2: sensor.leichtverpackungen
+      garbage_sensor_3: sensor.papier
+      garbage_sensor_4: sensor.restabfall
+      notifier: notify.telegram_schick_home
+      day_offset: '1'
+      reminder_time: '20:00:00'
+      reminder_message: 'Folgender Müll wird morgen abgeholt:'
+      reminder_title: "\U0001F5D1️ Müllabfuhr Erinnerung"
