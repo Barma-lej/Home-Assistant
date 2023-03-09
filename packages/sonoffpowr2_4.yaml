@@ -55,7 +55,7 @@ homeassistant:
   customize:
     # Sensor ##########
     sensor.sonoffpow_04_energy_total:
-      friendly_name: Verbrauch Total (Ambiente Küche)
+      friendly_name: Verbrauch (Ambiente Küche)
       icon: mdi:lightning-bolt
 
     sensor.sonoffpow_04_energy_power:

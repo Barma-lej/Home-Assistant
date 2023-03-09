@@ -56,27 +56,30 @@ automation:
 homeassistant:
   customize:
     # Sensor ##########
-    sensor.sonoffpow_01_energy_total:
-      friendly_name: Verbrauch Total (Wandlicht)
-      icon: mdi:lightning-bolt
+    sensor.sonoffpow_01_energy_totalstarttime:
+      friendly_name: Seit (Wandlicht)
 
     sensor.sonoffpow_01_energy_power:
       friendly_name: Leistung (Wandlicht)
       icon: hass:gauge
       device_class: power
 
+    sensor.sonoffpow_01_energy_total:
+      friendly_name: Verbrauch (Wandlicht)
+      # icon: mdi:chart-histogram
+
     sensor.sonoffpow_01_energy_today:
-      friendly_name: Verbrauch Heute (Wandlicht)
-      icon: mdi:lightning-bolt
+      friendly_name: Verbrauch Täglich (Wandlicht)
+      # icon: mdi:
 
     #    sensor.sonoffpow_01_energy_d:
     #      friendly_name: Verbrauch Heute (Wandlicht)
     #      icon: mdi:lightning-bolt
 
     sensor.sonoffpow_01_energy_m:
-      friendly_name: Verbrauch im Monat (Wandlicht)
-      icon: mdi:lightning-bolt
+      friendly_name: Verbrauch Monatlich (Wandlicht)
+      # icon: mdi:lightning-bolt
 
     sensor.sonoffpow_01_energy_y:
-      friendly_name: Verbrauch im Jahr (Wandlicht)
-      icon: mdi:lightning-bolt
+      friendly_name: Verbrauch Jahrlich (Wandlicht)
+      # icon: mdi:lightning-bolt

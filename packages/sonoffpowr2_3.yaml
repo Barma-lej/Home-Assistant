@@ -57,7 +57,7 @@ homeassistant:
   customize:
     # Sensor ##########
     sensor.sonoffpow_03_energy_total:
-      friendly_name: Verbrauch Total (Terrassenlicht)
+      friendly_name: Verbrauch (Terrassenlicht)
       icon: mdi:lightning-bolt
 
     sensor.sonoffpow_03_energy_power:

@@ -60,7 +60,7 @@ homeassistant:
       friendly_name: Leistung (Rollade Terrasse)
       icon: mdi:gauge
     sensor.shellyswitch25_10d315_energy:
-      friendly_name: Verbrauch Total (Rollade Terrasse)
+      friendly_name: Verbrauch (Rollade Terrasse)
     binary_sensor.shellyswitch25_10d315_overheating:
       friendly_name: Überhitzen (Rollade Terrasse)
       icon: mdi:thermometer-alert

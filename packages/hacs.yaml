@@ -16,4 +16,4 @@ automation:
       - service: persistent_notification.create
         data:
           title: Aktualisierung verfügbar
-          message: "{{ states('sensor.hacs') }} HACS Updates verfügbar"
+          message: "{{ states('sensor.hacs') }} HACS Updates verfügbar. [Öffnen](https://barma.duckdns.org/hacs)"

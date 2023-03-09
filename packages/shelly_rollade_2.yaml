@@ -60,7 +60,7 @@ homeassistant:
       friendly_name: Leistung (Rollade 2)
       icon: mdi:gauge
     sensor.shellyswitch25_f37b28_energy:
-      friendly_name: Verbrauch Total (Rollade 2)
+      friendly_name: Verbrauch (Rollade 2)
     binary_sensor.shellyswitch25_f37b28_overheating:
       friendly_name: Überhitzen (Rollade 2)
       icon: mdi:thermometer-alert

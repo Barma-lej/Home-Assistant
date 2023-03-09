@@ -62,15 +62,15 @@ homeassistant:
       friendly_name: Leistung (Wohnlicht)
       icon: mdi:gauge
     sensor.shellyswitch25_10c7c3_channel_1_energy:
-      friendly_name: Verbrauch Total (Wohnlicht)
+      friendly_name: Verbrauch (Wohnlicht)
     sensor.shelly_wohnlicht_d:
-      friendly_name: Verbrauch Heute (Wohnlicht)
+      friendly_name: Verbrauch Täglich (Wohnlicht)
       icon: mdi:lightning-bolt
     sensor.shelly_wohnlicht_m:
-      friendly_name: Verbrauch im Monat (Wohnlicht)
+      friendly_name: Verbrauch Monatlich (Wohnlicht)
       icon: mdi:lightning-bolt
     sensor.shelly_wohnlicht_y:
-      friendly_name: Verbrauch im Jahr (Wohnlicht)
+      friendly_name: Verbrauch Jahrlich (Wohnlicht)
       icon: mdi:lightning-bolt
 
     binary_sensor.shellyswitch25_10c7c3_channel_overpowering:
@@ -85,7 +85,7 @@ homeassistant:
     #    sensor.shellyswitch25_10c7c3_channel_2_power:
     #      friendly_name: Flur Energie
     #    sensor.shellyswitch25_10c7c3_channel_2_energy:
-    #      friendly_name: Verbrauch Total (Flur)
+    #      friendly_name: Verbrauch (Flur)
     binary_sensor.shellyswitch25_10c7c3_channel_2_overpowering:
       friendly_name: Überspannung (Wohnlicht 2)
       icon: mdi:flash-alert
