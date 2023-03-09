@@ -8,13 +8,12 @@ group:
       # - switch.sonoffs20_2
       - switch.sonoffs26_2
 
-  weihnachten_licht_draussen:
-    name: Weihnachten Licht draussen
-    entities:
-      # - switch.alfa01
-      # - switch.sonoffs20_1
-      - switch.sonoffs20_2
-      # - switch.sonoffs26_2
+  # weihnachten_licht_draussen:
+  #   name: Weihnachten Licht draussen
+  #   entities:
+  #     - switch.alfa01
+  #     - switch.sonoffs20_1
+  #     - switch.sonoffs26_2
 
 # Automations #######################################################
 automation:
