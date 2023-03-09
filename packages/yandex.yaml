@@ -1,0 +1,173 @@
+yandex_smart_home:
+  notifier:
+    oauth_token: !secret ya_oauth_token
+    skill_id: !secret ya_skill_id
+    user_id: !secret ya_user_id
+  filter:
+    # include_domains:
+    #   - switch
+    #   - light
+    include_entities:
+      - camera.einfahrt
+      - camera.garage
+      - camera.terrasse
+      - cover.tor
+      - cover.shellyswitch25_f37a8c
+      - cover.shellyswitch25_f37b28
+      - cover.shellyswitch25_10eaa4
+      - cover.shellyswitch25_10d315
+      - light.shellyswitch25_10a36d_channel_2
+      - light.shellyswitch25_10c7c3_channel_1
+      - light.sonoffbnsz01
+      - light.sonoffpow_01
+      # - light.sonoffpow_02
+      - light.sonoffpow_03
+      - light.sonoffpow_04
+      - light.kristinas_licht
+      - light.sonoffrf1
+      - light.tuyaplug3
+      - media_player.sony_bravia_kd55x8505b
+      - sensor.ble_temperature_temperatur_gt
+      - sensor.ble_humidity_temperatur_gt
+      - sensor.ble_temperature_temperatur_og
+      - sensor.ble_humidity_temperatur_og
+      - sensor.ble_temperature_temperatur_wz
+      - sensor.ble_humidity_temperatur_wz
+      # - switch.sonoffs26_1
+      - switch.tuyaplug2
+      # - vacuum.mower
+      - vacuum.robi
+    # include_entity_globs:
+    #   - sensor.temperature_*
+    # exclude_entities:
+    #   - light.highlight
+    # exclude_entity_globs:
+    #   - sensor.weather_*
+
+  entity_config:
+    camera.einfahrt:
+      name: Камера
+      room: Улица
+
+    camera.garage:
+      name: Камера
+      room: Гараж
+
+    camera.terrasse:
+      name: Камера
+      room: Терраса
+
+    cover.tor:
+      name: Ворота
+      room: Гараж
+      type: devices.types.openable
+
+    cover.shellyswitch25_f37a8c:
+      name: Окно 1
+      room: Зал
+      type: devices.types.openable
+    cover.shellyswitch25_f37b28:
+      name: Окно 2
+      room: Зал
+      type: devices.types.openable
+    cover.shellyswitch25_10eaa4:
+      name: Окно 3
+      room: Зал
+      type: devices.types.openable
+    cover.shellyswitch25_10d315:
+      name: Окно 4
+      room: Зал
+      type: devices.types.openable
+
+    light.shellyswitch25_10a36d_channel_2:
+      name: Люстра
+      room: Столовая
+      type: devices.types.light
+    light.shellyswitch25_10c7c3_channel_1:
+      name: Люстра
+      room: Зал
+      type: devices.types.light
+
+    light.sonoffbnsz01:
+      name: Лампа
+      room: Гараж
+      type: devices.types.light
+    light.sonoffpow_01:
+      name: На стене
+      room: Зал
+      type: devices.types.light
+    # light.sonoffpow_02:
+    #   name: Подсветка
+    #   room: Зал
+    #   type: devices.types.switch
+    light.sonoffpow_03:
+      name: Освещение
+      room: Терраса
+      type: devices.types.light
+    light.sonoffpow_04:
+      name: Подсветка
+      room: Кухня
+      type: devices.types.switch
+
+    light.kristinas_licht:
+      name: Лампа
+      room: Кристина
+      type: devices.types.light
+    light.sonoffrf1:
+      name: Лента
+      room: Кристина
+      type: devices.types.switch
+
+    media_player.sony_bravia_kd55x8505b:
+      name: Телевизор
+      room: Зал
+      type: devices.types.media_device.tv
+
+    sensor.ble_temperature_temperatur_gt:
+      name: Температура
+      room: Терраса
+      type: devices.types.sensor
+    sensor.ble_humidity_temperatur_gt:
+      name: Влажность
+      room: Терраса
+      type: devices.types.sensor
+    sensor.ble_temperature_temperatur_og:
+      name: Температура
+      room: Кристина
+      type: devices.types.sensor
+    sensor.ble_humidity_temperatur_og:
+      name: Влажность
+      room: Кристина
+      type: devices.types.sensor
+    sensor.ble_temperature_temperatur_wz:
+      name: Температура
+      room: Зал
+      type: devices.types.sensor
+    sensor.ble_humidity_temperatur_wz:
+      name: Влажность
+      room: Зал
+      type: devices.types.sensor
+
+    # switch.sonoffs26_1:
+    #   name: Мультимедиа
+    #   room: Зал
+    #   type: devices.types.socket
+
+    switch.tuyaplug2:
+      name: Мультимедиа
+      room: Зал
+      type: devices.types.socket
+    light.tuyaplug3:
+      name: Подсветка
+      room: Зал
+      type: devices.types.switch
+
+    # vacuum.mower:
+    #   name: Газонокосилка
+    #   room: Сад
+    #   type: devices.types.vacuum_cleaner
+
+    vacuum.robi:
+      name: Пылесос
+      room: Холл
+      type: devices.types.vacuum_cleaner
