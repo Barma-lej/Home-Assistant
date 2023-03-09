@@ -28,7 +28,7 @@ api:
 # cloud:
 config:
 conversation: # Allows you to issue voice commands from the frontend in enabled browsers
-# default_config:
+default_config:
 dhcp:
 energy:
 # map: # A map on the frontend to display the location of tracked devices.
@@ -52,14 +52,14 @@ frontend:
 
 # HTTP ##############################################################
 http:
-  ssl_certificate: /ssl/fullchain.pem
-  ssl_key: /ssl/privkey.pem
+  # ssl_certificate: /ssl/fullchain.pem
+  # ssl_key: /ssl/privkey.pem
   ip_ban_enabled: true
   login_attempts_threshold: 15
-  # use_x_forwarded_for: true
-  # trusted_proxies:
-    # - 172.30.32.0/24
-    # - 172.30.33.0/24
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 172.30.32.0/24
+    - 172.30.33.0/24
 
 logger:
   # default: critical
@@ -83,7 +83,9 @@ logger:
 
 # Recorder ##########################################################
 recorder:
+  db_url: !secret mariadb_url
   purge_keep_days: 120
+  commit_interval: 20
   exclude:
     domains:
       - calendar
@@ -131,6 +133,32 @@ history:
 
 # TTS ###############################################################
 tts:
+  # https://eu-central-1.console.aws.amazon.com/polly/home/SynthesizeSpeech
+  - platform: amazon_polly
+    aws_access_key_id: !secret aws_access_key_id
+    aws_secret_access_key: !secret aws_secret_access_key
+    region_name: !secret aws_region_name
+    voice: Hans
+    text_type: ssml
+
+  - platform: google_cloud
+    key_file: !secret key_file
+    language: de-DE
+    gender: male
+    voice: de-DE-Wavenet-D
+    encoding: linear16
+    speed: 0.9
+    pitch: -2.5
+    gain: -5.0
+    text_type: ssml
+    profiles:
+      - medium-bluetooth-speaker-class-device
+      - telephony-class-application
+      - wearable-class-device
+
+  - platform: google_translate
+
+  # https://cloud.yandex.ru/services/speechkit#demo
   - platform: yandextts
     api_key: !secret yandex_api_key
     language: "ru-RU"
@@ -138,8 +166,6 @@ tts:
     voice: oksana
     emotion: good
     speed: 0.9
-
-  - platform: google_translate
 
   - platform: microsoft
     api_key: !secret msspeech_api_key
