@@ -194,8 +194,8 @@
     default: []
   mode: restart
 - id: '1651786976779'
-  alias: Update notifications
-  description: ''
+  alias: Aktualisierung - Benachrichtigung
+  description: Aktualisirungsbenachrichtigung
   use_blueprint:
     path: mdegat01/update_notifications.yaml
     input:
@@ -208,9 +208,6 @@
       - update.home_assistant_core_update
       - update.home_assistant_supervisor_update
       - update.mosquitto_broker_update
-      - update.pi_hole_core_update_available
-      - update.pi_hole_ftl_update_available
-      - update.pi_hole_web_update_available
       - update.samba_share_update
       - update.sqlite_web_update
       - update.studio_code_server_update
@@ -356,6 +353,15 @@
     - sensor.octoprint_print_status
     from: Printing
     to: Finishing
+    enabled: false
+  - platform: state
+    entity_id:
+    - sensor.printer_3d_state
+    from: printing
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
   condition: []
   action:
   - service: notify.telegram_schick_home
@@ -366,6 +372,7 @@
         - url: http://192.168.2.18/plugin/UltimakerFormatPackage/thumbnail/{{ states('sensor.octoprint_print_file')
             | replace(' ','%20') | replace('gcode','png') }}
           caption: "\U0001F3ED 3D Druck ist fertig"
+    enabled: false
   - wait_for_trigger:
     - platform: state
       entity_id:
@@ -376,6 +383,7 @@
       minutes: 10
       seconds: 0
       milliseconds: 0
+    enabled: false
   - wait_for_trigger:
     - platform: numeric_state
       entity_id: sensor.octoprint_actual_tool0_temp
@@ -385,6 +393,7 @@
       minutes: 5
       seconds: 0
       milliseconds: 0
+    enabled: false
   - if:
     - condition: state
       entity_id: sensor.octoprint_print_status
@@ -397,6 +406,36 @@
     - service: notify.telegram_schick_home
       data:
         message: "\U0001F3ED 3D Druck ist ausgeschaltet"
+    enabled: false
+  - service: notify.telegram_schick_home
+    data:
+      message: "\U0001F3ED 3D Druck ist fertig"
+      data:
+        photo:
+        - url: http://192.168.2.18:7125/server/files/gcodes/{{ state_attr('sensor.printer_3d_file_metadata','thumbnails')[1]['relative_path']
+            }}
+          caption: "\U0001F3ED 3D Druck ist fertig"
+  - wait_for_trigger:
+    - platform: numeric_state
+      entity_id: sensor.printer_3d_hotend_actual
+      below: 70
+    timeout:
+      hours: 0
+      minutes: 5
+      seconds: 0
+      milliseconds: 0
+    enabled: true
+  - if:
+    - condition: template
+      value_template: '{{ not is_state(''sensor.printer_3d_state'',''printing'') }}'
+    then:
+    - service: switch.turn_off
+      data: {}
+      target:
+        entity_id: switch.tuyaplug1
+    - service: notify.telegram_schick_home
+      data:
+        message: "\U0001F3ED 3D Drucker ist ausgeschaltet"
   mode: single
 - id: '1674336725023'
   alias: Erinnerung - Mühlabfuhr
