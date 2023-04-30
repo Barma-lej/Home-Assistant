@@ -37,6 +37,23 @@ sensor:
     start: "{{ 0 }}"
     end: "{{ now() }}"
 
+# utility_meter:
+#   trockner_energy_daily:
+#     unique_id: trockner_energy_daily
+#     source: sensor.trockner_power
+#     name: Trockner Energy Daily
+#     cycle: daily
+#   trockner_energy_monthly:
+#     unique_id: trockner_energy_monthly
+#     source: sensor.trockner_power
+#     name: Trockner Energy Monthly
+#     cycle: monthly
+#   trockner_energy_yearly:
+#     unique_id: trockner_energy_yearly
+#     source: sensor.trockner_power
+#     name: Trockner Energy Yearly
+#     cycle: yearly
+
 homeassistant:
   customize:
     sensor.trockner_betriebszeit_heute:
@@ -48,5 +65,14 @@ homeassistant:
     sensor.trockner_betriebszeit_jahr:
       icon: mdi:calendar-clock
 
-    sensor.trockner_betriebszeit:
-      icon: mdi:calendar-clock
+    sensor.trockner_power:
+      friendly_name: Leistung (Trockner)
+
+    # sensor.trockner_energy:
+    #   friendly_name: Verbrauch (Trockner)
+    # sensor.trockner_energy_daily:
+    #   friendly_name: Verbrauch Heute (Trockner)
+    # sensor.trockner_energy_monthly:
+    #   friendly_name: Verbrauch Monatlich (Trockner)
+    # sensor.trockner_energy_yearly:
+    #   friendly_name: Verbrauch Jährlich (Trockner)

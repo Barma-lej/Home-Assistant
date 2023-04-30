@@ -33,36 +33,36 @@ homeassistant:
   customize:
     # Switch ##########
     switch.tuyaplug4:
-      friendly_name: Tuyaplug4
+      friendly_name: Waschmaschine
       # icon: mdi:printer-3d
     switch.tuyaplug4_childlock:
-      friendly_name: Kindersicherung ()
+      friendly_name: Kindersicherung (Waschmaschine)
       icon: mdi:account-lock
     switch.tuyaplug4_overcharge:
-      friendly_name: Überladung ()
+      friendly_name: Überladung (Waschmaschine)
       icon: mdi:battery-alert-variant
 
     # Sensor ##########
     sensor.tuyaplug4_current:
-      friendly_name: Stromstärke (Tuyaplug4)
+      friendly_name: Stromstärke (Waschmaschine)
       # icon: mdi:current-ac
 
     sensor.tuyaplug4_power:
-      friendly_name: Leistung (Tuyaplug4)
+      friendly_name: Leistung (Waschmaschine)
       # icon: mdi:lightning-bolt
 
     sensor.tuyaplug4_energy:
-      friendly_name: Verbrauch (Tuyaplug4)
+      friendly_name: Verbrauch (Waschmaschine)
       # icon: mdi:counter
 
     sensor.tuyaplug4_energy_daily:
-      friendly_name: Verbrauch Täglich (Tuyaplug4)
+      friendly_name: Verbrauch Täglich (Waschmaschine)
       # icon: mdi:counter
 
     sensor.tuyaplug4_energy_monthly:
-      friendly_name: Verbrauch Monatlich (Tuyaplug4)
+      friendly_name: Verbrauch Monatlich (Waschmaschine)
       # icon: mdi:counter
 
     sensor.tuyaplug4_energy_yearly:
-      friendly_name: Verbrauch Jahrlich (Tuyaplug4)
+      friendly_name: Verbrauch Jahrlich (Waschmaschine)
       # icon: mdi:counter

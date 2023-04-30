@@ -33,36 +33,36 @@ homeassistant:
   customize:
     # Switch ##########
     switch.tuyaplug5:
-      friendly_name: Tuyaplug5
+      friendly_name: Heizung
       # icon: mdi:printer-3d
     switch.tuyaplug5_childlock:
-      friendly_name: Kindersicherung ()
+      friendly_name: Kindersicherung (Heizung)
       icon: mdi:account-lock
     switch.tuyaplug5_overcharge:
-      friendly_name: Überladung ()
+      friendly_name: Überladung (Heizung)
       icon: mdi:battery-alert-variant
 
     # Sensor ##########
     sensor.tuyaplug5_current:
-      friendly_name: Stromstärke (Tuyaplug5)
+      friendly_name: Stromstärke (Heizung)
       # icon: mdi:current-ac
 
     sensor.tuyaplug5_power:
-      friendly_name: Leistung (Tuyaplug5)
+      friendly_name: Leistung (Heizung)
       # icon: mdi:lightning-bolt
 
     sensor.tuyaplug5_energy:
-      friendly_name: Verbrauch (Tuyaplug5)
+      friendly_name: Verbrauch (Heizung)
       # icon: mdi:counter
 
     sensor.tuyaplug5_energy_daily:
-      friendly_name: Verbrauch Täglich (Tuyaplug5)
+      friendly_name: Verbrauch Täglich (Heizung)
       # icon: mdi:counter
 
     sensor.tuyaplug5_energy_monthly:
-      friendly_name: Verbrauch Monatlich (Tuyaplug5)
+      friendly_name: Verbrauch Monatlich (Heizung)
       # icon: mdi:counter
 
     sensor.tuyaplug5_energy_yearly:
-      friendly_name: Verbrauch Jahrlich (Tuyaplug5)
+      friendly_name: Verbrauch Jahrlich (Heizung)
       # icon: mdi:counter

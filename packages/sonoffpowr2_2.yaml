@@ -56,7 +56,7 @@ homeassistant:
     # Switch ##########
     switch.sonoffpow_02:
       friendly_name: Irrigation
-      icon: mdi:sprinkler-variant
+      icon: mdi:power
 
     # Sensor ##########
     sensor.sonoffpow_02_energy_totalstarttime:
