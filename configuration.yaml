@@ -23,7 +23,7 @@ zone:
     icon: mdi:home
     passive: false
 
-# Enables ###########################################################
+# Enables #############################
 api:
 # cloud:
 config:
@@ -46,11 +46,11 @@ folder_watcher:
 # Show links to resources in log and frontend
 # introduction:
 
-# Enables the frontend ##############################################
+# Enables the frontend ################
 frontend:
   themes: !include_dir_merge_named themes
 
-# HTTP ##############################################################
+# HTTP ################################
 http:
   # ssl_certificate: /ssl/fullchain.pem
   # ssl_key: /ssl/privkey.pem
@@ -81,10 +81,12 @@ logger:
     # custom_components.reolink_cctv: debug
     custom_components.xiaomi_miio_fan.fan: fatal
 
-# Recorder ##########################################################
+# Recorder ############################
 recorder:
-  db_url: !secret mariadb_url
-  purge_keep_days: 120
+  # db_url: sqlite:////media/cams/home-assistant_v2.db
+  # db_url: sqlite:////media/cams/1/home-assistant_v2_1.db
+  # db_url: !secret mariadb_url
+  purge_keep_days: 90
   commit_interval: 20
   exclude:
     domains:
@@ -101,7 +103,7 @@ recorder:
       - sensor.sunrise
       - sensor.only_text
 
-# Logbook ###########################################################
+# Logbook #############################
 logbook:
   exclude:
     domains:
@@ -131,7 +133,7 @@ history:
       - calendar
       - sun
 
-# TTS ###############################################################
+# TTS #################################
 tts:
   # https://eu-central-1.console.aws.amazon.com/polly/home/SynthesizeSpeech
   - platform: amazon_polly
@@ -178,13 +180,13 @@ tts:
     # contour: (0, 0) (100, 100)
     region: germanywestcentral
 
-# FFMPEG ############################################################
+# FFMPEG ##############################
 ffmpeg:
   # ffmpeg_bin: /usr/bin/ffmpeg
 
 stream:
 
-# MQTT ##############################################################
+# MQTT ################################
 # mqtt:
 #   broker: !secret mqtt_brocker
 #   port: 8883
@@ -197,19 +199,19 @@ stream:
 #   # certificate: auto
 #   certificate: !secret http_ssl_cert
 
-# Google ############################################################
+# Google ##############################
 # google:
 #   client_id: !secret google_client_id
 #   client_secret: !secret google_client_secret
 #   track_new_calendar: true
 
-# Device Tracker ####################################################
+# Device Tracker ######################
 device_tracker:
   - platform: google_maps
     username: !secret my_email
     # password: !secret google_pass
 
-# Includes ##########################################################
+# Includes ############################
 automation: !include automations.yaml
 google_assistant: !include google_assistant.yaml
 group: !include groups.yaml
