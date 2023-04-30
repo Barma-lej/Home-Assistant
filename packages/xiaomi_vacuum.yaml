@@ -49,15 +49,15 @@ homeassistant:
     sensor.robi_total_cleaned_time:
       friendly_name: "Dauer (insg.)"
 
-camera:
-  - platform: xiaomi_cloud_map_extractor
-    host: !secret robi_ip
-    token: !secret robi_token
-    username: !secret xiaomi_email
-    password: !secret xiaomi_password
-    draw: ["all"]
-    attributes:
-      - calibration_points
+# camera:
+#   - platform: xiaomi_cloud_map_extractor
+#     host: !secret robi_ip
+#     token: !secret robi_token
+#     username: !secret xiaomi_email
+#     password: !secret xiaomi_password
+#     draw: ["all"]
+#     attributes:
+#       - calibration_points
 
 # Sensor  ###########################################################
 template:

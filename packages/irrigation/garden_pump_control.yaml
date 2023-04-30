@@ -2,7 +2,7 @@
 automation:
   # Отключение насоса, при отключении автоматизации полива
   - id: irrigation_failsafe_pump_control_switch
-    alias: Irrigation Failsafe - Pump Control Switch
+    alias: Irrigation - Failsafe Pump Control Switch
     description: "Отключение насоса, при отключении автоматизации полива"
 
     trigger:
@@ -12,7 +12,7 @@ automation:
 
     action:
       - service: switch.turn_off
-        entity_id: switch.pump
+        entity_id: switch.irrigation_pump
 
   # Включение насоса, если открылся один из клапанов
   - id: irrigation_pump_on
@@ -21,18 +21,19 @@ automation:
 
     trigger:
       - platform: state
-        entity_id: group.irrigation_switches
+        entity_id: switch.irrigation_valves
+        # entity_id: group.irrigation_switches
         to: "on"
         for: "00:00:01"
 
     condition:
       - condition: state
-        entity_id: switch.pump
+        entity_id: switch.irrigation_pump
         state: "off"
 
     action:
       - service: switch.turn_on
-        entity_id: switch.pump
+        entity_id: switch.irrigation_pump
 
   # Выключение насоса, если закрыты все клапаны с задержкой для смены зоны полива
   - id: irrigation_pump_off
@@ -41,7 +42,8 @@ automation:
 
     trigger:
       - platform: state
-        entity_id: group.irrigation_switches
+        entity_id: switch.irrigation_valves
+        # entity_id: group.irrigation_switches
         to: "off"
         for: "00:00:04"
 
@@ -53,12 +55,13 @@ automation:
       - condition: and
         conditions:
           - condition: state
-            entity_id: group.irrigation_switches
+            entity_id: switch.irrigation_valves
+            # entity_id: group.irrigation_switches
             state: "off"
           - condition: state
-            entity_id: switch.zone3_valve
+            entity_id: switch.irrigation_zone3_valve
             state: "off"
 
     action:
       - service: switch.turn_off
-        entity_id: switch.pump
+        entity_id: switch.irrigation_pump

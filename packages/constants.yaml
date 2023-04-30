@@ -17,10 +17,10 @@ input_number:
     mode: box
     initial: 3.85
     min: 0
-    max: 6
+    max: 10
     step: 0.01
     icon: mdi:currency-eur
-    unit_of_measurement: "EUR/m3"
+    unit_of_measurement: EUR/m³
 
   # Gardena OS140
   # 580 l/Std 3 Bar (https://www.roboter-forum.com/index.php?thread/37782-gardena-os-140/)
@@ -33,4 +33,4 @@ input_number:
     max: 5
     step: 0.01
     icon: mdi:waves
-    unit_of_measurement: "m3/Std"
+    unit_of_measurement: m³/h

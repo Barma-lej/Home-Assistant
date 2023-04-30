@@ -47,11 +47,11 @@ automation:
     action:
       - service: light.toggle
         data:
-          entity_id: light.ambiente_wohnen
+          entity_id: light.tuyaplug3
 
       - wait_for_trigger:
           - platform: state
-            entity_id: light.ambiente_wohnen
+            entity_id: light.tuyaplug3
         timeout: "00:00:05"
         continue_on_timeout: true
 
@@ -59,7 +59,7 @@ automation:
         data:
           target: "{{ trigger.event.data.chat_id }}"
           message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
-          message: "💡 {{ state_attr('light.ambiente_wohnen', 'friendly_name') }} - {{ states('light.ambiente_wohnen') }}"
+          message: "💡 {{ state_attr('light.tuyaplug3', 'friendly_name') }} - {{ states('light.tuyaplug3') }}"
 
 # Customize #####################################
 homeassistant:

@@ -27,8 +27,8 @@ automation:
       - service: input_boolean.turn_off
         data:
           entity_id:
-            - input_boolean.cycle1_manual_run
-            - input_boolean.cycle2_manual_run
+            - input_boolean.irrigation_cycle1_manual_run
+            - input_boolean.irrigation_cycle2_manual_run
 
       # Turn all Irrigation automations on or off (EXCEPT this one!)
       - service: >

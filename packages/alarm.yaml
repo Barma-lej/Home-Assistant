@@ -155,13 +155,13 @@ script:
           media_content_id: "media-source://media_source/local/sounds/polizeisirene-martinshorn-KCD04046.mp3"
           extra:
             thumb: "/local/images/alarm_red.png"
-            title: HomeAssistantRadio
+            title: Alarm
 
       - delay: 00:00:10
 
       - service: tts.amazon_polly_say
         data:
-          entity_id: media_player.nest_mini
+          entity_id: media_player.home_group
           message: |-
             <speak>
               <prosody rate="90%">

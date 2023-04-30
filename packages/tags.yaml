@@ -14,6 +14,6 @@ automation:
       event_data:
         tag_id: 4d4d9d64-59ff-4a65-8d8c-d1a088f46599
     action:
-      - service: switch.toggle
+      - service: light.toggle
         data:
-          entity_id: switch.sonoffpow_01
+          entity_id: light.sonoffpow_01

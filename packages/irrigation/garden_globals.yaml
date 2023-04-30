@@ -5,95 +5,113 @@ switch:
   - platform: template
     switches:
       irrigation:
-        friendly_name: Bewässerung
+        friendly_name: Irrigation - Bewässerungsautomat
         unique_id: irrigation_manual_switch
-        value_template: "{{ is_state('input_boolean.cycle1_manual_run', 'on') }}"
-        icon_template: "{{ iif(is_state('input_boolean.cycle1_manual_run', 'on'), 'mdi:fountain', 'mdi:water-pump-off') }}"
+        value_template: "{{ is_state('input_boolean.irrigation_cycle1_manual_run', 'on') }}"
+        icon_template: "{{ iif(is_state('input_boolean.irrigation_cycle1_manual_run', 'on'), 'mdi:fountain', 'mdi:water-pump-off') }}"
         turn_on:
           service: input_boolean.turn_on
           target:
-            entity_id: input_boolean.cycle1_manual_run
+            entity_id: input_boolean.irrigation_cycle1_manual_run
         turn_off:
           service: input_boolean.turn_off
           target:
-            entity_id: input_boolean.cycle1_manual_run
+            entity_id: input_boolean.irrigation_cycle1_manual_run
+
+  - platform: group
+    name: Irrigation - Valves
+    unique_id: irrigation_valves
+    entities:
+      - switch.irrigation_zone1_valve
+      - switch.irrigation_zone2_valve
 
 # Groups ############################################################
 group:
-  irrigation_switches:
-    entities:
-      - switch.zone1_valve
-      - switch.zone2_valve
-      # - switch.zone3_valve
+  # irrigation_switches:
+  #   entities:
+  #     - switch.irrigation_zone1_valve
+  #     - switch.irrigation_zone2_valve
+  #     # - switch.irrigation_zone3_valve
 
   irrigation_automations:
+    name: "Irrigation - Automatisierungen"
     entities:
-      - automation.irrigation_cancel_a_manual_cycle
-      - automation.irrigation_failsafe_master_control_switch
-      - automation.irrigation_failsafe_pump_master_control_switch
-      - automation.irrigation_failsafe_valve_1_on
-      - automation.irrigation_failsafe_valve_2_on
-      # - automation.irrigation_failsafe_valve_3_on
-      - automation.irrigation_master_control_switch
-      - automation.irrigation_pump_off
-      - automation.irrigation_pump_on
-      - automation.irrigation_run_a_cycle_manually
+      # Irrigation
+      - automation.irrigation_set_next_run_time_when_schedule_enabled_or_time_changed
       - automation.irrigation_run_cycle_1
       - automation.irrigation_run_cycle_2
-      - automation.irrigation_set_next_run_time_when_schedule_enabled_or_time_changed
-      - automation.irrigation_update_the_last_time_a_cycle_ended
+      - automation.irrigation_run_a_cycle_manually
+      - automation.irrigation_cancel_a_manual_cycle
+      # - automation.irrigation_cancel_if_it_rains
+
+      # Master Control
+      - automation.irrigation_master_control_switch
+
+      # Pump control
+      - automation.irrigation_failsafe_pump_control_switch
+      - automation.irrigation_pump_on
+      - automation.irrigation_pump_off
+
+      # Statistic
+      # - automation.irrigation_set_start_end_time
+      # - automation.irrigation_daily_to_total
+
+      # Failsafe
+      - automation.irrigation_failsafe_master_control_switch
+      - automation.irrigation_failsafe_valve_1_on
+      - automation.irrigation_failsafe_valve_2_on
 
 # Input_Booleans ####################################################
 input_boolean:
   irrigation_master_control_switch:
-    name: Irrigation - Master Control Switch
+    name: Irrigation - Bewässerungsautomat
     icon: mdi:sprinkler-variant
 
-  cycle1_enable:
-    name: Irrigation - Enable schedule
-    icon: mdi:pipe
-  cycle2_enable:
-    name: Irrigation - Enable schedule
-    icon: mdi:pipe
+  irrigation_cycle1_enable:
+    name: Irrigation - Zeitplan aktivieren
+    icon: mdi:calendar-multiple-check
+  irrigation_cycle2_enable:
+    name: Irrigation - Zeitplan aktivieren
+    icon: mdi:calendar-multiple-check
 
-  cycle1_enable_saved_state:
-    name: Irrigation - Save state of the cycle1
+  irrigation_cycle1_enable_saved_state:
+    name: Irrigation - Speichern der Status des 1 Zyklus
     icon: mdi:content-save
-  cycle2_enable_saved_state:
-    name: Irrigation - Save state of the cycle2
+  irrigation_cycle2_enable_saved_state:
+    name: Irrigation - Speichern der Status des 2 Zyklus
     icon: mdi:content-save
 
-  cycle1_use_sensor_data:
-    name: Irrigation - Use sensor data
+  irrigation_cycle1_use_sensor_data:
+    name: Irrigation - Sensordaten verwenden
     icon: mdi:thermometer-lines
-  cycle2_use_sensor_data:
-    name: Irrigation - Use sensor data
+  irrigation_cycle2_use_sensor_data:
+    name: Irrigation - Sensordaten verwenden
     icon: mdi:thermometer-lines
 
-  cycle1_manual_run:
-    name: Irrigation - Run morning cycle now
-    icon: mdi:arrow-right-drop-circle
-  cycle2_manual_run:
-    name: Irrigation - Run afternoon cycle now
-    icon: mdi:arrow-right-drop-circle
+  irrigation_cycle1_manual_run:
+    name: Irrigation - Morgenzyklus starten
+    icon: mdi:weather-sunset-up
+  irrigation_cycle2_manual_run:
+    name: Irrigation - Abendzyklus starten
+    icon: mdi:weather-sunset-down
 
-  cycle1_running:
-    name: Irrigation - Cycle 1 running
+  irrigation_cycle1_running:
+    name: Irrigation - Zyklus 1 läuft
     icon: mdi:run
-  cycle2_running:
-    name: Irrigation - Cycle 2 running
+  irrigation_cycle2_running:
+    name: Irrigation - Zyklus 2 läuft
     icon: mdi:run
 
 # Input_Texts #######################################################
 input_text:
-  current_zone:
-    name: Irrigation - Current zone
+  irrigation_current_zone:
+    name: Irrigation - Aktuelle Zone
     icon: mdi:select-marker
 
 # Input_Selects ####################################################\
 input_select:
-  cycle1_watering_days:
-    name: Irrigation - Morning cycle watering days
+  irrigation_cycle1_watering_days:
+    name: Irrigation - Bewässerungstage am Morgen
     options:
       - "Täglich"
       - "Alle 2 Tage"
@@ -101,8 +119,8 @@ input_select:
       - "Einmal"
     icon: mdi:calendar
 
-  cycle2_watering_days:
-    name: Irrigation - Afternoon cycle watering days
+  irrigation_cycle2_watering_days:
+    name: Irrigation - Bewässerungstage am Abend
     options:
       - "Täglich"
       - "Alle 2 Tage"
@@ -110,8 +128,8 @@ input_select:
       - "Einmal"
     icon: mdi:calendar
 
-  cycle1_schedule_time:
-    name: Irrigation - Morning cycle schedule start time
+  irrigation_cycle1_schedule_time:
+    name: Irrigation - Startzeit des Morgenszyklus
     options:
       - "00:00"
       - "00:15"
@@ -211,8 +229,8 @@ input_select:
       - "23:45"
     icon: mdi:alarm
 
-  cycle2_schedule_time:
-    name: Irrigation - Afternoon cycle schedule start time
+  irrigation_cycle2_schedule_time:
+    name: Irrigation - Startzeit des Abendszyklus
     options:
       - "00:00"
       - "00:15"
@@ -314,44 +332,44 @@ input_select:
 
 # Input_Datetimes ###################################################
 input_datetime:
-  cycle1_next_run_time:
-    name: Irrigation - Next run time of the cycle1
+  irrigation_cycle1_next_run_time:
+    name: Irrigation - Geplanter Start am Morgen
     has_date: true
     has_time: true
     icon: mdi:clock-out
 
-  cycle2_next_run_time:
-    name: Irrigation - Next run time of the cycle2
+  irrigation_cycle2_next_run_time:
+    name: Irrigation - Geplanter Start am Abend
     has_date: true
     has_time: true
     icon: mdi:clock-out
 
 # Input_Numbers #####################################################
 input_number:
-  cycle1_zone1_duration:
-    name: Irrigation - Zone 1 duration
+  irrigation_cycle1_zone1_duration:
+    name: Irrigation - Hinter Dauer am Morgen
     min: 0
     max: 90
     step: 1
     icon: mdi:camera-timer
     unit_of_measurement: min
-  cycle1_zone2_duration:
-    name: Irrigation - Zone 2 duration
+  irrigation_cycle1_zone2_duration:
+    name: Irrigation - Vorne Dauer am Morgen
     min: 0
     max: 90
     step: 1
     icon: mdi:camera-timer
     unit_of_measurement: min
 
-  cycle2_zone1_duration:
-    name: Irrigation - Zone 1 duration
+  irrigation_cycle2_zone1_duration:
+    name: Irrigation - Hinter Dauer am Abend
     min: 0
     max: 90
     step: 1
     icon: mdi:camera-timer
     unit_of_measurement: min
-  cycle2_zone2_duration:
-    name: Irrigation - Zone 2 duration
+  irrigation_cycle2_zone2_duration:
+    name: Irrigation - Vorne Dauer am Abend
     min: 0
     max: 90
     step: 1
@@ -359,28 +377,28 @@ input_number:
     unit_of_measurement: min
 
   # The temperature above which the irrigation will started
-  cycle1_temperature_threshold:
-    name: Irrigation - Temperature threshold
+  irrigation_cycle1_temperature_threshold:
+    name: Irrigation - Morgenstemp. >=
     min: 10
     max: 30
     icon: mdi:thermometer
     unit_of_measurement: "°C"
-  cycle2_temperature_threshold:
-    name: Irrigation - Temperature threshold
+  irrigation_cycle2_temperature_threshold:
+    name: Irrigation - Abendtemp. >=
     min: 10
     max: 30
     icon: mdi:thermometer
     unit_of_measurement: "°C"
 
   # The moisture below which the irrigation will started
-  zone1_moisture_threshold:
-    name: Irrigation - Moisture threshold
+  irrigation_zone1_moisture_threshold:
+    name: Irrigation - Bodenfeuchte vorne
     min: 5
     max: 45
     icon: mdi:water-percent
     unit_of_measurement: "%"
-  zone2_moisture_threshold:
-    name: Irrigation - Moisture threshold
+  irrigation_zone2_moisture_threshold:
+    name: Irrigation - Bodenfeuchte hinten
     min: 5
     max: 45
     icon: mdi:water-percent
@@ -388,17 +406,17 @@ input_number:
 
 # Timers ############################################################
 timer:
-  zone_duration:
-    name: Irrigation - Time remaining
+  irrigation_zone_duration:
+    name: Irrigation - Verbleibende Zeit
 
 # Template sensors ##################################################
 template:
   - sensor:
-      - name: Cycle1 next run time
-        unique_id: cycle1_next_run_time
+      - name: Irrigation Cycle1 next run time
+        unique_id: irrigation_cycle1_next_run_time
         state: >-
-          {% if is_state('input_boolean.cycle1_enable', 'on') %}
-            {%- set date = state_attr('input_datetime.cycle1_next_run_time', 'timestamp') %}
+          {% if is_state('input_boolean.irrigation_cycle1_enable', 'on') %}
+            {%- set date = state_attr('input_datetime.irrigation_cycle1_next_run_time', 'timestamp') %}
             {% set weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"] %}
             {% set weekdays_short = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] %}
             {% set months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "Nowember", "Dezember"] %}
@@ -411,11 +429,11 @@ template:
           {% endif %}
         icon: mdi:clock-start
 
-      - name: Cycle2 next run time
-        unique_id: cycle2_next_run_time
+      - name: Irrigation Cycle2 next run time
+        unique_id: irrigation_cycle2_next_run_time
         state: >-
-          {% if is_state('input_boolean.cycle2_enable', 'on') %}
-            {%- set date = state_attr('input_datetime.cycle2_next_run_time', 'timestamp') %}
+          {% if is_state('input_boolean.irrigation_cycle2_enable', 'on') %}
+            {%- set date = state_attr('input_datetime.irrigation_cycle2_next_run_time', 'timestamp') %}
             {% set weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"] %}
             {% set weekdays_short = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] %}
             {% set months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "Nowember", "Dezember"] %}
@@ -428,121 +446,124 @@ template:
           {% endif %}
         icon: mdi:clock-start
 
-      - name: Cycle running
-        unique_id: cycle_running
+      - name: Irrigation Cycle running
+        unique_id: irrigation_cycle_running
         state: >-
-          {% if is_state('input_boolean.cycle1_running', 'on') %}
+          {% if is_state('input_boolean.irrigation_cycle1_running', 'on') %}
             Morgen
-          {% elif is_state('input_boolean.cycle2_running', 'on') %}
+          {% elif is_state('input_boolean.irrigation_cycle2_running', 'on') %}
             Abend
           {% else %}
             -
           {% endif %}
         icon: >-
-          {% if is_state('input_boolean.cycle1_running', 'on') or
-                is_state('input_boolean.cycle2_running', 'on') %}
+          {% if is_state('input_boolean.irrigation_cycle1_running', 'on') or
+                is_state('input_boolean.irrigation_cycle2_running', 'on') %}
             mdi:water-pump
           {% else %}
             mdi:water-pump-off
           {% endif %}
 
-      - name: Zone being watered
-        unique_id: zone_being_watered
-        state: "{{ states('input_text.current_zone') }}"
+      - name: Irrigation Zone being watered
+        unique_id: irrigation_zone_being_watered
+        state: "{{ states('input_text.irrigation_current_zone') }}"
         icon: mdi:fountain
 
 homeassistant:
   customize:
-    group.irrigation_switches:
-      friendly_name: "Ventile"
+    # group.irrigation_switches:
+    #   friendly_name: "Ventile"
 
-    group.irrigation_automations:
-      friendly_name: "Automatisierungen"
+    # group.irrigation_automations:
+    #   friendly_name: "Automatisierungen"
 
     # Input Boolean #################################################
-    input_boolean.irrigation_master_control_switch:
-      friendly_name: "Bewässerungsautomat"
-      icon: mdi:sprinkler-variant
+    # input_boolean.irrigation_master_control_switch:
+    #   friendly_name: "Bewässerungsautomat"
+    #   icon: mdi:sprinkler-variant
 
-    input_boolean.cycle1_enable:
-      friendly_name: Zeitplan aktivieren
-      icon: mdi:calendar-multiple-check
+    # input_boolean.irrigation_cycle1_enable:
+    #   friendly_name: Irrigation - Zeitplan aktivieren
+    #   icon: mdi:calendar-multiple-check
 
-    input_boolean.cycle2_enable:
-      friendly_name: Zeitplan aktivieren
-      icon: mdi:calendar-multiple-check
+    # input_boolean.irrigation_cycle2_enable:
+    #   friendly_name: Irrigation - Zeitplan aktivieren
+    #   icon: mdi:calendar-multiple-check
 
-    input_boolean.cycle1_use_sensor_data:
-      friendly_name: "Sensordaten verwenden"
-      icon: mdi:thermometer-lines
+    # input_boolean.irrigation_cycle1_use_sensor_data:
+    #   friendly_name: "Sensordaten verwenden"
+    #   icon: mdi:thermometer-lines
 
-    input_boolean.cycle2_use_sensor_data:
-      friendly_name: "Sensordaten verwenden"
-      icon: mdi:thermometer-lines
+    # input_boolean.irrigation_cycle2_use_sensor_data:
+    #   friendly_name: "Sensordaten verwenden"
+    #   icon: mdi:thermometer-lines
 
-    input_boolean.cycle1_manual_run:
-      friendly_name: "Morgenzyklus starten"
-      icon: mdi:weather-sunset-up
+    # input_boolean.irrigation_cycle1_manual_run:
+    #   friendly_name: "Morgenzyklus starten"
+    #   icon: mdi:weather-sunset-up
 
-    input_boolean.cycle2_manual_run:
-      friendly_name: "Abendzyklus starten"
-      icon: mdi:weather-sunset-down
+    # input_boolean.irrigation_cycle2_manual_run:
+    #   friendly_name: "Abendzyklus starten"
+    #   icon: mdi:weather-sunset-down
 
     # Input Select ##################################################
-    input_select.cycle1_watering_days:
-      friendly_name: Bewässerungstage am Morgen
+    # input_select.irrigation_cycle1_watering_days:
+    #   friendly_name: Bewässerungstage am Morgen
 
-    input_select.cycle2_watering_days:
-      friendly_name: Bewässerungstage am Abend
+    # input_select.irrigation_cycle2_watering_days:
+    #   friendly_name: Bewässerungstage am Abend
 
-    input_select.cycle1_schedule_time:
-      friendly_name: Startzeit des Morgenszyklus
+    # input_select.irrigation_cycle1_schedule_time:
+    #   friendly_name: Startzeit des Morgenszyklus
 
-    input_select.cycle2_schedule_time:
-      friendly_name: Startzeit des Abendszyklus
+    # input_select.irrigation_cycle2_schedule_time:
+    #   friendly_name: Startzeit des Abendszyklus
 
     # Input Number ##################################################
-    input_number.cycle1_zone1_duration:
-      friendly_name: Hinten Dauer
+    # input_number.irrigation_cycle1_zone1_duration:
+    #   friendly_name: Hinten Dauer
 
-    input_number.cycle1_zone2_duration:
-      friendly_name: Vorne Dauer
+    # input_number.irrigation_cycle1_zone2_duration:
+    #   friendly_name: Vorne Dauer
 
-    input_number.cycle2_zone1_duration:
-      friendly_name: Hinten Dauer
+    # input_number.irrigation_cycle2_zone1_duration:
+    #   friendly_name: Hinten Dauer
 
-    input_number.cycle2_zone2_duration:
-      friendly_name: Vorne Dauer
+    # input_number.irrigation_cycle2_zone2_duration:
+    #   friendly_name: Vorne Dauer
 
-    input_number.cycle1_temperature_threshold:
-      friendly_name: Morgentemp. >=
-      icon: mdi:thermometer
+    # input_number.irrigation_cycle1_temperature_threshold:
+    #   friendly_name: Morgentemp. >=
+    #   icon: mdi:thermometer
 
-    input_number.cycle2_temperature_threshold:
-      friendly_name: Abendtemp. >=
-      icon: mdi:thermometer
+    # input_number.irrigation_cycle2_temperature_threshold:
+    #   friendly_name: Abendtemp. >=
+    #   icon: mdi:thermometer
 
-    input_number.zone1_moisture_threshold:
-      friendly_name: Bodenfeuchte vorne
-      icon: mdi:water-percent
+    # input_number.irrigation_zone1_moisture_threshold:
+    #   friendly_name: Bodenfeuchte vorne
+    #   icon: mdi:water-percent
 
-    input_number.zone2_moisture_threshold:
-      friendly_name: Bodenfeuchte hinten
-      icon: mdi:water-percent
+    # input_number.irrigation_zone2_moisture_threshold:
+    #   friendly_name: Bodenfeuchte hinten
+    #   icon: mdi:water-percent
 
     # Timer #########################################################
-    timer.zone_duration:
-      friendly_name: Verbleibende Zeit
+    # timer.irrigation_zone_duration:
+    #   friendly_name: Verbleibende Zeit
 
     # Sensors #######################################################
-    sensor.cycle1_next_run_time:
-      friendly_name: "Nächste geplante Laufzeit"
+    sensor.irrigation_cycle1_next_run_time:
+      friendly_name: "Irrigation - Geplanter Start am Morgen"
 
-    sensor.cycle2_next_run_time:
-      friendly_name: "Nächste geplante Laufzeit"
+    sensor.irrigation_cycle2_next_run_time:
+      friendly_name: "Irrigation - Geplanter Start am Abend"
 
-    sensor.cycle_running:
-      friendly_name: "Aktueller Zyklus"
+    sensor.irrigation_cycle_running:
+      friendly_name: "Irrigation - Aktueller Zyklus"
 
-    sensor.zone_being_watered:
-      friendly_name: "Bewässerte Zone"
+    sensor.irrigation_zone_being_watered:
+      friendly_name: "Irrigation - Bewässerte Zone"
+
+    switch.irrigation_valves:
+      friendly_name: "Irrigation - Ventile"

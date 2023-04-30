@@ -21,4 +21,4 @@ template:
 homeassistant:
   customize:
     sensor.irrigation_wifi:
-      friendly_name: Bewässerung WLAN
+      friendly_name: Irrigation - WLAN Stärke

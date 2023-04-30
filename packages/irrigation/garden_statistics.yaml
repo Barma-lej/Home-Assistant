@@ -1,532 +1,249 @@
-# Groups ############################################################
-group:
-  irrigation_status_zone1:
-    all: true
-    entities:
-      - switch.zone1_valve
-      - switch.pump
+# Switches ##########################################################
+switch:
+  # Master control switch
+  - platform: template
+    switches:
+      irrigation_watering:
+        unique_id: irrigation_watering
+        value_template: "{{ states('sensor.sonoffpow_02_energy_power') | float(0) > 100 }}"
+        turn_on:
+          service: switch.turn_on
+          target:
+            entity_id: switch.sonoffpow_02
+        turn_off:
+          service: switch.turn_off
+          target:
+            entity_id: switch.sonoffpow_02
+        icon_template: "{{ 'mdi:water-pump' if is_state('switch.irrigation_watering', 'on') else 'mdi:water-pump-off' }}"
 
-  irrigation_status_zone2:
+  # Groups
+  - platform: group
+    name: Irrigation - Switches Zone1
+    unique_id: irrigation_switches_zone1
     all: true
     entities:
-      - switch.zone2_valve
-      - switch.pump
+      - switch.irrigation_zone1_valve
+      - switch.irrigation_pump
+      - switch.irrigation_watering
 
-  irrigation_status_zone3:
+  - platform: group
+    name: Irrigation - Switches Zone2
+    unique_id: irrigation_switches_zone2
     all: true
     entities:
-      - switch.zone3_valve
-      - switch.pump
+      - switch.irrigation_zone2_valve
+      - switch.irrigation_pump
+      - switch.irrigation_watering
 
-  irrigation_status_test:
+  - platform: group
+    name: Irrigation - Switches Zone3
+    unique_id: irrigation_switches_zone3
     all: true
     entities:
-      - switch.sonoffs20_2
-      - switch.sonoffs20_1
+      - switch.irrigation_zone3_valve
+      - switch.irrigation_pump
+      - switch.irrigation_watering
+
+  - platform: group
+    name: Irrigation - Switches Pump
+    unique_id: irrigation_switches_pump
+    all: true
+    entities:
+      - switch.irrigation_pump
+      - switch.irrigation_watering
 
 # Sensors ###########################################################
 template:
-  - sensor:
-      - name: Irrigation - Stat Zone1 power
-        unique_id: irrigation_stat_zone1_power
-        state: "{{ 1020.0 if is_state('group.irrigation_status_zone1', 'on') else 0.0 }}"
-        unit_of_measurement: "W"
-        device_class: power
-
-      - name: Irrigation - Stat Zone2 power
-        unique_id: irrigation_stat_zone2_power
-        state: "{{ 1020.0 if is_state('group.irrigation_status_zone2', 'on') else 0.0 }}"
-        unit_of_measurement: "W"
-        device_class: power
-
-      - name: Irrigation - Stat Zone3 power
-        unique_id: irrigation_stat_zone3_power
-        state: "{{ 680.0 if is_state('group.irrigation_status_zone3', 'on') else 0.0 }}"
-        unit_of_measurement: "W"
-        device_class: power
-
-      - name: Irrigation - Stat Pump power
-        unique_id: irrigation_stat_pump_power
-        state: >
-          {{ (states('sensor.irrigation_stat_zone1_power') | float(0))
-          + (states('sensor.irrigation_stat_zone2_power') | float(0))
-          + (states('sensor.irrigation_stat_zone3_power') | float(0)) }}
-        unit_of_measurement: "W"
-        device_class: power
-
-      # Daily ontime sensors
-      - name: Irrigation ontime zone1 daily
-        unique_id: irrigation_ontime_zone1_daily
-        state: "{{ (states('sensor.irrigation_hs_zone1_daily') | float(0)) | round(2) }}"
-        unit_of_measurement: "Std"
-        icon: mdi:water-outline
-        attributes:
-          time_formatted: >
-            {% set t = states('sensor.irrigation_ontime_zone1_daily') | float(0) *60 %}
-            {{ '%0.02d:%0.02d:00' | format(t // 60, t % 60) }}
-          volume_m3: >-
-            {{ (states('sensor.irrigation_ontime_zone1_daily') | float(0)
-            * states('input_number.os140_volume') | float(0) * 1.5) | round(2) }}
-          wasserkosten: >-
-            {{ (state_attr('sensor.irrigation_ontime_zone1_daily','volume_m3') | float(0)
-            * states('input_number.os140_volume') | float(0)
-            * states('input_number.water_price') | float(0)) | round(2) }}
-
-      - name: Irrigation ontime zone2 daily
-        unique_id: irrigation_ontime_zone2_daily
-        state: "{{ (states('sensor.irrigation_hs_zone2_daily') | float(0)) | round(2) }}"
-        unit_of_measurement: "Std"
-        icon: mdi:water-outline
-        attributes:
-          time_formatted: >
-            {% set t = states('sensor.irrigation_ontime_zone2_daily') | float(0) *60 %}
-            {{ '%0.02d:%0.02d:00' | format(t // 60, t % 60) }}
-          volume_m3: >-
-            {{ (states('sensor.irrigation_ontime_zone2_daily') | float(0)
-            * states('input_number.os140_volume') | float(0) * 2) | round(2) }}
-          wasserkosten: >-
-            {{ (state_attr('sensor.irrigation_ontime_zone2_daily','volume_m3') | float(0)
-            * states('input_number.os140_volume') | float(0)
-            * states('input_number.water_price') | float(0)) | round(2) }}
-
-      - name: Irrigation ontime zone3 daily
-        unique_id: irrigation_ontime_zone3_daily
-        state: "{{ (states('sensor.irrigation_hs_zone3_daily') | float(0)) | round(2) }}"
-        unit_of_measurement: "Std"
-        icon: mdi:water-outline
-        attributes:
-          time_formatted: >
-            {% set t = states('sensor.irrigation_ontime_zone3_daily') | float(0) *60 %}
-            {{ '%0.02d:%0.02d:00' | format(t // 60, t % 60) }}
-          volume_m3: >-
-            {{ (states('sensor.irrigation_ontime_zone3_daily') | float(0)
-            * states('input_number.os140_volume') | float(0) * 0.5) | round(2) }}
-          wasserkosten: >-
-            {{ (state_attr('sensor.irrigation_ontime_zone3_daily','volume_m3') | float(0)
-            * states('input_number.os140_volume') | float(0)
-            * states('input_number.water_price') | float(0)) | round(2) }}
-
-      - name: Irrigation ontime pump daily
-        unique_id: irrigation_ontime_pump_daily
-        state: "{{ (states('sensor.irrigation_hs_pump_daily') | float(0)) | round(2) }}"
-        unit_of_measurement: "Std"
-        icon: mdi:water-outline
-        attributes:
-          time_formatted: >
-            {% set t = states('sensor.irrigation_ontime_pump_daily') | float(0) *60 %}
-            {{ '%0.02d:%0.02d:00' | format(t // 60, t % 60) }}
-          volume_m3: >
-            {{ (state_attr('sensor.irrigation_ontime_zone1_daily', 'volume_m3') | float(0)
-            + state_attr('sensor.irrigation_ontime_zone2_daily', 'volume_m3') | float(0)
-            + state_attr('sensor.irrigation_ontime_zone3_daily', 'volume_m3') | float(0)) | round(1) }}
-          wasserkosten: >
-            {{ (state_attr('sensor.irrigation_ontime_zone1_daily', 'wasserkosten') | float(0)
-            + state_attr('sensor.irrigation_ontime_zone2_daily', 'wasserkosten') | float(0)
-            + state_attr('sensor.irrigation_ontime_zone3_daily', 'wasserkosten') | float(0)) | round(2) }}
-
-      # Ontime sensors
-      - name: Irrigation ontime zone1
-        unique_id: irrigation_ontime_zone1
-        state: "{{ (states('input_number.irrigation_ontime_zone1') | float(0) + states('sensor.irrigation_hs_zone1_daily') | float(0)) | round(2) }}"
-        unit_of_measurement: "Std"
-        icon: mdi:water
-        attributes:
-          last_start: "{{ state_attr('input_datetime.irrigation_last_start_zone1','timestamp') | timestamp_custom('%a %d.%m.%Y %H:%M:%S', true) }}"
-          time_formatted: >
-            {%- set t = states('sensor.irrigation_ontime_zone1') | float(0) *60 %}
-            {% if t > 1440 -%}
-              {{ '%0d Tg. %0.02d:%0.02d:00' | format(t // 1440, ((t % 1440) // 60), t % 60) }}
-            {%- else -%}
-              {{ '%0.02d:%0.02d:00' | format(((t % 1440) // 60), t % 60) }}
-            {%- endif %}
-          volume_m3: >-
-            {{ (states('sensor.irrigation_ontime_zone1') | float(0)
-            * states('input_number.os140_volume') | float(0) * 1.5) | round(2) }}
-          wasserkosten: >-
-            {{ (state_attr('sensor.irrigation_ontime_zone1','volume_m3') | float(0)
-            * states('input_number.os140_volume') | float(0)
-            * states('input_number.water_price') | float(0)) | round(2) }}
-
-      - name: Irrigation ontime zone2
-        unique_id: irrigation_ontime_zone2
-        state: "{{ (states('input_number.irrigation_ontime_zone2') | float(0) + states('sensor.irrigation_hs_zone2_daily') | float(0)) | round(2) }}"
-        unit_of_measurement: "Std"
-        icon: mdi:water
-        attributes:
-          last_start: "{{ state_attr('input_datetime.irrigation_last_start_zone2','timestamp') | timestamp_custom('%a %d.%m.%Y %H:%M:%S', true) }}"
-          time_formatted: >
-            {%- set t = states('sensor.irrigation_ontime_zone2') | float(0) *60 %}
-            {% if t > 1440 -%}
-              {{ '%0d Tg. %0.02d:%0.02d:00' | format(t // 1440, ((t % 1440) // 60), t % 60) }}
-            {%- else -%}
-              {{ '%0.02d:%0.02d:00' | format(((t % 1440) // 60), t % 60) }}
-            {%- endif %}
-          volume_m3: >-
-            {{ (states('sensor.irrigation_ontime_zone2') | float(0)
-            * states('input_number.os140_volume') | float(0) * 2) | round(2) }}
-          wasserkosten: >-
-            {{ (state_attr('sensor.irrigation_ontime_zone2','volume_m3') | float(0)
-            * states('input_number.os140_volume') | float(0)
-            * states('input_number.water_price') | float(0)) | round(2) }}
-
-      - name: Irrigation ontime zone3
-        unique_id: irrigation_ontime_zone3
-        state: "{{ (states('input_number.irrigation_ontime_zone3') | float(0) + states('sensor.irrigation_hs_zone3_daily') | float(0)) | round(2) }}"
-        unit_of_measurement: "Std"
-        icon: mdi:water
-        attributes:
-          last_start: "{{ state_attr('input_datetime.irrigation_last_start_zone3','timestamp') | timestamp_custom('%a %d.%m.%Y %H:%M:%S', true) }}"
-          time_formatted: >
-            {% set t = states('sensor.irrigation_ontime_zone3') | float(0) *60 -%}
-            {%- if t > 1440 -%}
-              {{ '%0d Tg. %0.02d:%0.02d:00' | format(t // 1440, ((t % 1440) // 60), t % 60) }}
-            {%- else -%}
-              {{ '%0.02d:%0.02d:00' | format(((t % 1440) // 60), t % 60) }}
-            {%- endif %}
-          volume_m3: >-
-            {{ (states('sensor.irrigation_ontime_zone3') | float(0)
-            * states('input_number.os140_volume') | float(0) * 0.5) | round(2) }}
-          wasserkosten: >-
-            {{ (state_attr('sensor.irrigation_ontime_zone3','volume_m3') | float(0)
-            * states('input_number.os140_volume') | float(0)
-            * states('input_number.water_price') | float(0)) | round(2) }}
-
-      - name: Irrigation ontime pump
-        unique_id: irrigation_ontime_pump
-        state: "{{ (states('input_number.irrigation_ontime_pump') | float(0) + states('sensor.irrigation_hs_pump_daily') | float(0)) | round(2) }}"
-        unit_of_measurement: "Std"
-        icon: mdi:water
-        attributes:
-          last_start: "{{ state_attr('input_datetime.irrigation_last_start_pump','timestamp') | timestamp_custom('%a %d.%m.%Y %H:%M:%S', true) }}"
-          time_formatted: >
-            {%- set t = states('sensor.irrigation_ontime_pump') | float(0) *60 %}
-            {% if t > 1440 -%}
-              {{ '%0d Tg. %0.02d:%0.02d:00' | format(t // 1440, ((t % 1440) // 60), t % 60) }}
-            {%- else -%}
-              {{ '%0.02d:%0.02d:00' | format(((t % 1440) // 60), t % 60) }}
-            {%- endif %}
-          volume_m3: >
-            {{ (state_attr('sensor.irrigation_ontime_zone1', 'volume_m3') | float(0) + 
-              state_attr('sensor.irrigation_ontime_zone2', 'volume_m3') | float(0) + 
-              state_attr('sensor.irrigation_ontime_zone3', 'volume_m3') | float(0)) | round(1) }}
-          wasserkosten: >
-            {{ (state_attr('sensor.irrigation_ontime_zone1', 'wasserkosten') | float(0) + 
-              state_attr('sensor.irrigation_ontime_zone2', 'wasserkosten') | float(0) + 
-              state_attr('sensor.irrigation_ontime_zone3', 'wasserkosten') | float(0)) | round(2) }}
-
+  - trigger:
+      - platform: state
+        entity_id:
+          - switch.irrigation_switches_zone1
+          - switch.irrigation_switches_zone2
+          - switch.irrigation_switches_zone3
+          - switch.irrigation_switches_pump
+        from: "on"
+        to: "off"
+    sensor:
       - name: Irrigation last irrigated time
         unique_id: irrigation_last_irrigated_time
-        state: >
-          {%- set date = state_attr('input_datetime.irrigation_last_irrigated_end_time','timestamp') %}
-          {% set weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"] %}
-          {% set weekdays_short = ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."] %}
-          {% set months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "Nowember", "Dezember"] %}
-          {% set months_short = ["Jan", "Feb", "Mrz", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Now", "Dez"] %}
-          {% set w = date | timestamp_custom("%w") | int(0) %}
-          {% set m = date | timestamp_custom("%m") | int(0) -%}
+        state: >-
+          {%- set date = as_timestamp(now()) -%}
+          {%- set weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"] -%}
+          {%- set weekdays_short = ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."] -%}
+          {%- set months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "Nowember", "Dezember"] -%}
+          {%- set months_short = ["Jan", "Feb", "Mrz", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Now", "Dez"] -%}
+          {%- set w = date | timestamp_custom("%w") | int(0) -%}
+          {%- set m = date | timestamp_custom("%m") | int(0) -%}
           {{ weekdays_short[w] }} {{ date | timestamp_custom('%d.%m.%Y %H:%M:%S', true) }}
-        icon: mdi:update
+        icon: mdi:clock-end
+        attributes:
+          datetime: "{{ now() }}"
+          timestamp: "{{ as_timestamp(now()) }}"
+
+  - sensor:
+      # Water Consumption
+      - name: Irrigation - Water Consumption Zone1
+        unique_id: irrigation_water_consumption_zone1
+        state: >-
+          {{ (states('sensor.irrigation_watering_duration_zone1_yearly') | float(0)
+          * states('input_number.os140_volume') | float(0) * 1.5) | round(2) }}
+        device_class: water
+        state_class: total_increasing
+        unit_of_measurement: m³
+        icon: mdi:water-outline
+        attributes:
+          cost: >-
+            {{ (states('sensor.irrigation_water_consumption_zone1') | float(0)
+            * states('input_number.water_price') | float(0)) | round(2) }}
+
+      - name: Irrigation - Water Consumption Zone2
+        unique_id: irrigation_water_consumption_zone2
+        state: >-
+          {{ (states('sensor.irrigation_watering_duration_zone2_yearly') | float(0)
+          * states('input_number.os140_volume') | float(0) * 2) | round(2) }}
+        device_class: water
+        state_class: total_increasing
+        unit_of_measurement: m³
+        icon: mdi:water-outline
+        attributes:
+          cost: >-
+            {{ (states('sensor.irrigation_water_consumption_zone2') | float(0)
+            * states('input_number.water_price') | float(0)) | round(2) }}
+
+      # 10 литров за 72 секунды = 500 литров/час = 0,5 m³/h
+      - name: Irrigation - Water Consumption Zone3
+        unique_id: irrigation_water_consumption_zone3
+        state: >-
+          {{ (states('sensor.irrigation_watering_duration_zone3_yearly') | float(0)
+          * 0.5) | round(2) }}
+        device_class: water
+        state_class: total_increasing
+        unit_of_measurement: m³
+        icon: mdi:water-outline
+        attributes:
+          cost: >-
+            {{ (states('sensor.irrigation_water_consumption_zone3') | float(0)
+            * states('input_number.water_price') | float(0)) | round(2) }}
+
+      - name: Irrigation - Water Consumption Pump
+        unique_id: irrigation_water_consumption_pump
+        state: >-
+          {{ (states('sensor.irrigation_water_consumption_zone1') | float(0)
+          + states('sensor.irrigation_water_consumption_zone2') | float(0)
+          + states('sensor.irrigation_water_consumption_zone3') | float(0)) | round(2) }}
+        device_class: water
+        state_class: total_increasing
+        unit_of_measurement: m³
+        icon: mdi:water
+        attributes:
+          cost: >-
+            {{ (states('sensor.irrigation_water_consumption_pump') | float(0)
+            * states('input_number.water_price') | float(0)) | round(2) }}
+
+      # - name: Irrigation - Watering duration
+      #   unique_id: irrigation_watering_duration
+      #   state: >-
+      #     {% set t = states('sensor.irrigation_watering_duration_pump_yearly') | float(0) * 60 -%}
+      #     {%- if t > 1440 -%}
+      #       {{ '%0d Tg. %0.02d:%0.02d:%0.02d' | format(t // 1440, t % 1440 // 60, t % 60, t % 1 * 60) }}
+      #     {%- else -%}
+      #       {{ '%0.02d:%0.02d:%02d' | format(((t % 1440) // 60), t % 60, t % 1 * 60) }}
+      #     {%- endif %}
+      #   icon: mdi:clock
+      #   attributes:
+      #     pump_daily: >-
+      #       {% set t = states('sensor.irrigation_watering_duration_pump_daily') | float(0) *60 %}
+      #       {{ '%0.02d:%0.02d:%0.02d' | format(t // 60, t % 60, t % 1 * 60) }}
+      #     pump_yearly: "{{ states('sensor.irrigation_watering_duration') }}"
+      #     zone1_daily: >-
+      #       {% set t = states('sensor.irrigation_watering_duration_zone1_daily') | float(0) *60 %}
+      #       {{ '%0.02d:%0.02d:%0.02d' | format(t // 60, t % 60, t % 1 * 60) }}
+      #     zone1_yearly: >-
+      #       {% set t = states('sensor.irrigation_watering_duration_zone1_yearly') | float(0) * 60 -%}
+      #       {%- if t > 1440 -%}
+      #         {{ '%0d Tg. %0.02d:%0.02d:%0.02d' | format(t // 1440, t % 1440 // 60, t % 60, t % 1 * 60) }}
+      #       {%- else -%}
+      #         {{ '%0.02d:%0.02d:%02d' | format(((t % 1440) // 60), t % 60, t % 1 * 60) }}
+      #       {%- endif %}
+      #     zone2_daily: >-
+      #       {% set t = states('sensor.irrigation_watering_duration_zone2_daily') | float(0) *60 %}
+      #       {{ '%0.02d:%0.02d:%0.02d' | format(t // 60, t % 60, t % 1 * 60) }}
+      #     zone2_yearly: >-
+      #       {% set t = states('sensor.irrigation_watering_duration_zone2_yearly') | float(0) * 60 -%}
+      #       {%- if t > 1440 -%}
+      #         {{ '%0d Tg. %0.02d:%0.02d:%0.02d' | format(t // 1440, t % 1440 // 60, t % 60, t % 1 * 60) }}
+      #       {%- else -%}
+      #         {{ '%0.02d:%0.02d:%02d' | format(((t % 1440) // 60), t % 60, t % 1 * 60) }}
+      #       {%- endif %}
+      #     zone3_daily: >-
+      #       {% set t = states('sensor.irrigation_watering_duration_zone3_daily') | float(0) *60 %}
+      #       {{ '%0.02d:%0.02d:%0.02d' | format(t // 60, t % 60, t % 1 * 60) }}
+      #     zone3_yearly: >-
+      #       {% set t = states('sensor.irrigation_watering_duration_zone3_yearly') | float(0) * 60 -%}
+      #       {%- if t > 1440 -%}
+      #         {{ '%0d Tg. %0.02d:%0.02d:%0.02d' | format(t // 1440, t % 1440 // 60, t % 60, t % 1 * 60) }}
+      #       {%- else -%}
+      #         {{ '%0.02d:%0.02d:%02d' | format(((t % 1440) // 60), t % 60, t % 1 * 60) }}
+      #       {%- endif %}
 
 sensor:
-  # Energy sensors
-  - platform: integration
-    name: Irrigation - Stat Zone1 energy
-    unique_id: irrigation_stat_zone1_energy
-    source: sensor.irrigation_stat_zone1_power
-    method: left
-    unit_prefix: k
-    round: 2
-
-  - platform: integration
-    name: Irrigation - Stat Zone2 energy
-    unique_id: irrigation_stat_zone2_energy
-    source: sensor.irrigation_stat_zone2_power
-    method: left
-    unit_prefix: k
-    round: 2
-
-  - platform: integration
-    name: Irrigation - Stat Zone3 energy
-    unique_id: irrigation_stat_zone3_energy
-    source: sensor.irrigation_stat_zone3_power
-    method: left
-    unit_prefix: k
-    round: 2
-
-  - platform: integration
-    name: Irrigation - Stat pump energy
-    unique_id: irrigation_stat_pump_energy
-    source: sensor.irrigation_stat_pump_power
-    method: left
-    unit_prefix: k
-    round: 2
-
   # Watering durations
   - platform: history_stats
-    name: irrigation_hs_zone1_daily
-    entity_id: group.irrigation_status_zone1
+    name: Irrigation - Watering Duration Zone1 Daily
+    entity_id: switch.irrigation_switches_zone1
     state: "on"
     type: time
-    start: "{{ now().replace(hour=0, minute=0, second=0, microsecond=0) }}"
+    start: "{{ today_at() }}"
     end: "{{ now() }}"
 
   - platform: history_stats
-    name: irrigation_hs_zone2_daily
-    entity_id: group.irrigation_status_zone2
+    name: Irrigation - Watering Duration Zone2 Daily
+    entity_id: switch.irrigation_switches_zone2
     state: "on"
     type: time
-    start: "{{ now().replace(hour=0, minute=0, second=0, microsecond=0) }}"
+    start: "{{ today_at() }}"
     end: "{{ now() }}"
 
   - platform: history_stats
-    name: irrigation_hs_zone3_daily
-    entity_id: group.irrigation_status_zone3
+    name: Irrigation - Watering Duration Zone3 Daily
+    entity_id: switch.irrigation_switches_zone3
     state: "on"
     type: time
-    start: "{{ now().replace(hour=0, minute=0, second=0, microsecond=0) }}"
+    start: "{{ today_at() }}"
     end: "{{ now() }}"
 
   - platform: history_stats
-    name: irrigation_hs_pump_daily
-    entity_id: switch.pump
+    name: Irrigation - Watering Duration Pump Daily
+    entity_id: switch.irrigation_switches_pump
     state: "on"
     type: time
-    start: "{{ now().replace(hour=0, minute=0, second=0, microsecond=0) }}"
+    start: "{{ today_at() }}"
     end: "{{ now() }}"
 
 # Utility meter #####################################################
 utility_meter:
-  irrigation_stat_zone1_energy_daily:
-    source: sensor.irrigation_stat_zone1_energy
-    cycle: daily
-  irrigation_stat_zone1_energy_yearly:
-    source: sensor.irrigation_stat_zone1_energy
+  irrigation_watering_duration_zone1_yearly:
+    unique_id: irrigation_watering_duration_zone1_yearly
+    source: sensor.irrigation_watering_duration_zone1_daily
     cycle: yearly
 
-  irrigation_stat_zone2_energy_daily:
-    source: sensor.irrigation_stat_zone2_energy
-    cycle: daily
-  irrigation_stat_zone2_energy_yearly:
-    source: sensor.irrigation_stat_zone2_energy
+  irrigation_watering_duration_zone2_yearly:
+    unique_id: irrigation_watering_duration_zone2_yearly
+    source: sensor.irrigation_watering_duration_zone2_daily
     cycle: yearly
 
-  irrigation_stat_zone3_energy_daily:
-    source: sensor.irrigation_stat_zone3_energy
-    cycle: daily
-  irrigation_stat_zone3_energy_yearly:
-    source: sensor.irrigation_stat_zone3_energy
+  irrigation_watering_duration_zone3_yearly:
+    unique_id: irrigation_watering_duration_zone3_yearly
+    source: sensor.irrigation_watering_duration_zone3_daily
     cycle: yearly
 
-  irrigation_stat_pump_energy_daily:
-    source: sensor.irrigation_stat_pump_energy
-    cycle: daily
-  irrigation_stat_pump_energy_yearly:
-    source: sensor.irrigation_stat_pump_energy
+  irrigation_watering_duration_pump_yearly:
+    unique_id: irrigation_watering_duration_pump_yearly
+    source: sensor.irrigation_watering_duration_pump_daily
     cycle: yearly
-
-# Input_Numbers #####################################################
-input_number:
-  # Zones statistics
-  irrigation_ontime_zone1:
-    min: 0
-    max: 50000
-    name: On time Zone 1
-    step: 0.001
-    mode: box
-    icon: mdi:camera-timer
-    unit_of_measurement: "Std"
-
-  irrigation_ontime_zone2:
-    min: 0
-    max: 50000
-    name: On time Zone 2
-    step: 0.001
-    mode: box
-    icon: mdi:camera-timer
-    unit_of_measurement: "Std"
-
-  irrigation_ontime_zone3:
-    min: 0
-    max: 50000
-    name: On time Zone 3
-    step: 0.001
-    mode: box
-    icon: mdi:camera-timer
-    unit_of_measurement: "Std"
-
-  irrigation_ontime_pump:
-    min: 0
-    max: 50000
-    name: On time pump
-    step: 0.001
-    mode: box
-    icon: mdi:camera-timer
-    unit_of_measurement: "Std"
-
-  irrigation_test1:
-    min: 0
-    max: 50000
-    name: On time pump
-    step: 1
-    mode: box
-    icon: mdi:camera-timer
-    unit_of_measurement: "Std"
-
-  irrigation_test2:
-    min: 0
-    max: 50000
-    name: On time pump
-    step: 1
-    mode: box
-    icon: mdi:camera-timer
-    unit_of_measurement: "Std"
-
-  irrigation_hs_test1:
-    min: 0
-    max: 50000
-    name: On time pump
-    step: 1
-    mode: box
-    icon: mdi:camera-timer
-    unit_of_measurement: "Std"
-
-  irrigation_hs_test2:
-    min: 0
-    max: 50000
-    name: On time pump
-    step: 1
-    mode: box
-    icon: mdi:camera-timer
-    unit_of_measurement: "Std"
-
-# Input Datetime #####################################################
-input_datetime:
-  # Last irrigated start time
-  irrigation_last_start_zone1:
-    name: Irrigation - Last irrigated start time of test
-    has_date: true
-    has_time: true
-    icon: mdi:clock-start
-
-  irrigation_last_start_zone2:
-    name: Irrigation - Last irrigated start time of test
-    has_date: true
-    has_time: true
-    icon: mdi:clock-start
-
-  irrigation_last_start_zone3:
-    name: Irrigation - Last irrigated start time of test
-    has_date: true
-    has_time: true
-    icon: mdi:clock-start
-
-  irrigation_last_start_pump:
-    name: Irrigation - Last irrigated start time of test
-    has_date: true
-    has_time: true
-    icon: mdi:clock-start
-
-  # Last irrigated end time
-  irrigation_last_irrigated_end_time:
-    name: Irrigation - Last irrigated end time
-    has_date: true
-    has_time: true
-    icon: mdi:clock-end
 
 # Automations #######################################################
 automation:
-  - id: irrigation_set_start_end_time
-    alias: Irrigation - Set last start end time
-    description: Irrigation - Set last start time
-    mode: parallel
-
-    trigger:
-      - platform: state
-        entity_id:
-          - group.irrigation_status_zone1
-          - group.irrigation_status_zone2
-          - group.irrigation_status_zone3
-          - switch.pump
-        from: "off"
-        to: "on"
-
-      - platform: state
-        entity_id:
-          - group.irrigation_status_zone1
-          - group.irrigation_status_zone2
-          - group.irrigation_status_zone3
-          - switch.pump
-        from: "on"
-        to: "off"
-
-    action:
-      - service: input_datetime.set_datetime
-        target:
-          entity_id: >
-            {% if trigger.to_state.state == 'on' %}
-              {% if 'zone1' in trigger.entity_id %}
-                input_datetime.irrigation_last_start_zone1
-              {% elif 'zone2' in trigger.entity_id %}
-                input_datetime.irrigation_last_start_zone2
-              {% elif 'zone3' in trigger.entity_id %}
-                input_datetime.irrigation_last_start_zone3
-              {% elif 'test' in trigger.entity_id %}
-                input_datetime.irrigation_last_start_test
-              {% else %}
-                input_datetime.irrigation_last_start_pump
-              {% endif %}
-            {% else %}
-              input_datetime.irrigation_last_irrigated_end_time
-            {% endif %}
-        data:
-          datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
-
-  # Sum daily and total statistics
-  - id: irrigation_daily_to_total
-    alias: Irrigation - Daily to total
-    trigger:
-      - platform: time
-        at: "23:59:55"
-
-    action:
-      - service: input_number.set_value
-        data:
-          entity_id: input_number.irrigation_ontime_zone1
-          value: "{{ states('input_number.irrigation_ontime_zone1') | float(0) + states('sensor.irrigation_hs_zone1_daily') | float(0) }}"
-
-      - service: input_number.set_value
-        data:
-          entity_id: input_number.irrigation_ontime_zone2
-          value: "{{ states('input_number.irrigation_ontime_zone2') | float(0) + states('sensor.irrigation_hs_zone2_daily') | float(0) }}"
-
-      - service: input_number.set_value
-        data:
-          entity_id: input_number.irrigation_ontime_zone3
-          value: "{{ states('input_number.irrigation_ontime_zone3') | float(0) + states('sensor.irrigation_hs_zone3_daily') | float(0) }}"
-
-      - service: input_number.set_value
-        data:
-          entity_id: input_number.irrigation_ontime_pump
-          value: "{{ states('input_number.irrigation_ontime_pump') | float(0) + states('sensor.irrigation_hs_pump_daily') | float(0) }}"
-
-  # - id: irrigation_test
-  #   alias: Irrigation test
-  #   variables:
-  #     zone:
-  #       - "test1"
-  #       - "test2"
-
-  #   trigger:
-  #   - platform: time
-  #     at: "15:24:30"
-
-  #   action:
-  #   - service: input_number.set_value
-  #     target:
-  #       entity_id: input_number.irrigation_{{ zone }}
-  #     data:
-  #       value: "{{ states('input_number.irrigation_' ~ zone ) | float(0) + states('input_number.irrigation_hs_' ~ zone ) | float(0) }}"
-
   # Notify when valve and pump changed status
   - id: irrigation_notify
     alias: Irrigation - Notify
@@ -535,23 +252,25 @@ automation:
     trigger:
       - platform: state
         entity_id:
-          - group.irrigation_status_zone1
-          - group.irrigation_status_zone2
-          - group.irrigation_status_zone3
-          - switch.pump
+          - switch.irrigation_switches_zone1
+          - switch.irrigation_switches_zone2
+          - switch.irrigation_switches_zone3
+          - switch.irrigation_switches_pump
         from: "on"
         to: "off"
-      #  for: '00:00:02'
+        variables:
+          action: "Ende"
 
       - platform: state
         entity_id:
-          - group.irrigation_status_zone1
-          - group.irrigation_status_zone2
-          - group.irrigation_status_zone3
-          - switch.pump
+          - switch.irrigation_switches_zone1
+          - switch.irrigation_switches_zone2
+          - switch.irrigation_switches_zone3
+          - switch.irrigation_switches_pump
         from: "off"
         to: "on"
-    #  for: '00:00:02'
+        variables:
+          action: "Start"
 
     # condition:
     # - condition: template
@@ -561,12 +280,7 @@ automation:
       - service: notify.telegram_schick_home
         data:
           title: 💦 Bewässerung
-          message: >
-            {% if trigger.to_state.state == 'on' %}
-              Start *{{ trigger.from_state.attributes.friendly_name}}*
-            {% else %}
-              Ende *{{ trigger.from_state.attributes.friendly_name}}*
-            {% endif %}
+          message: "{{ action }} *{{ trigger.from_state.attributes.friendly_name}}*"
 
 # Customize #########################################################
 homeassistant:
@@ -589,16 +303,67 @@ homeassistant:
     sensor.irrigation_ontime_pump:
       friendly_name: "Pumpennutzung"
 
-    sensor.irrigation_last_irrigated_time:
-      friendly_name: "Bewässerung beendet"
+    # Switches ##############
+    # Master control switch
+    switch.irrigation_watering:
+      friendly_name: "Irrigation - Bewässerungschalter"
+      icon: mdi:numeric-1-box-multiple
 
-    group.irrigation_status_zone1:
-      friendly_name: "Hinterhof"
-    group.irrigation_status_zone2:
-      friendly_name: "Vorderhof"
-    group.irrigation_status_zone3:
-      friendly_name: "Hahn"
-# Recorder ##########################################################
+    # Groups of switches
+    switch.irrigation_switches_zone1:
+      friendly_name: "Irrigation - Hinterhofgruppe"
+      icon: mdi:numeric-1-box-multiple
+    switch.irrigation_switches_zone2:
+      friendly_name: "Irrigation - Vorderhofgruppe"
+      icon: mdi:numeric-2-box-multiple
+    switch.irrigation_switches_zone3:
+      friendly_name: "Irrigation - Hahngruppe"
+      icon: mdi:faucet
+    switch.irrigation_switches_pump:
+      friendly_name: "Irrigation - Pumpengruppe"
+      icon: mdi:pump
+
+    # Sensors
+    sensor.irrigation_last_irrigated_time:
+      friendly_name: "Irrigation - Bewässerung beendet"
+
+    # Water consumption
+    sensor.irrigation_water_consumption_zone1:
+      friendly_name: "Irrigation - Wasserverbrauch Hinterhof"
+    sensor.irrigation_water_consumption_zone2:
+      friendly_name: "Irrigation - Wasserverbrauch Vorderhof"
+    sensor.irrigation_water_consumption_zone3:
+      friendly_name: "Irrigation - Wasserverbrauch Hahn"
+    sensor.irrigation_water_consumption_pump:
+      friendly_name: "Irrigation - Wasserverbrauch Pumpe"
+
+    sensor.irrigation_watering_duration:
+      friendly_name: "Irrigation - Dauer Jährlich"
+
+    # Watering duration
+    sensor.irrigation_watering_duration_zone1_daily:
+      friendly_name: "Irrigation - Dauer Hinterhof Täglich"
+      icon: mdi:clock-outline
+    sensor.irrigation_watering_duration_zone2_daily:
+      friendly_name: "Irrigation - Dauer Vorderhof Täglich"
+      icon: mdi:clock-outline
+    sensor.irrigation_watering_duration_zone3_daily:
+      friendly_name: "Irrigation - Dauer Hahn Täglich"
+      icon: mdi:clock-outline
+    sensor.irrigation_watering_duration_pump_daily:
+      friendly_name: "Irrigation - Dauer Pumpe Täglich"
+      icon: mdi:clock-outline
+
+    sensor.irrigation_watering_duration_zone1_yearly:
+      friendly_name: "Irrigation - Dauer Hinterhof Jährlich"
+    sensor.irrigation_watering_duration_zone2_yearly:
+      friendly_name: "Irrigation - Dauer Vorderhof Jährlich"
+    sensor.irrigation_watering_duration_zone3_yearly:
+      friendly_name: "Irrigation - Dauer Hahn Jährlich"
+    sensor.irrigation_watering_duration_pump_yearly:
+      friendly_name: "Irrigation - Dauer Pumpe Jährlich"
+
+      # Recorder ##########################################################
 # recorder:
 #  exclude:
 #  entities:
