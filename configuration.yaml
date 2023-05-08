@@ -91,6 +91,7 @@ recorder:
   exclude:
     domains:
       - calendar
+      - sun
       - weblink
     entity_globs:
       - sensor.weather_*
@@ -127,11 +128,6 @@ discovery:
 
 # Enables support for tracking state changes over time
 history:
-  exclude:
-    domains:
-      - group
-      - calendar
-      - sun
 
 # TTS #################################
 tts:
