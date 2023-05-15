@@ -12,6 +12,16 @@ input_number:
     icon: mdi:currency-eur
     unit_of_measurement: "EUR/kWh"
 
+  energy_subscription_price:
+    name: Strom Grundpreis
+    mode: box
+    initial: 115
+    min: 0
+    max: 300
+    step: 0.01
+    icon: mdi:currency-eur
+    unit_of_measurement: "EUR"
+
   water_price:
     name: Wasserpreis
     mode: box
@@ -34,16 +44,26 @@ input_number:
     step: 0.01
     icon: mdi:waves
     unit_of_measurement: m³/h
+# template:
+#   - sensor:
+#       # Подсчёт абонентской платы за электричество
+#       - name: "Placeholder energy subscription price"
+#         unique_id: placeholder_energy_subscription_price
+#         state: 0
+#         unit_of_measurement: kWh
+#         device_class: energy
+#         state_class: total
 
-template:
-  - sensor:
-      - name: "Platzhalter Verbrauch Grundpreis"
-        unit_of_measurement: kWh
-        device_class: energy
-        state: 0
-        state_class: total
-      - name: "Grundpreis"
-        unit_of_measurement: EUR
-        device_class: monetary
-        state: "{{ ((now().strftime('%j')|float - 116) + (now().year - 2023) * 365) * 0.4077 + 47.2932 }}"
-        state_class: total_increasing
+#       - name: "Energy Subscription Costs"
+#         unique_id: energy_subscription_costs
+#         state: "{{ input_number.energy_subscription_price | float(0) / 365 }}"
+#         unit_of_measurement: EUR
+#         device_class: monetary
+#         state_class: total_increasing
+
+# homeassistant:
+#   customize:
+#     sensor.placeholder_energy_subscription_price:
+#       friendly_name: "Platzhalter Verbrauch Grundpreis"
+#     sensor.energy_subscription_total_costs:
+#       friendly_name: "Strom Grundpreis"
