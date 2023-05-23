@@ -83,6 +83,13 @@ switch:
     turn_off:
       service: shell_command.turn_off_pc12
 
+  - platform: wake_on_lan
+    name: !secret pc13_name
+    mac: !secret pc13_mac
+    host: !secret pc13_host
+    turn_off:
+      service: shell_command.turn_off_pc13
+
 shell_command:
   turn_off_pc1: !secret pc1_shutdown
   turn_off_pc2: !secret pc2_shutdown
@@ -96,3 +103,4 @@ shell_command:
   turn_off_pc10: !secret pc2_shutdown
   turn_off_pc11: !secret pc2_shutdown
   turn_off_pc12: !secret pc2_shutdown
+  turn_off_pc13: !secret pc2_shutdown
