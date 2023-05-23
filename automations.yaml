@@ -259,12 +259,17 @@
     attribute: connected_paired_devices
     state: B4:EC:02:94:8A:CF (VW BT 1505)
     enabled: false
-  - condition: template
-    value_template: '{{ "B4:EC:02:94:8A:CF (VW BT 1505)" in state_attr("sensor.sm_g996b_bluetooth_connection",
-      "connected_paired_devices") }}'
   - condition: numeric_state
     entity_id: sensor.torposition
     below: 10
+  - condition: or
+    conditions:
+    - condition: template
+      value_template: '{{ "68:4E:05:63:56:10 (VOLKSWAGEN-21ED)" in state_attr("sensor.sm_g996b_bluetooth_connection",
+        "connected_paired_devices") }}'
+    - condition: template
+      value_template: '{{ "B4:EC:02:94:8A:CF (VW BT 1505)" in state_attr("sensor.sm_g996b_bluetooth_connection",
+        "connected_paired_devices") }}'
   action:
   - service: switch.turn_on
     data: {}
@@ -296,9 +301,14 @@
     attribute: connected_paired_devices
     state: B4:EC:02:94:8A:CF (VW BT 1505)
     enabled: false
-  - condition: template
-    value_template: '{{ "B4:EC:02:94:8A:CF (VW BT 1505)" in state_attr("sensor.sm_g996b_bluetooth_connection",
-      "connected_paired_devices") }}'
+  - condition: or
+    conditions:
+    - condition: template
+      value_template: '{{ "68:4E:05:63:56:10 (VOLKSWAGEN-21ED)" in state_attr("sensor.sm_g996b_bluetooth_connection",
+        "connected_paired_devices") }}'
+    - condition: template
+      value_template: '{{ "B4:EC:02:94:8A:CF (VW BT 1505)" in state_attr("sensor.sm_g996b_bluetooth_connection",
+        "connected_paired_devices") }}'
   - condition: numeric_state
     entity_id: sensor.torposition
     above: 5
