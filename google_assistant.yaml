@@ -44,6 +44,21 @@ entity_config:
   #   room: Wohnzimmer
   #   expose: true
 
+  # sensor.ble_temperature_temperatur_gt:
+  #   name: Terrassentemperatur
+  #   room: Garten
+  #   expose: true
+
+  # sensor.ble_temperature_temperatur_eg:
+  #   name: wohnzimmertemperatur
+  #   room: Wohnzimmer
+  #   expose: true
+
+  # sensor.ble_temperature_temperatur_og:
+  #   name: Obergeschosstemperatur
+  #   room: Arbeitszimmer
+  #   expose: true
+
   switch.mower_mowing:
     name: Mähroboter
     room: Garten
