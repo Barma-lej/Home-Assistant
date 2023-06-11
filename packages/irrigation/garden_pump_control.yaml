@@ -65,3 +65,25 @@ automation:
     action:
       - service: switch.turn_off
         entity_id: switch.irrigation_pump
+
+  # Включение насоса для подкачки
+  - id: irrigation_regular_pumping
+    alias: Irrigation - Regular pumping
+    description: "Регулярная подкачка воды"
+
+    trigger:
+      - platform: time_pattern
+        hours: "/2"
+        minutes: "2"
+
+    condition:
+      - condition: state
+        entity_id: switch.irrigation_pump
+        state: "off"
+
+    action:
+      - service: switch.turn_on
+        entity_id: switch.irrigation_pump
+      - delay: 15
+      - service: switch.turn_off
+        entity_id: switch.irrigation_pump
