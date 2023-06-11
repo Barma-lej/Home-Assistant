@@ -50,7 +50,7 @@ automation:
           message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
           message: "💡 {{ state_attr('light.sonoffpow_01', 'friendly_name') }} - {{ states('light.sonoffpow_01') }}"
 
-#  Service ist {{ trigger.event }}"
+# Service ist {{ trigger.event }}"
 
 # Customize #########################################################
 homeassistant:
