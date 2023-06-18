@@ -36,10 +36,10 @@ homeassistant:
       friendly_name: Tuyaplug6
       # icon: mdi:printer-3d
     switch.tuyaplug6_childlock:
-      friendly_name: Kindersicherung ()
+      friendly_name: Kindersicherung (Tuyaplug6)
       icon: mdi:account-lock
     switch.tuyaplug6_overcharge:
-      friendly_name: Überladung ()
+      friendly_name: Überladung (Tuyaplug6)
       icon: mdi:battery-alert-variant
 
     # Sensor ##########
