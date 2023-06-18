@@ -1,0 +1,68 @@
+# Tuya
+# https://github.com/rospogrigio/localtuya/issues/1148
+#
+
+# Sensors #######################################
+sensor:
+  - platform: integration
+    unique_id: tuyaplug7_energy
+    source: sensor.tuyaplug7_power
+    name: Tuyaplug7 Energy
+    unit_prefix: k
+    round: 2
+
+utility_meter:
+  tuyaplug7_energy_daily:
+    unique_id: tuyaplug7_energy_daily
+    source: sensor.tuyaplug7_energy
+    name: Tuyaplug7 Energy Daily
+    cycle: daily
+  tuyaplug7_energy_monthly:
+    unique_id: tuyaplug7_energy_monthly
+    source: sensor.tuyaplug7_energy
+    name: Tuyaplug7 Energy Monthly
+    cycle: monthly
+  tuyaplug7_energy_yearly:
+    unique_id: tuyaplug7_energy_yearly
+    source: sensor.tuyaplug7_energy
+    name: Tuyaplug7 Energy Yearly
+    cycle: yearly
+
+# Customize #####################################
+homeassistant:
+  customize:
+    # Switch ##########
+    switch.tuyaplug7:
+      friendly_name: Schick-PC
+      icon: mdi:desktop-tower-monitor
+    switch.tuyaplug7_childlock:
+      friendly_name: Kindersicherung (Schick-PC)
+      icon: mdi:account-lock
+    switch.tuyaplug7_overcharge:
+      friendly_name: Überladung (Schick-PC)
+      icon: mdi:battery-alert-variant
+
+    # Sensor ##########
+    sensor.tuyaplug7_current:
+      friendly_name: Stromstärke (Schick-PC)
+      # icon: mdi:current-ac
+
+    sensor.tuyaplug7_power:
+      friendly_name: Leistung (Schick-PC)
+      # icon: mdi:lightning-bolt
+
+    sensor.tuyaplug7_energy:
+      friendly_name: Verbrauch (Schick-PC)
+      # icon: mdi:counter
+
+    sensor.tuyaplug7_energy_daily:
+      friendly_name: Verbrauch Täglich (Schick-PC)
+      # icon: mdi:counter
+
+    sensor.tuyaplug7_energy_monthly:
+      friendly_name: Verbrauch Monatlich (Schick-PC)
+      # icon: mdi:counter
+
+    sensor.tuyaplug7_energy_yearly:
+      friendly_name: Verbrauch Jahrlich (Schick-PC)
+      # icon: mdi:counter
