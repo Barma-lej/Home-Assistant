@@ -34,7 +34,7 @@ homeassistant:
     # Switch ##########
     switch.tuyaplug4:
       friendly_name: Waschmaschine
-      # icon: mdi:printer-3d
+      icon: mdi:washing-machine
     switch.tuyaplug4_childlock:
       friendly_name: Kindersicherung (Waschmaschine)
       icon: mdi:account-lock

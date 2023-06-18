@@ -34,7 +34,7 @@ homeassistant:
     # Switch ##########
     switch.tuyaplug5:
       friendly_name: Heizung
-      # icon: mdi:printer-3d
+      icon: mdi:heating-coil
     switch.tuyaplug5_childlock:
       friendly_name: Kindersicherung (Heizung)
       icon: mdi:account-lock
