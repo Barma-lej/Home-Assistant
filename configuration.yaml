@@ -119,13 +119,6 @@ logbook:
       - sensor.sunrise
       - sensor.only_text
 
-# Discover some devices automatically
-discovery:
-  # Disable discovering
-  ignore:
-    - songpal
-    - yeelight
-
 # Enables support for tracking state changes over time
 history:
 
