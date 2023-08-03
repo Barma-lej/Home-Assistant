@@ -16,6 +16,7 @@ yandex_smart_home:
       - cover.shellyswitch25_f37b28
       - cover.shellyswitch25_10eaa4
       - cover.shellyswitch25_10d315
+      - fan.ventilator
       - light.shellyswitch25_10a36d_channel_2
       - light.shellyswitch25_10c7c3_channel_1
       - light.sonoffbnsz01
@@ -78,6 +79,11 @@ yandex_smart_home:
       name: Окно 4
       room: Зал
       type: devices.types.openable
+
+    fan.ventilator:
+      name: Вентилятор
+      room: Зал
+      type: devices.types.thermostat
 
     light.shellyswitch25_10a36d_channel_2:
       name: Люстра
