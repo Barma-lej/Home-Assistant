@@ -22,13 +22,11 @@ template:
         unique_id: cpu_load
         state: "{{ (states('sensor.load_15m') | float(0) ) | round(2) }}"
         icon: mdi:memory
-        unit_of_measurement: " "
 
       - name: "Last boot local"
         unique_id: last_boot_local
         state: "{{ as_timestamp(states('sensor.last_boot')) | timestamp_custom('%d.%m.%Y %H:%M') }}"
         icon: mdi:clock-start
-        unit_of_measurement: " "
 
 sensor:
   # Command Line
