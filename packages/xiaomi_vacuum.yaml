@@ -133,7 +133,6 @@ template:
           {%- set days = (time / 86400) | int(0) -%}
           {{ days }} Tagen {{ '{:02}:{:02}:{:02}'.format(hours, minutes, seconds) }}
         icon: mdi:clock-fast
-        unit_of_measurement: ""
 
       - name: Robi last clean duration fmt
         unique_id: robi_last_clean_duration_fmt
@@ -144,7 +143,6 @@ template:
           {%- set hours = ((time % 86400) / 3600) | int(0) -%}
           {{ '{:02}:{:02}:{:02}'.format(hours, minutes, seconds) }}
         icon: mdi:clock-fast
-        unit_of_measurement: ""
 
 #   - platform: rest
 #     resource: !secret robi_resource_map
