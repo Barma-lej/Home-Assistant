@@ -110,6 +110,8 @@ automation:
 # Scripts ###########################################################
 script:
   telegram_callback:
+    alias: Telegram - Callback
+    icon: mdi:send
     mode: parallel
     sequence:
       - service: telegram_bot.send_message

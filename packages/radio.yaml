@@ -7,7 +7,7 @@ recorder:
       - input_number.radio_volume
       - input_select.radio_station
       - input_select.radio_player
-      - group.radio
+      # - group.radio
       - automation.radio_stop
       - automation.radio_stream
       - automation.radio_volume
@@ -21,7 +21,7 @@ logbook:
       - input_number.radio_volume
       - input_select.radio_station
       - input_select.radio_player
-      - group.radio
+      # - group.radio
       - automation.radio_stop
       - automation.radio_stream
       - automation.radio_volume
@@ -78,14 +78,14 @@ input_select:
     icon: mdi:speaker-wireless
 
 # Groups ############################################################
-group:
-  radio:
-    name: Radio
-    icon: mdi:radio
-    entities:
-      - input_select.radio_station
-      - input_select.radio_player
-      - input_number.radio_volume
+# group:
+#   radio:
+#     name: Radio
+#     icon: mdi:radio
+#     entities:
+#       - input_select.radio_station
+#       - input_select.radio_player
+#       - input_number.radio_volume
 
 # Automations #######################################################
 automation:
@@ -134,6 +134,7 @@ script:
   # Plays the radio
   radio:
     alias: Radio - Wiedergabe
+    description: "Turns on the radio"
     icon: mdi:play
     sequence:
       #      - service: media_player.volume_set
@@ -188,6 +189,7 @@ script:
 
   radio_stop:
     alias: Radio - Stop
+    description: "Turns off the radio"
     icon: mdi:stop
     sequence:
       # - service: media_player.volume_set
@@ -222,12 +224,12 @@ script:
             {% endif %}
 
 # Customize #########################################################
-homeassistant:
-  customize:
-    # Groups ##########
-    group.radio:
-      friendly_name: Radio
-    script.radio:
-      friendly_name: Play
-    script.radio_stop:
-      friendly_name: Stop
+# homeassistant:
+#   customize:
+#     # Groups ##########
+#     group.radio:
+#       friendly_name: Radio
+#     # script.radio:
+#     #   friendly_name: Play
+#     # script.radio_stop:
+#     #   friendly_name: Stop

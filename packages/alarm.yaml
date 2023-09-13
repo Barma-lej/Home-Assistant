@@ -66,7 +66,7 @@ automation:
     action:
       - service: switch.turn_off
         target:
-          entity_id: switch.garage_siren
+          entity_id: switch.garage_siren_on_event
       - service: timer.finish
         target:
           entity_id: timer.alarm_indoor
@@ -136,10 +136,13 @@ automation:
 
 script:
   alarm_play:
+    alias: Alarm - Play
+    description: "Turns on a siren on the speakers"
+    icon: mdi:alarm-light
     sequence:
       - service: switch.turn_on
         target:
-          entity_id: switch.garage_siren
+          entity_id: switch.garage_siren_on_event
 
       - service: media_player.volume_set
         target:

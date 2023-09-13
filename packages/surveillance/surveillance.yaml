@@ -5,17 +5,17 @@ scene:
     name: camera_detection_on
     icon: mdi:cctv
     entities:
-      switch.einfahrt_ftp: "on"
+      switch.einfahrt_ftp_upload: "on"
       switch.einfahrt_push_notifications: "on"
-      switch.einfahrt_recording: "on"
+      switch.einfahrt_record: "on"
       switch.einfahrt_record_audio: "on"
-      switch.garage_ftp: "on"
+      switch.garage_ftp_upload: "on"
       switch.garage_push_notifications: "on"
-      switch.garage_recording: "on"
+      switch.garage_record: "on"
       switch.garage_record_audio: "on"
-      switch.terrasse_ftp: "on"
+      switch.terrasse_ftp_upload: "on"
       switch.terrasse_push_notifications: "on"
-      switch.terrasse_recording: "on"
+      switch.terrasse_record: "on"
       switch.terrasse_record_audio: "on"
       switch.alfa03: "on"
 
@@ -116,6 +116,22 @@ automation:
       - service: scene.turn_on
         target:
           entity_id: scene.camera_detection_on
+
+  # PTZ control with buttons
+  - id: camera_ptz_buttons_control
+    alias: "Camera - PTZ buttons control"
+    trigger:
+      platform: state
+      entity_id:
+        - button.garage_ptz_up
+        - button.garage_ptz_down
+        - button.garage_ptz_left
+        - button.garage_ptz_right
+
+    action:
+      - delay: 1
+      - service: button.press
+        entity_id: button.garage_ptz_stop
 # Script ############################################################
 #script:
 ########################################

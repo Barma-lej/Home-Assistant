@@ -163,11 +163,11 @@
         domain: sensor
         above: 30
       sequence:
-      - service: reolink_cctv.ptz_control
+      - service: select.select_option
         data:
-          entity_id: camera.garage
-          command: TOPOS
-          preset: 1
+          option: Tor
+        target:
+          entity_id: select.garage_ptz_preset
     - conditions:
       - type: is_value
         condition: device
@@ -176,21 +176,21 @@
         domain: sensor
         below: 20
       sequence:
-      - service: reolink_cctv.ptz_control
+      - service: select.select_option
         data:
-          entity_id: camera.garage
-          command: TOPOS
-          preset: 2
+          option: Tuer
+        target:
+          entity_id: select.garage_ptz_preset
       - delay:
           hours: 0
           minutes: 0
           seconds: 30
           milliseconds: 0
-      - service: reolink_cctv.ptz_control
+      - service: select.select_option
         data:
-          entity_id: camera.garage
-          command: TOPOS
-          preset: 2
+          option: Tuer
+        target:
+          entity_id: select.garage_ptz_preset
     default: []
   mode: restart
 - id: '1651786976779'
@@ -213,6 +213,16 @@
       - update.studio_code_server_update
       - update.tasmoadmin_update
       - update.wled_soundreactive_firmware
+      - update.terrasse_update
+      - update.einfahrt_update
+      - update.garage_update
+      - update.terminal_ssh_update
+      - update.nginx_home_assistant_ssl_proxy_update
+      - update.home_assistant_glow_firmware
+      - update.garagegate_firmware
+      - update.pi_hole_dostupno_veb_obnovlenie
+      - update.pi_hole_dostupno_obnovlenie_iadra
+      - update.pi_hole_dostupno_obnovlenie_ftl
       mobile_app_device: 52dde1dbd0bd045e5b6181020e86c549
       run_config_check: false
       send_to_ha: true

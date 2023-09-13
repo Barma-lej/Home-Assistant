@@ -1,5 +1,25 @@
 # Irrigation - Lovelace variables and scripts
 
+# Recorder ##########################################################
+recorder:
+  exclude:
+    entities:
+      - script.irrigation_views_toggle
+      - input_boolean.irrigation_view_cycle1
+      - input_boolean.irrigation_view_cycle2
+      - input_boolean.irrigation_view_stat
+      - input_boolean.irrigation_view_consumption
+
+# Logbook ###########################################################
+logbook:
+  exclude:
+    entities:
+      - script.irrigation_views_toggle
+      - input_boolean.irrigation_view_cycle1
+      - input_boolean.irrigation_view_cycle2
+      - input_boolean.irrigation_view_stat
+      - input_boolean.irrigation_view_consumption
+
 # Input_Booleans ####################################################
 input_boolean:
   irrigation_view_cycle1:
@@ -62,6 +82,7 @@ input_boolean:
 script:
   irrigation_views_toggle:
     alias: Irrigation - Tabs umschalten
+    icon: mdi:tab
     sequence:
       - service: input_boolean.turn_off
         data:
@@ -73,21 +94,20 @@ script:
       - service: input_boolean.turn_on
         data:
           entity_id: "{{ entity_id }}"
+# homeassistant:
+#   customize:
+#     # input_boolean.irrigation_view_cycle1:
+#     #   friendly_name: "Irrigation - Morgen"
+#     #   icon: mdi:weather-sunset-up
 
-homeassistant:
-  customize:
-    #     input_boolean.irrigation_view_cycle1:
-    #       friendly_name: "Irrigation - Morgen"
-    #       icon: mdi:weather-sunset-up
+#     # input_boolean.irrigation_view_cycle2:
+#     #   friendly_name: "Irrigation - Abend"
+#     #   icon: mdi:weather-sunset-down
 
-    #     input_boolean.irrigation_view_cycle2:
-    #       friendly_name: "Irrigation - Abend"
-    #       icon: mdi:weather-sunset-down
+#     # input_boolean.irrigation_view_stat:
+#     #   friendly_name: "Verlauf"
+#     #   icon: mdi:history
 
-    #     input_boolean.irrigation_view_stat:
-    #       friendly_name: "Verlauf"
-    #       icon: mdi:history
-
-    script.irrigation_views_toggle:
-      # friendly_name: "Irrigation - Tabs umschalten"
-      icon: mdi:tab
+#     script.irrigation_views_toggle:
+#       # friendly_name: "Irrigation - Tabs umschalten"
+#       icon: mdi:tab
