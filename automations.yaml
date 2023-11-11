@@ -364,25 +364,6 @@
   alias: 3D - Druck ist fertig
   description: ''
   trigger:
-  - platform: numeric_state
-    entity_id: sensor.octoprint_job_percentage
-    above: 99.999999
-    enabled: false
-  - platform: state
-    entity_id:
-    - sensor.octoprint_print_status
-    from: Printing
-    to: Finishing
-    enabled: false
-  - platform: state
-    entity_id:
-    - sensor.printer_3d_state
-    from: printing
-    for:
-      hours: 0
-      minutes: 10
-      seconds: 0
-    enabled: false
   - platform: state
     entity_id:
     - sensor.ender_3_s1_pro_current_print_state
@@ -393,58 +374,6 @@
       seconds: 0
   condition: []
   action:
-  - service: notify.telegram_schick_home
-    data:
-      message: "\U0001F3ED 3D Druck ist fertig"
-      data:
-        photo:
-        - url: http://192.168.2.18/plugin/UltimakerFormatPackage/thumbnail/{{ states('sensor.octoprint_print_file')
-            | replace(' ','%20') | replace('gcode','png') }}
-          caption: "\U0001F3ED 3D Druck ist fertig"
-    enabled: false
-  - wait_for_trigger:
-    - platform: state
-      entity_id:
-      - sensor.octoprint_last_event
-      to: MovieDone
-    timeout:
-      hours: 0
-      minutes: 10
-      seconds: 0
-      milliseconds: 0
-    enabled: false
-  - wait_for_trigger:
-    - platform: numeric_state
-      entity_id: sensor.octoprint_actual_tool0_temp
-      below: 70
-    timeout:
-      hours: 0
-      minutes: 5
-      seconds: 0
-      milliseconds: 0
-    enabled: false
-  - if:
-    - condition: state
-      entity_id: sensor.octoprint_print_status
-      state: Operational
-    then:
-    - service: switch.turn_off
-      data: {}
-      target:
-        entity_id: switch.tuyaplug1
-    - service: notify.telegram_schick_home
-      data:
-        message: "\U0001F3ED 3D Druck ist ausgeschaltet"
-    enabled: false
-  - service: notify.telegram_schick_home
-    data:
-      message: "\U0001F3ED 3D Druck ist fertig"
-      data:
-        photo:
-        - url: http://192.168.2.18:7125/server/files/gcodes/{{ state_attr('sensor.printer_3d_file_metadata','thumbnails')[1]['relative_path']
-            }}
-          caption: "\U0001F3ED 3D Druck ist fertig"
-    enabled: false
   - service: notify.telegram_schick_home
     data:
       message: "\U0001F3ED 3D Druck ist fertig"
@@ -465,7 +394,6 @@
       minutes: 5
       seconds: 0
       milliseconds: 0
-    enabled: true
   - if:
     - condition: template
       value_template: '{{ not is_state(''sensor.ender_3_s1_pro_current_print_state'',''printing'')
@@ -505,9 +433,10 @@
     weekday:
     - mon
   action:
-  - service: fritz.cleanup
-    data:
-      device_id: a2c8836b6f13a4e84719bc7a1c13e287
+  - service: button.press
+    data: {}
+    target:
+      entity_id: button.fritz_box_7490_cleanup
   - service: ble_monitor.cleanup_entries
     data: {}
   - service: tts.clear_cache
