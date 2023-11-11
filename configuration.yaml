@@ -78,6 +78,7 @@ logger:
     miio.miioprotocol: fatal
     # reolink_ip: debug
     custom_components.landroid_cloud: warn
+    custom_components.localtuya.common: critical
     # custom_components.reolink_cctv: debug
     custom_components.xiaomi_miio_fan.fan: fatal
 
