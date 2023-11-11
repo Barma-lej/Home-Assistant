@@ -50,19 +50,6 @@ automation:
           message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
           message: "💡 {{ state_attr('light.sonoffpow_03', 'friendly_name') }} - {{ states('light.sonoffpow_03') }}"
 
-  - id: wled_integration_manage
-    alias: "WLED - Integration manage"
-    trigger:
-      - platform: state
-        entity_id: light.sonoffpow_03
-      - platform: time_pattern
-        minutes: "/15"
-    condition: "{{ is_state('light.sonoffpow_03', 'on') or is_state('light.sonoffpow_03', 'off') }}"
-    action:
-      - service: "{{ iif(is_state('light.sonoffpow_03', 'on'), 'homeassistant.enable_config_entry', 'homeassistant.disable_config_entry') }}"
-        data:
-          config_entry_id: 17c5043bacbffb9c30be8a0fab31ff2f
-
 #  Service ist {{ trigger.event }}"
 
 # Customize #########################################################

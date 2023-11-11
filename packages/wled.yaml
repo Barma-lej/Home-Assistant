@@ -1,0 +1,56 @@
+# Input Boolean #############
+input_select:
+  wled_effects_loop:
+    name: WLED - Effektschleife
+    initial: Keine
+    icon: mdi:sync
+    options:
+      - Keine
+      - Nacheinander
+      - Zufällig
+
+# Input Boolean #############
+input_number:
+  wled_effect_time:
+    name: WLED - Effektzeit
+    initial: 30
+    icon: mdi:sync
+    min: 10
+    max: 3600
+    step: 10
+
+#     service: light.turn_on
+# target:
+#   entity_id: light.wled
+# data:
+#   effect: "{{ state_attr('light.wled', 'effect_list') | random }}"
+
+# Automation ################
+automation:
+  - id: wled_integration_manage
+    alias: "WLED - Integration manage"
+    trigger:
+      - platform: state
+        entity_id: light.sonoffpow_03
+      - platform: time_pattern
+        minutes: "/15"
+    condition: "{{ is_state('light.sonoffpow_03', 'on') or is_state('light.sonoffpow_03', 'off') }}"
+    action:
+      - service: "{{ iif(is_state('light.sonoffpow_03', 'on'), 'homeassistant.enable_config_entry', 'homeassistant.disable_config_entry') }}"
+        data:
+          config_entry_id: 17c5043bacbffb9c30be8a0fab31ff2f
+
+  - id: wled_loop_run
+    alias: "WLED - Start Effektschleife"
+    mode: single
+    trigger:
+      - platform: state
+        entity_id:
+          - input_select.wled_effects_loop
+        to: Nacheinander
+      - platform: state
+        entity_id:
+          - input_select.wled_effects_loop
+        to: Zufällig
+    action:
+      - service: script.wled_loop
