@@ -32,6 +32,7 @@
 addons
 custom_components
 deps
+# esphome Settings in the folder
 manuals
 script
 tts
@@ -61,5 +62,5 @@ haus_022019_og.png
 person.yaml
 meteostat.yaml
 
-esphome/garagegate.yaml
+# esphome/garagegate.yaml
 packages/sonoffrfbridge.yaml
