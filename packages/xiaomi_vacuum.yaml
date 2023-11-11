@@ -561,10 +561,10 @@ script:
 #        message: "The vacuum cleaner stopped and reported an error while cleaning the area {{ states('input_select.robi_zone') | lower }}."
 #
 # Camera ############################################################
-#camera:
-#  - platform: generic
-#    name: Vacuum map
-#    still_image_url: "{{ states('sensor.robi_map_url') }}"
-#    verify_ssl: false
-#    content_type: image/png
-#    framerate: 1
+# camera:
+#   - platform: generic
+#     name: Vacuum map
+#     still_image_url: "{{ states('sensor.robi_map_url') }}"
+#     verify_ssl: false
+#     content_type: image/png
+#     framerate: 1
