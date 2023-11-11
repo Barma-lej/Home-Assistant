@@ -1,0 +1,253 @@
+# Garagentorsteuerung
+#
+# Garagentorsteuerung mit der Positionskontrolle von Garagentoren
+# © Barma-lej
+#
+substitutions:
+  device_name: garagegate
+  friendly_name: Tor
+  project_version: "2.2.1"
+  device_description: "Garagentorsteuerung mit der Positionskontrolle von Garagentoren"
+
+  # Define the GPIO pins
+  status_led: GPIO2
+  optocoupler_pin: GPIO5
+  relay_pin: GPIO4
+  # Ultrasonic sensor
+  echo_pin: GPIO13
+  trigger_pin: GPIO12
+
+  # Webserver credentials ⬇ #
+  web_username: !secret web_server_user
+  web_password: !secret web_server_password
+
+esphome:
+  name: '${device_name}'
+  comment: '${device_description}'
+  name_add_mac_suffix: false
+  project:
+    name: "barma-lej.garagegate"
+    version: "${project_version}"
+
+# Choose the right Platform
+# esp32: https://esphome.io/components/esp32.html
+# esp8266: https://esphome.io/components/esp8266.html
+esp8266:
+  board: esp12e
+
+# WiFi credentials #
+wifi:
+  ssid: !secret wlan_ssid
+  password: !secret wlan_password
+  power_save_mode: none
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "${friendly_name} Fallback AP"
+    password: "!secret fallback_ap_password"
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable improv over serial
+improv_serial:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret garagentor_api
+
+ota:
+  safe_mode: true
+  password: !secret ota_password
+  reboot_timeout: 10min
+  num_attempts: 5
+
+web_server:
+  port: 80
+  auth:
+    username: '${web_username}'
+    password: '${web_password}'
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: ${optocoupler_pin}
+      mode: INPUT_PULLUP
+    name: "${friendly_name} offen"
+    id: gate_is_open
+    filters:
+      - delayed_on_off: 50ms
+    on_state:
+      # set partial opened gate to false
+      - homeassistant.service:
+          service: homeassistant.turn_off
+          data: {"entity_id": "input_boolean.torteil"}
+
+# If Yunshan as a Parttional open in Home Assistant
+#  - platform: homeassistant
+#    name: “From garageteiloffnung through HA”
+#    entity_id: binary_sensor.torteil
+#    id: part
+#    internal: true
+
+# If Sonoff 1ch Inching as a Parttional open in Home Assistant
+  - platform: homeassistant
+    name: “From garageteiloffnung through HA”
+    entity_id: input_boolean.torteil
+    id: part
+    internal: true
+
+button:
+  # Restart the ESP
+  - platform: restart
+    name: "${friendly_name} Restart"
+  # Boot in Safe mode
+  - platform: safe_mode
+    name: "${friendly_name} Safe Mode Boot"
+    entity_category: diagnostic
+
+cover:
+  - platform: template
+    name: "${friendly_name}"
+    id: gate
+    device_class: garage
+    optimistic: false
+    has_position: true
+    open_action:
+      - switch.turn_on: relayPulse
+    close_action:
+      - switch.turn_on: relayPulse
+    stop_action:
+      - switch.turn_on: relayPulse
+
+switch:
+  - platform: gpio
+    pin: ${relay_pin}
+    id: relay
+    restore_mode: ALWAYS_OFF
+
+  - platform: template
+    name: "${friendly_name}"
+    icon: "mdi:garage"
+    id: relayPulse
+    turn_on_action:
+      - switch.turn_on: relay
+      - delay: 800ms
+      - switch.turn_off: relay
+
+      # set partial opened gate to false
+      - homeassistant.service:
+          service: homeassistant.turn_off
+          data: {"entity_id": "input_boolean.torteil"}
+
+sensor:
+  # id(dist) is between:
+  # 0.23 (top position) an
+  # 2.60 (bottom position)
+  - platform: ultrasonic
+    id: dist
+    trigger_pin: ${trigger_pin}
+    echo_pin: ${echo_pin}
+    name: "${friendly_name} Distanz"
+    update_interval: 1s
+    accuracy_decimals: 2
+    timeout: 3m
+    state_class: "measurement"
+    filters:
+      - offset: -0.23
+      # - delta: 0.0499
+      # - median:
+      #     window_size: 5
+      #     send_every: 5
+      #     send_first_at: 1
+      - lambda: |-
+          float MIN_ERROR_WINDOW = 1.5;
+          float MAX_ERROR_WINDOW = 1.57;
+          // float MAX_DIFFERENCE = 0.75;  // adjust this!
+          float MIN_DIFFERENCE = 0.0499;  // adjust this!
+          static float last_value = NAN;
+          // ESP_LOGD("custom", "last_value: %f", last_value);
+          // ESP_LOGD("custom", "x: %f", x);
+          if (isnan(last_value) || (
+            // std::abs(x - last_value) < MAX_DIFFERENCE
+              std::abs(x - last_value) > MIN_DIFFERENCE
+              && (
+                x < MIN_ERROR_WINDOW
+                || x > MAX_ERROR_WINDOW
+              )
+            )
+          )
+            return last_value = x;
+          else
+            return {};
+    on_value:
+      # In Lambdas you can get the value from the trigger with x.
+      # 
+      # 0.0 = 0% = CLOSED
+      # 1.0 = 100% = OPEN
+      # return gate position from 0 to 1
+      then:
+        - cover.template.publish:
+            id: gate
+            position: !lambda |-
+              if (id(gate_is_open).state) {
+                if (id(part).state) {
+                  return 0.05;
+                } else {
+                  if (x < 0.1) {
+                    return 1;
+                  } else {
+                    return 1 - x / 2.4;
+                  }
+                }
+              } else {
+                return 0;
+              }
+        - sensor.template.publish:
+            id: pos
+            state:  !lambda |-
+              return (id(gate).position * 100);
+
+  - platform: template
+    name: "${friendly_name}position"
+    id: pos
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+
+  - platform: uptime
+    name: "${friendly_name} Uptime"
+
+  - platform: wifi_signal
+    name: "${friendly_name} WiFi Signal"
+    update_interval: 120s
+
+text_sensor:
+  # Installed version
+  - platform: template
+    name: "${friendly_name} Installed version"
+    id: glow_version
+    icon: "mdi:label-outline"
+    entity_category: diagnostic
+    lambda: |-
+      return {"${project_version}"};
+    update_interval: 6h
+  # ESPHome version
+  - platform: version
+    hide_timestamp: true
+    name: '${friendly_name} ESPHome Version'
+  # IP address and connected SSID
+  - platform: wifi_info
+    ip_address:
+      name: '${friendly_name} IP Address'
+      icon: mdi:wifi
+    ssid:
+      name: '${friendly_name} Connected SSID'
+      icon: mdi:wifi-strength-2
+
+status_led:
+  pin:
+    # Blue LED
+    number: ${status_led}
