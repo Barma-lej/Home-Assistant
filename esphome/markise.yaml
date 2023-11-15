@@ -7,7 +7,7 @@
 substitutions:
   device_name: "markise"
   friendly_name: Markise
-  project_version: "1.0.0"
+  project_version: "2023.11.0"
   device_description: "Control Somfy markise with the ESP-12F_Relay_X2 and Somfy Sender io (1822609)"
 
   # Define the GPIO pins

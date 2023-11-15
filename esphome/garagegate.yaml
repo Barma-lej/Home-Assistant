@@ -6,7 +6,7 @@
 substitutions:
   device_name: garagegate
   friendly_name: Tor
-  project_version: "2.2.1"
+  project_version: "2023.11.11"
   device_description: "Garagentorsteuerung mit der Positionskontrolle von Garagentoren"
 
   # Define the GPIO pins
