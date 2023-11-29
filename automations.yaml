@@ -58,7 +58,7 @@
     device_id: db8b13c767d84865a607aca77975a221
     entity_id: sensor.torposition
     domain: sensor
-    above: 50
+    above: 40
     for:
       hours: 0
       minutes: 0
@@ -94,8 +94,9 @@
   description: Garagenlicht ausschalten wenn das Garagentor geschlossen wurde
   trigger:
   - platform: state
-    entity_id: binary_sensor.tor_offen
-    to: 'off'
+    entity_id:
+    - binary_sensor.tor_ist_geschlossen
+    to: 'on'
     for:
       hours: 0
       minutes: 0
@@ -139,8 +140,9 @@
       minutes: 0
       seconds: 5
   - platform: state
-    entity_id: binary_sensor.tor_offen
-    to: 'off'
+    entity_id:
+    - binary_sensor.tor_ist_geschlossen
+    to: 'on'
     for:
       hours: 0
       minutes: 0
