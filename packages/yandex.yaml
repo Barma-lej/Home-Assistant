@@ -11,6 +11,7 @@ yandex_smart_home:
       - camera.einfahrt
       - camera.garage
       - camera.terrasse
+      - cover.markise
       - cover.tor
       - cover.shellyswitch25_f37a8c
       - cover.shellyswitch25_f37b28
@@ -57,6 +58,11 @@ yandex_smart_home:
     camera.terrasse:
       name: Камера
       room: Терраса
+
+    cover.markise:
+      name: маркиза
+      room: Терраса
+      type: devices.types.openable
 
     cover.tor:
       name: Ворота

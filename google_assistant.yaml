@@ -154,6 +154,16 @@ entity_config:
     room: Garage
     expose: true
 
+  cover.markise:
+    name: Markise
+    aliases:
+      - markise
+      - terrasse
+      - маркиза
+      - терраса
+    room: Garten
+    expose: true
+
   # sensor.gartorpos:
   #   name: Tor Status
   #   room: Garage
