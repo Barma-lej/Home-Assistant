@@ -7,12 +7,13 @@
 substitutions:
   device_name: "markise"
   friendly_name: Markise
+  room: "Garten"
   project_version: "2023.11.0"
   device_description: "Control Somfy markise with the ESP-12F_Relay_X2 and Somfy Sender io (1822609)"
 
   # Define the GPIO pins
-  relay1_pin: GPIO5
-  relay2_pin: GPIO4
+  relay1_pin: GPIO4
+  relay2_pin: GPIO5
   status_led_pin: GPIO2
 
   # Webserver credentials ⬇ #
@@ -74,6 +75,15 @@ status_led:
     number: ${status_led_pin}
     inverted: True
 
+button:
+  # Restart the ESP
+  - platform: restart
+    name: "${friendly_name} Restart"
+  # Boot in Safe mode
+  - platform: safe_mode
+    name: "${friendly_name} Safe Mode Boot"
+    entity_category: diagnostic
+
 # x2 relay outputs, exposed as switches in Home Assistant
 switch:
   - platform: gpio
@@ -81,16 +91,19 @@ switch:
     name: Relay1
     interlock: &interlock_group [relay1, relay2]
     id: relay1
+    internal: true
   - platform: gpio
     pin: ${relay2_pin}
     name: Relay2
     interlock: *interlock_group
     id: relay2
+    internal: true
 
   - platform: template
     name: "Öffnen ${friendly_name}"
     icon: "mdi:wave-arrow-up"
     id: open_markise
+    internal: true
     turn_on_action:
       - switch.turn_on: relay1
       - delay: 800ms
@@ -100,6 +113,7 @@ switch:
     name: "Schlissen ${friendly_name}"
     icon: "mdi:wave-arrow-up"
     id: close_markise
+    internal: true
     turn_on_action:
       - switch.turn_on: relay2
       - delay: 800ms
@@ -109,15 +123,17 @@ switch:
     name: "Stop ${friendly_name}"
     icon: "mdi:wave-arrow-up"
     id: stop_markise
+    internal: true
     turn_on_action:
       - switch.turn_on: relay1
-      - delay: 200ms
+      - delay: 100ms
       - switch.turn_off: relay1
 
 cover:
 - platform: time_based
   name: "${friendly_name}"
-  icon: "mdi:marquise"
+  device_class: awning
+  icon: "mdi:storefront"
   id: markise
   has_built_in_endstop: True
   open_action:
@@ -127,5 +143,5 @@ cover:
     - switch.turn_on: close_markise
   close_duration: 50s
   stop_action:
-    - switch.turn_off: stop_markise
+    - switch.turn_on: stop_markise
     # - switch.turn_off: close_markise
