@@ -14,7 +14,8 @@ automation:
     initial_state: false
     trigger:
       - platform: state
-        entity_id: vacuum.mower
+        # entity_id: vacuum.mower
+        entity_id: lawn_mower.mower
 
     condition:
       - condition: template
@@ -39,7 +40,8 @@ automation:
       #     entity_id: vacuum.mower
       #     attribute: error
       - platform: template
-        value_template: "{{ state_attr('vacuum.mower','error')['id'] }}"
+        value_template: "{{ states('sensor.mower_error') }}"
+        # value_template: "{{ state_attr('vacuum.mower','error')['id'] }}"
 
     condition:
       - condition: template
@@ -50,8 +52,10 @@ automation:
         data:
           title: 🏎️ Lanroid M500
           message: >-
-            *{{ trigger.to_state.state }}: {{ state_attr('vacuum.mower','error')['description'] }}*
-            <- {{ trigger.from_state.state }}: {{ state_attr('vacuum.mower','error')['description'] }}
+            *{{ trigger.to_state.state }}: {{ states('sensor.mower_error') }}*
+            <- {{ trigger.from_state.state }}: {{ states('sensor.mower_error') }}
+          # *{{ trigger.to_state.state }}: {{ state_attr('vacuum.mower','error')['description'] }}*
+          # <- {{ trigger.from_state.state }}: {{ state_attr('vacuum.mower','error')['description'] }}
 
     #  - service: persistent_notification.create
     #    data:
