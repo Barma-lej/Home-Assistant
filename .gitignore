@@ -31,12 +31,13 @@
 .cloud
 addons
 custom_components
+community
 deps
 # esphome Settings in the folder
 manuals
 script
 tts
-community
+unused
 
 # Ensure these YAML files are ignored, otherwise your secret data/credentials will leak.
 .HA_VERSION
