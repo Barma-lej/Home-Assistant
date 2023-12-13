@@ -195,40 +195,6 @@
           entity_id: select.garage_ptz_preset
     default: []
   mode: restart
-- id: '1651786976779'
-  alias: Aktualisierung - Benachrichtigung
-  description: Aktualisirungsbenachrichtigung
-  use_blueprint:
-    path: mdegat01/update_notifications.yaml
-    input:
-      reminder_hours: '6'
-      update_entities:
-      - update.duck_dns_update
-      - update.esphome_update
-      - update.fritz_box_7490_fritz_os
-      - update.ftp_update
-      - update.home_assistant_core_update
-      - update.home_assistant_supervisor_update
-      - update.mosquitto_broker_update
-      - update.samba_share_update
-      - update.sqlite_web_update
-      - update.studio_code_server_update
-      - update.tasmoadmin_update
-      - update.wled_soundreactive_firmware
-      - update.terrasse_update
-      - update.einfahrt_update
-      - update.garage_update
-      - update.terminal_ssh_update
-      - update.nginx_home_assistant_ssl_proxy_update
-      - update.home_assistant_glow_firmware
-      - update.garagegate_firmware
-      - update.pi_hole_dostupno_veb_obnovlenie
-      - update.pi_hole_dostupno_obnovlenie_iadra
-      - update.pi_hole_dostupno_obnovlenie_ftl
-      mobile_app_device: 52dde1dbd0bd045e5b6181020e86c549
-      run_config_check: false
-      send_to_ha: true
-      take_backup: true
 - id: '1661601350027'
   alias: Считана метка Red
   description: ''
