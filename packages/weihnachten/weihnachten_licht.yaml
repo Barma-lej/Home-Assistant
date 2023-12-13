@@ -1,19 +1,19 @@
 # group.weihnachten_licht
-group:
-  weihnachten_licht:
-    name: Weihnachten Licht
-    entities:
-      - switch.alfa01
-      - switch.sonoffs20_1
-      # - switch.sonoffs20_2
-      - switch.sonoffs26_2
+# group:
+#   weihnachten_licht:
+#     name: Weihnachten Licht
+#     entities:
+#       - switch.alfa01
+#       - switch.sonoffs20_1
+#       # - switch.sonoffs20_2
+#       - switch.sonoffs26_2
 
-  # weihnachten_licht_draussen:
-  #   name: Weihnachten Licht draussen
-  #   entities:
-  #     - switch.alfa01
-  #     - switch.sonoffs20_1
-  #     - switch.sonoffs26_2
+# weihnachten_licht_draussen:
+#   name: Weihnachten Licht draussen
+#   entities:
+#     - switch.alfa01
+#     - switch.sonoffs20_1
+#     - switch.sonoffs26_2
 
 # Automations #######################################################
 automation:
@@ -35,7 +35,7 @@ automation:
     action:
       - service: switch.turn_on
         data:
-          entity_id: group.weihnachten_licht
+          entity_id: switch.weihnachten
 
   # Weihnachten licht an wenn jemand kommt
   - id: weihnachten_licht_an_wenn_jemand_kommt
@@ -57,9 +57,9 @@ automation:
     action:
       - service: switch.turn_on
         data:
-          entity_id: group.weihnachten_licht
+          entity_id: switch.weihnachten
 
-    # Weihnachten licht an am Morgens
+  # Weihnachten licht an am Morgens
   - id: weihnachten_licht_an_anatolij
     # Anatolij Arbeit
     alias: Weihnachten - Licht An Anatolij
@@ -87,7 +87,7 @@ automation:
     action:
       - service: switch.turn_on
         data:
-          entity_id: group.weihnachten_licht
+          entity_id: switch.weihnachten
 
   # Einschalten wenn Natalja hat Dienst
   # - id: weihnachten_licht_an_natalja
@@ -104,7 +104,7 @@ automation:
   #   action:
   #     - service: switch.turn_on
   #       data:
-  #         entity_id: group.weihnachten_licht
+  #         entity_id: switch.weihnachten
 
   # Weihnachten licht aus
   - id: weihnachten_licht_aus
@@ -132,30 +132,31 @@ automation:
     action:
       - service: switch.turn_off
         data:
-          entity_id: group.weihnachten_licht
+          entity_id: switch.weihnachten
 
   # Weihnachten licht draussen
-  # Weihnachten licht draussen an
-  - id: weihnachten_licht_draussen_an
-    alias: Weihnachten - Licht Draussen An
-    trigger:
-      - platform: sun
-        event: sunset
-        offset: "00:20:00"
 
-    action:
-      - service: switch.turn_on
-        data:
-          entity_id: group.weihnachten_licht_draussen
+  # # Weihnachten licht draussen an
+  # - id: weihnachten_licht_draussen_an
+  #   alias: Weihnachten - Licht Draussen An
+  #   trigger:
+  #     - platform: sun
+  #       event: sunset
+  #       offset: "00:20:00"
 
-  # Weihnachten licht draussen aus
-  - id: weihnachten_licht_draussen_aus
-    alias: Weihnachten - Licht Draussen Aus
-    trigger:
-      - platform: time
-        at: "23:00:00"
+  #   action:
+  #     - service: switch.turn_on
+  #       data:
+  #         entity_id: switch.weihnachten_draussen
 
-    action:
-      - service: switch.turn_off
-        data:
-          entity_id: group.weihnachten_licht_draussen
+  # # Weihnachten licht draussen aus
+  # - id: weihnachten_licht_draussen_aus
+  #   alias: Weihnachten - Licht Draussen Aus
+  #   trigger:
+  #     - platform: time
+  #       at: "23:00:00"
+
+  #   action:
+  #     - service: switch.turn_off
+  #       data:
+  #         entity_id: switch.weihnachten_draussen
