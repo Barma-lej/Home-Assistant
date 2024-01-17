@@ -13,6 +13,10 @@ scene:
       switch.garage_push_notifications: "on"
       switch.garage_record: "on"
       switch.garage_record_audio: "on"
+      # switch.innen_ftp_upload: "on"
+      # switch.innen_push_notifications: "on"
+      # switch.innen_record: "on"
+      # switch.innen_record_audio: "on"
       switch.terrasse_ftp_upload: "on"
       switch.terrasse_push_notifications: "on"
       switch.terrasse_record: "on"
@@ -127,11 +131,25 @@ automation:
         - button.garage_ptz_down
         - button.garage_ptz_left
         - button.garage_ptz_right
+        - button.garage_ptz_zoom_in
+        - button.garage_ptz_zoom_out
+        - button.innen_ptz_up
+        - button.innen_ptz_down
+        - button.innen_ptz_left
+        - button.innen_ptz_right
+        - button.innen_ptz_zoom_in
+        - button.innen_ptz_zoom_out
 
     action:
-      - delay: 1
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 0
+          milliseconds: 600
       - service: button.press
         entity_id: button.garage_ptz_stop
+      - service: button.press
+        entity_id: button.innen_ptz_stop
 # Script ############################################################
 #script:
 ########################################
