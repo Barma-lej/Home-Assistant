@@ -335,11 +335,12 @@
   - platform: state
     entity_id:
     - sensor.ender_3_s1_pro_current_print_state
-    from: printing
+    from:
     for:
       hours: 0
       minutes: 10
       seconds: 0
+    to: complete
   condition: []
   action:
   - service: notify.telegram_schick_home
@@ -351,21 +352,18 @@
           caption: "\U0001F3ED 3D Druck ist fertig"
   - wait_for_trigger:
     - platform: numeric_state
-      entity_id: sensor.printer_3d_hotend_actual
-      below: 70
-      enabled: false
-    - platform: numeric_state
       entity_id: sensor.ender_3_s1_pro_extruder_temperature
       below: 70
     timeout:
       hours: 0
-      minutes: 5
+      minutes: 10
       seconds: 0
       milliseconds: 0
   - if:
     - condition: template
       value_template: '{{ not is_state(''sensor.ender_3_s1_pro_current_print_state'',''printing'')
-        }}'
+
+        and not is_state(''sensor.ender_3_s1_pro_current_print_state'',''paused'')}}'
     then:
     - service: switch.turn_off
       data: {}
@@ -387,7 +385,7 @@
       garbage_sensor_4: sensor.restabfall
       notifier: notify.telegram_schick_home
       day_offset: '1'
-      reminder_time: '20:00:00'
+      reminder_time: '18:20:00'
       reminder_message: 'Folgender Müll wird morgen abgeholt:'
       reminder_title: "\U0001F5D1️ Müllabfuhr Erinnerung"
 - id: '1694760290268'
@@ -410,3 +408,37 @@
   - service: tts.clear_cache
     data: {}
   mode: single
+- id: '1704829899531'
+  alias: Aktualisierung
+  description: Aktualisierungsbenachrichtigung
+  use_blueprint:
+    path: mdegat01/update_notifications.yaml
+    input:
+      update_entities:
+      - update.duck_dns_update
+      - update.einfahrt_update
+      - update.esphome_update
+      - update.fritz_box_7490_fritz_os
+      - update.ftp_update
+      - update.garage_update
+      - update.garagegate_firmware
+      - update.home_assistant_core_update
+      - update.home_assistant_supervisor_update
+      - update.home_assistant_glow_firmware
+      - update.markise_firmware
+      - update.mosquitto_broker_update
+      - update.nginx_home_assistant_ssl_proxy_update
+      - update.pi_hole_dostupno_veb_obnovlenie
+      - update.pi_hole_dostupno_obnovlenie_iadra
+      - update.pi_hole_dostupno_obnovlenie_ftl
+      - update.samba_share_update
+      - update.sqlite_web_update
+      - update.studio_code_server_update
+      - update.tasmoadmin_update
+      - update.terminal_ssh_update
+      - update.terrasse_update
+      mobile_app_device: 52dde1dbd0bd045e5b6181020e86c549
+      reminder_hours: '6'
+      run_config_check: true
+      send_to_ha: true
+      mobile_app_device_2: 52dde1dbd0bd045e5b6181020e86c549
