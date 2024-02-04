@@ -144,8 +144,8 @@ automation:
       - delay:
           hours: 0
           minutes: 0
-          seconds: 0
-          milliseconds: 600
+          seconds: 1
+          milliseconds: 000
       - service: button.press
         entity_id: button.garage_ptz_stop
       - service: button.press
