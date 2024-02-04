@@ -189,6 +189,7 @@ template:
 sensor:
   # Watering durations
   - platform: history_stats
+    unique_id: irrigation_switches_zone1
     name: Irrigation - Watering Duration Zone1 Daily
     entity_id: switch.irrigation_switches_zone1
     state: "on"
@@ -197,6 +198,7 @@ sensor:
     end: "{{ now() }}"
 
   - platform: history_stats
+    unique_id: irrigation_switches_zone2
     name: Irrigation - Watering Duration Zone2 Daily
     entity_id: switch.irrigation_switches_zone2
     state: "on"
@@ -205,6 +207,7 @@ sensor:
     end: "{{ now() }}"
 
   - platform: history_stats
+    unique_id: irrigation_switches_zone3
     name: Irrigation - Watering Duration Zone3 Daily
     entity_id: switch.irrigation_switches_zone3
     state: "on"
@@ -213,6 +216,7 @@ sensor:
     end: "{{ now() }}"
 
   - platform: history_stats
+    unique_id: irrigation_switches_pump
     name: Irrigation - Watering Duration Pump Daily
     entity_id: switch.irrigation_switches_pump
     state: "on"
