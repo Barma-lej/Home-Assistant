@@ -328,7 +328,7 @@
         media_stream: alarm_stream_max
         tts_text: Die Garage ist geschlossen
   mode: single
-- id: '1674331541169'
+- id: 3d_prtint_is_done
   alias: 3D - Druck ist fertig
   description: ''
   trigger:
@@ -442,3 +442,36 @@
       run_config_check: true
       send_to_ha: true
       mobile_app_device_2: 52dde1dbd0bd045e5b6181020e86c549
+- id: camera_manage_status_led
+  alias: Camera - Manage status LED
+  trigger:
+  - platform: sun
+    event: sunrise
+    id: sunrise
+  - platform: sun
+    event: sunset
+    id: sunset
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - sunrise
+      sequence:
+      - service: light.turn_on
+        metadata: {}
+        data: {}
+        target:
+          entity_id: light.innen_status_led
+    - conditions:
+      - condition: trigger
+        id:
+        - sunset
+      sequence:
+      - service: light.turn_off
+        metadata: {}
+        data: {}
+        target:
+          entity_id: light.innen_status_led
+  mode: single
