@@ -105,23 +105,23 @@ switch:
     id: open_markise
     internal: true
     turn_on_action:
-      - switch.turn_on: relay1
-      - delay: 800ms
-      - switch.turn_off: relay1
-
-  - platform: template
-    name: "Schlissen ${friendly_name}"
-    icon: "mdi:wave-arrow-up"
-    id: close_markise
-    internal: true
-    turn_on_action:
       - switch.turn_on: relay2
       - delay: 800ms
       - switch.turn_off: relay2
 
   - platform: template
+    name: "Schlissen ${friendly_name}"
+    icon: "mdi:wave-arrow-down"
+    id: close_markise
+    internal: true
+    turn_on_action:
+      - switch.turn_on: relay1
+      - delay: 800ms
+      - switch.turn_off: relay1
+
+  - platform: template
     name: "Stop ${friendly_name}"
-    icon: "mdi:wave-arrow-up"
+    icon: "mdi:wave"
     id: stop_markise
     internal: true
     turn_on_action:
