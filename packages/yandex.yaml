@@ -28,7 +28,8 @@ yandex_smart_home:
       - light.kristinas_licht
       - light.sonoffrf1
       - light.tuyaplug3
-      - media_player.sony_bravia_kd55x8505b
+      # - media_player.sony_bravia_kd55x8505b
+      - media_player.sony_kd_55x8505b
       - sensor.ble_temperature_temperatur_gt
       - sensor.ble_humidity_temperatur_gt
       - sensor.ble_temperature_temperatur_og
@@ -130,7 +131,8 @@ yandex_smart_home:
       room: Кристина
       type: devices.types.switch
 
-    media_player.sony_bravia_kd55x8505b:
+    # media_player.sony_bravia_kd55x8505b:
+    media_player.sony_kd_55x8505b:
       name: Телевизор
       room: Зал
       type: devices.types.media_device.tv

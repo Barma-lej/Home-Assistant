@@ -84,7 +84,8 @@ entity_config:
     room: Ambiente
     expose: true
 
-  media_player.sony_bravia_kd55x8505b:
+  # media_player.sony_bravia_kd55x8505b:
+  media_player.sony_kd_55x8505b:
     name: TV
     room: Wohnzimmer
     expose: true
