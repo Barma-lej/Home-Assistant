@@ -25,6 +25,7 @@ media_extractor:
     media_player.soundblaster:
       # video: bestvideo
       music: bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=ogg]/bestaudio
-    media_player.sony_bravia_kd55x8505b:
+    # media_player.sony_bravia_kd55x8505b:
+    media_player.sony_kd55x8505b:
       video: bestvideo
       music: bestaudio[ext=mp3]/bestaudio[ext=m4a]/bestaudio[ext=ogg]/bestaudio

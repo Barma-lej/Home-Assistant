@@ -46,7 +46,7 @@ automation:
     condition:
       - condition: or
         conditions:
-          - "{{ is_state('media_player.sony_bravia_kd55x8505b', 'off') }}"
+          - "{{ is_state('media_player.sony_kd_55x8505b', 'off') }}"
 
     action:
       - alias: "Выбор условий для выключения и включения TV Board"
