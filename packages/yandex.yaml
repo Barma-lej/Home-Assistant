@@ -30,6 +30,8 @@ yandex_smart_home:
       - light.tuyaplug3
       # - media_player.sony_bravia_kd55x8505b
       - media_player.sony_kd_55x8505b
+      - media_player.chromecast
+      # - media_player.tv_gq75qn92catxzg
       - sensor.ble_temperature_temperatur_gt
       - sensor.ble_humidity_temperatur_gt
       - sensor.ble_temperature_temperatur_og
@@ -133,34 +135,92 @@ yandex_smart_home:
 
     # media_player.sony_bravia_kd55x8505b:
     media_player.sony_kd_55x8505b:
-      name: Телевизор
-      room: Зал
+      name: Сони
+      room: Кристина
       type: devices.types.media_device.tv
 
+    media_player.chromecast:
+      name: Хромкаст
+      room: Зал
+      # type: devices.types.media_device.cast
+      features:
+        - volume_mute
+        - volume_set
+        - next_previous_track
+        # - select_source
+        - turn_on_off
+        - play_pause
+        - play_media
+
+    # media_player.tv_gq75qn92catxzg:
+    #   name: Телевизор
+    #   room: Зал
+    #   type: devices.types.media_device.tv
+
+    # sensor.room_temperature:
+    #   name: Погода в комнате
+    #   properties:
+    #     - type: temperature
+    #       entity: sensor.room_temperature
+    #     - type: humidity
+    #       entity: sensor.room_humidity
+    #     - type: co2_level
+    #       entity: sensor.room_co2_level
+    #     - type: illumination
+    #       entity: sensor.room_illumination_lux
+    #     - type: battery_level
+    #       entity: sensor.room_meteo_battery_level
     sensor.ble_temperature_temperatur_gt:
       name: Температура
       room: Терраса
       type: devices.types.sensor
-    sensor.ble_humidity_temperatur_gt:
-      name: Влажность
-      room: Терраса
-      type: devices.types.sensor
+      properties:
+        - type: temperature
+          entity: sensor.ble_temperature_temperatur_gt
+        - type: humidity
+          entity: sensor.ble_humidity_temperatur_gt
     sensor.ble_temperature_temperatur_og:
       name: Температура
-      room: Кристина
+      room: Терраса
       type: devices.types.sensor
-    sensor.ble_humidity_temperatur_og:
-      name: Влажность
-      room: Кристина
-      type: devices.types.sensor
+      properties:
+        - type: temperature
+          entity: sensor.ble_temperature_temperatur_og
+        - type: humidity
+          entity: sensor.ble_humidity_temperatur_og
     sensor.ble_temperature_temperatur_wz:
       name: Температура
-      room: Зал
+      room: Терраса
       type: devices.types.sensor
-    sensor.ble_humidity_temperatur_wz:
-      name: Влажность
-      room: Зал
-      type: devices.types.sensor
+      properties:
+        - type: temperature
+          entity: sensor.ble_temperature_temperatur_wz
+        - type: humidity
+          entity: sensor.ble_humidity_temperatur_wz
+    # sensor.ble_temperature_temperatur_gt:
+    #   name: Температура
+    #   room: Терраса
+    #   type: devices.types.sensor
+    # sensor.ble_humidity_temperatur_gt:
+    #   name: Влажность
+    #   room: Терраса
+    #   type: devices.types.sensor
+    # sensor.ble_temperature_temperatur_og:
+    #   name: Температура
+    #   room: Кристина
+    #   type: devices.types.sensor
+    # sensor.ble_humidity_temperatur_og:
+    #   name: Влажность
+    #   room: Кристина
+    #   type: devices.types.sensor
+    # sensor.ble_temperature_temperatur_wz:
+    #   name: Температура
+    #   room: Зал
+    #   type: devices.types.sensor
+    # sensor.ble_humidity_temperatur_wz:
+    #   name: Влажность
+    #   room: Зал
+    #   type: devices.types.sensor
 
     # switch.sonoffs26_1:
     #   name: Мультимедиа
