@@ -40,8 +40,8 @@ sun: # Track the sun
 system_health: # System Health integration data can be viewed in Developer Tools on the “Info” tab.
 websocket_api:
 
-folder_watcher:
-  - folder: /media/cams
+# folder_watcher:
+#   - folder: /media/cams
 
 # Show links to resources in log and frontend
 # introduction:
