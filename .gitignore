@@ -65,3 +65,4 @@ meteostat.yaml
 
 # esphome/garagegate.yaml
 packages/sonoffrfbridge.yaml
+www/images/pluto-qrcode.png
