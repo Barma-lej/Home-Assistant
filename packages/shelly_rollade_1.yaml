@@ -20,125 +20,125 @@ utility_meter:
 
 # Automation ########################################################
 automation:
-  - id: rolladen_close_if_its_hot
-    alias: Rolladen - schliessen wehh es heiss ist
-    mode: single
-    trigger:
-      - platform: numeric_state
-        entity_id: sun.sun
-        attribute: azimuth
-        above: 165
-        for:
-          minutes: 1
+  # - id: rolladen_close_if_its_hot
+  #   alias: Rolladen - schliessen wehh es heiss ist
+  #   mode: single
+  #   trigger:
+  #     - platform: numeric_state
+  #       entity_id: sun.sun
+  #       attribute: azimuth
+  #       above: 165
+  #       for:
+  #         minutes: 1
 
-      - platform: numeric_state
-        entity_id: sun.sun
-        attribute: azimuth
-        above: 185
-        for:
-          minutes: 1
+  #     - platform: numeric_state
+  #       entity_id: sun.sun
+  #       attribute: azimuth
+  #       above: 185
+  #       for:
+  #         minutes: 1
 
-      - platform: numeric_state
-        entity_id: sun.sun
-        attribute: azimuth
-        above: 225
-        for:
-          minutes: 1
+  #     - platform: numeric_state
+  #       entity_id: sun.sun
+  #       attribute: azimuth
+  #       above: 225
+  #       for:
+  #         minutes: 1
 
-      - platform: numeric_state
-        entity_id: sun.sun
-        attribute: azimuth
-        above: 265
-        for:
-          minutes: 1
+  #     - platform: numeric_state
+  #       entity_id: sun.sun
+  #       attribute: azimuth
+  #       above: 265
+  #       for:
+  #         minutes: 1
 
-    condition:
-      alias: "Жарче чем 24° и облачность ниже 40%"
-      and:
-        - condition: numeric_state
-          entity_id: "sensor.rasen_temperature"
-          above: 22
-        - condition: numeric_state
-          entity_id: "sensor.wetter_openweather_d_cloud_coverage"
-          below: 20
+  #   condition:
+  #     alias: "Жарче чем 24° и облачность ниже 40%"
+  #     and:
+  #       - condition: numeric_state
+  #         entity_id: "sensor.rasen_temperature"
+  #         above: 22
+  #       - condition: numeric_state
+  #         entity_id: "sensor.wetter_openweather_d_cloud_coverage"
+  #         below: 20
 
-    action:
-      - choose:
-          - conditions:
-              - and:
-                  - condition: numeric_state
-                    entity_id: sun.sun
-                    attribute: azimuth
-                    below: 185
-                  - condition: numeric_state
-                    entity_id: cover.shellyswitch25_f37a8c
-                    attribute: current_position
-                    above: 40
-            sequence:
-              - service: cover.set_cover_position
-                target:
-                  entity_id: cover.shellyswitch25_f37a8c
-                data:
-                  position: 33
+  #   action:
+  #     - choose:
+  #         - conditions:
+  #             - and:
+  #                 - condition: numeric_state
+  #                   entity_id: sun.sun
+  #                   attribute: azimuth
+  #                   below: 185
+  #                 - condition: numeric_state
+  #                   entity_id: cover.shellyswitch25_f37a8c
+  #                   attribute: current_position
+  #                   above: 40
+  #           sequence:
+  #             - service: cover.set_cover_position
+  #               target:
+  #                 entity_id: cover.shellyswitch25_f37a8c
+  #               data:
+  #                 position: 33
 
-          - conditions:
-              - and:
-                  - condition: numeric_state
-                    entity_id: sun.sun
-                    attribute: azimuth
-                    above: 184
-                  - condition: numeric_state
-                    entity_id: sun.sun
-                    attribute: azimuth
-                    below: 225
-                  - condition: numeric_state
-                    entity_id: cover.shellyswitch25_f37b28
-                    attribute: current_position
-                    above: 40
-            sequence:
-              - service: cover.set_cover_position
-                target:
-                  entity_id: cover.shellyswitch25_f37b28
-                data:
-                  position: 29
+  #         - conditions:
+  #             - and:
+  #                 - condition: numeric_state
+  #                   entity_id: sun.sun
+  #                   attribute: azimuth
+  #                   above: 184
+  #                 - condition: numeric_state
+  #                   entity_id: sun.sun
+  #                   attribute: azimuth
+  #                   below: 225
+  #                 - condition: numeric_state
+  #                   entity_id: cover.shellyswitch25_f37b28
+  #                   attribute: current_position
+  #                   above: 40
+  #           sequence:
+  #             - service: cover.set_cover_position
+  #               target:
+  #                 entity_id: cover.shellyswitch25_f37b28
+  #               data:
+  #                 position: 29
 
-          - conditions:
-              - and:
-                  - condition: numeric_state
-                    entity_id: sun.sun
-                    attribute: azimuth
-                    above: 224
-                  - condition: numeric_state
-                    entity_id: sun.sun
-                    attribute: azimuth
-                    below: 265
-                  - condition: numeric_state
-                    entity_id: cover.shellyswitch25_10eaa4
-                    attribute: current_position
-                    above: 40
-            sequence:
-              - service: cover.set_cover_position
-                target:
-                  entity_id: cover.shellyswitch25_10eaa4
-                data:
-                  position: 29
+  #         - conditions:
+  #             - and:
+  #                 - condition: numeric_state
+  #                   entity_id: sun.sun
+  #                   attribute: azimuth
+  #                   above: 224
+  #                 - condition: numeric_state
+  #                   entity_id: sun.sun
+  #                   attribute: azimuth
+  #                   below: 265
+  #                 - condition: numeric_state
+  #                   entity_id: cover.shellyswitch25_10eaa4
+  #                   attribute: current_position
+  #                   above: 40
+  #           sequence:
+  #             - service: cover.set_cover_position
+  #               target:
+  #                 entity_id: cover.shellyswitch25_10eaa4
+  #               data:
+  #                 position: 29
 
-          - conditions:
-              - and:
-                  - condition: numeric_state
-                    entity_id: sun.sun
-                    attribute: azimuth
-                    above: 264
-                  - condition: numeric_state
-                    entity_id: cover.shellyswitch25_10d315
-                    attribute: current_position
-                    above: 75
-            sequence:
-              - service: cover.set_cover_position
-                target:
-                  entity_id: cover.shellyswitch25_10d315
-                data:
-                  position: 60
+  #         - conditions:
+  #             - and:
+  #                 - condition: numeric_state
+  #                   entity_id: sun.sun
+  #                   attribute: azimuth
+  #                   above: 264
+  #                 - condition: numeric_state
+  #                   entity_id: cover.shellyswitch25_10d315
+  #                   attribute: current_position
+  #                   above: 75
+  #           sequence:
+  #             - service: cover.set_cover_position
+  #               target:
+  #                 entity_id: cover.shellyswitch25_10d315
+  #               data:
+  #                 position: 60
 
   - id: telegram_rollade_1
     alias: "Telegram - Rollade 1"
