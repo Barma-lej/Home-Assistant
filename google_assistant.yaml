@@ -85,9 +85,10 @@ entity_config:
     expose: true
 
   # media_player.sony_bravia_kd55x8505b:
+  # media_player.tv_gq75qn92catxzg:
   media_player.sony_kd_55x8505b:
-    name: TV
-    room: Wohnzimmer
+    name: Sony
+    room: Kristina
     expose: true
 
   group.ambientelight:
