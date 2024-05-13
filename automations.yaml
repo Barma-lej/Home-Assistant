@@ -1,381 +1,387 @@
 - id: tasmota_state_on_startup
   alias: Tasmota - Power state on HA startup
   trigger:
-  - event: start
-    platform: homeassistant
+    - event: start
+      platform: homeassistant
   action:
-  - data:
-      payload: '1'
-      topic: sonoffs/cmnd/state
-    service: mqtt.publish
-  - data:
-      payload: '1'
-      topic: sonoffs/tele/STATE
-    service: mqtt.publish
+    - data:
+        payload: "1"
+        topic: sonoffs/cmnd/state
+      service: mqtt.publish
+    - data:
+        payload: "1"
+        topic: sonoffs/tele/STATE
+      service: mqtt.publish
 - id: rolladen_auf
   alias: Rolladen - Auf
-  description: ''
+  description: ""
   trigger:
-  - event: sunrise
-    offset: 03:00:00
-    platform: sun
+    - event: sunrise
+      offset: 03:00:00
+      platform: sun
   condition: []
   action:
-  - data:
-      entity_id: cover.rolladen
-      position: 100
-    service: cover.set_cover_position
-  - data:
-      message: Rolladen geöffnet
-      title: "\U0001F53C Rolladen"
-    service: notify.telegram_schick_home
+    - data:
+        entity_id: cover.rolladen
+        position: 100
+      service: cover.set_cover_position
+    - data:
+        message: Rolladen geöffnet
+        title: "\U0001F53C Rolladen"
+      service: notify.telegram_schick_home
   mode: single
 - id: rolladen_zu
   alias: Rolladen - Zu
-  description: ''
+  description: ""
   trigger:
-  - event: sunset
-    offset: 01:30:00
-    platform: sun
+    - event: sunset
+      offset: 01:30:00
+      platform: sun
   condition: []
   action:
-  - data:
-      entity_id: cover.rolladen
-      position: 0
-    service: cover.set_cover_position
-  - data:
-      message: Rolladen geschlossen
-      title: "\U0001F53D Rolladen"
-    service: notify.telegram_schick_home
+    - data:
+        entity_id: cover.rolladen
+        position: 0
+      service: cover.set_cover_position
+    - data:
+        message: Rolladen geschlossen
+        title: "\U0001F53D Rolladen"
+      service: notify.telegram_schick_home
   mode: single
 - id: garagenlicht_einschalten
   alias: Garage - Licht einschalten
-  description: Garagenlicht einschalten nach der Sonnenunregang oder wenn es dunkel
+  description:
+    Garagenlicht einschalten nach der Sonnenunregang oder wenn es dunkel
     ist
   trigger:
-  - type: value
-    platform: device
-    device_id: db8b13c767d84865a607aca77975a221
-    entity_id: sensor.torposition
-    domain: sensor
-    above: 40
-    for:
-      hours: 0
-      minutes: 0
-      seconds: 5
-      milliseconds: 0
+    - type: value
+      platform: device
+      device_id: db8b13c767d84865a607aca77975a221
+      entity_id: sensor.torposition
+      domain: sensor
+      above: 40
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 5
+        milliseconds: 0
   condition:
-  - condition: or
-    conditions:
-    - condition: sun
-      before: sunrise
-      before_offset: 00:15:00
-    - condition: sun
-      after: sunset
-      after_offset: -00:15:00
+    - condition: or
+      conditions:
+        - condition: sun
+          before: sunrise
+          before_offset: 00:15:00
+        - condition: sun
+          after: sunset
+          after_offset: -00:15:00
   action:
-  - type: turn_on
-    device_id: 63713a671de1472e84d5832bcb399f0e
-    entity_id: light.sonoffbnsz01
-    domain: light
-    brightness_pct: 95
-  - delay:
-      hours: 0
-      minutes: 10
-      seconds: 0
-      milliseconds: 0
-  - type: turn_off
-    device_id: 63713a671de1472e84d5832bcb399f0e
-    entity_id: light.sonoffbnsz01
-    domain: light
+    - type: turn_on
+      device_id: 63713a671de1472e84d5832bcb399f0e
+      entity_id: light.sonoffbnsz01
+      domain: light
+      brightness_pct: 95
+    - delay:
+        hours: 0
+        minutes: 10
+        seconds: 0
+        milliseconds: 0
+    - type: turn_off
+      device_id: 63713a671de1472e84d5832bcb399f0e
+      entity_id: light.sonoffbnsz01
+      domain: light
   mode: restart
 - id: garagenlicht_ausschalten
   alias: Garage - Licht ausschalten
   description: Garagenlicht ausschalten wenn das Garagentor geschlossen wurde
   trigger:
-  - platform: state
-    entity_id:
-    - binary_sensor.tor_ist_geschlossen
-    to: 'on'
-    for:
-      hours: 0
-      minutes: 0
-      seconds: 5
-  - platform: state
-    entity_id: input_boolean.torteil
-    to: 'on'
-    for:
-      hours: 0
-      minutes: 0
-      seconds: 5
+    - platform: state
+      entity_id:
+        - binary_sensor.tor_ist_geschlossen
+      to: "on"
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 5
+    - platform: state
+      entity_id: input_boolean.torteil
+      to: "on"
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 5
   condition: []
   action:
-  - type: turn_off
-    device_id: 63713a671de1472e84d5832bcb399f0e
-    entity_id: light.sonoffbnsz01
-    domain: light
+    - type: turn_off
+      device_id: 63713a671de1472e84d5832bcb399f0e
+      entity_id: light.sonoffbnsz01
+      domain: light
   mode: restart
 - id: camera_garage_richtung
   alias: Camera - Garage Richtung
   description: Направление камеры в зависимости от положения гаражных ворот
   trigger:
-  - type: value
-    platform: device
-    device_id: db8b13c767d84865a607aca77975a221
-    entity_id: sensor.torposition
-    domain: sensor
-    above: 30
-    for:
-      hours: 0
-      minutes: 0
-      seconds: 5
-  - type: value
-    platform: device
-    device_id: db8b13c767d84865a607aca77975a221
-    entity_id: sensor.torposition
-    domain: sensor
-    below: 20
-    for:
-      hours: 0
-      minutes: 0
-      seconds: 5
-  - platform: state
-    entity_id:
-    - binary_sensor.tor_ist_geschlossen
-    to: 'on'
-    for:
-      hours: 0
-      minutes: 0
-      seconds: 3
-  - platform: state
-    entity_id: input_boolean.torteil
-    to: 'on'
-    for:
-      hours: 0
-      minutes: 0
-      seconds: 5
-  condition: []
-  action:
-  - choose:
-    - conditions:
-      - type: is_value
-        condition: device
-        device_id: db8b13c767d84865a607aca77975a221
-        entity_id: sensor.torposition
-        domain: sensor
-        above: 30
-      sequence:
-      - service: select.select_option
-        data:
-          option: Tor
-        target:
-          entity_id: select.garage_ptz_preset
-    - conditions:
-      - type: is_value
-        condition: device
-        device_id: db8b13c767d84865a607aca77975a221
-        entity_id: sensor.tor_distanz
-        domain: sensor
-        below: 20
-      sequence:
-      - service: select.select_option
-        data:
-          option: Tuer
-        target:
-          entity_id: select.garage_ptz_preset
-      - delay:
-          hours: 0
-          minutes: 0
-          seconds: 30
-          milliseconds: 0
-      - service: select.select_option
-        data:
-          option: Tuer
-        target:
-          entity_id: select.garage_ptz_preset
-    default: []
-  mode: restart
-- id: '1661601350027'
-  alias: Считана метка Red
-  description: ''
-  trigger:
-  - platform: tag
-    tag_id: 4d4d9d64-59ff-4a65-8d8c-d1a088f46599
-  condition: []
-  action:
-  - service: switch.toggle
-    data: {}
-    target:
-      entity_id: switch.tor
-  mode: single
-- id: '1661607357549'
-  alias: Считана метка Green
-  description: ''
-  trigger:
-  - platform: tag
-    tag_id: 25cf4f63-039d-47b6-8012-32e9e6cb831d
-  condition: []
-  action:
-  - service: light.toggle
-    data: {}
-    target:
-      entity_id: light.sonoffpow_01
-  mode: single
-- id: '1668006470208'
-  alias: Garage - Coming home
-  description: Open tor if Tiguan is coming to home
-  trigger:
-  - platform: device
-    device_id: 52dde1dbd0bd045e5b6181020e86c549
-    domain: device_tracker
-    entity_id: device_tracker.sm_g996b
-    type: enters
-    zone: zone.home
-  condition:
-  - condition: state
-    entity_id: sensor.sm_g996b_bluetooth_connection
-    attribute: connected_paired_devices
-    state: B4:EC:02:94:8A:CF (VW BT 1505)
-    enabled: false
-  - condition: numeric_state
-    entity_id: sensor.torposition
-    below: 10
-  - condition: or
-    conditions:
-    - condition: template
-      value_template: '{{ "68:4E:05:63:56:10 (VOLKSWAGEN-21ED)" in state_attr("sensor.sm_g996b_bluetooth_connection",
-        "connected_paired_devices") }}'
-    - condition: template
-      value_template: '{{ "B4:EC:02:94:8A:CF (VW BT 1505)" in state_attr("sensor.sm_g996b_bluetooth_connection",
-        "connected_paired_devices") }}'
-  action:
-  - service: switch.turn_on
-    data: {}
-    target:
-      entity_id: switch.tor
-  - service: notify.mobile_app_sm_g996b
-    data:
-      message: TTS
-      title: Garage
-      data:
-        ttl: 0
-        priority: high
-        media_stream: alarm_stream_max
-        tts_text: Die Garage öffnet
-  mode: single
-- id: '1668017327174'
-  alias: Garage - Leaving home
-  description: Close tor if Tiguan is leaving home
-  trigger:
-  - platform: device
-    device_id: 52dde1dbd0bd045e5b6181020e86c549
-    domain: device_tracker
-    entity_id: device_tracker.sm_g996b
-    type: leaves
-    zone: zone.home
-  condition:
-  - condition: state
-    entity_id: sensor.sm_g996b_bluetooth_connection
-    attribute: connected_paired_devices
-    state: B4:EC:02:94:8A:CF (VW BT 1505)
-    enabled: false
-  - condition: or
-    conditions:
-    - condition: template
-      value_template: '{{ "68:4E:05:63:56:10 (VOLKSWAGEN-21ED)" in state_attr("sensor.sm_g996b_bluetooth_connection",
-        "connected_paired_devices") }}'
-    - condition: template
-      value_template: '{{ "B4:EC:02:94:8A:CF (VW BT 1505)" in state_attr("sensor.sm_g996b_bluetooth_connection",
-        "connected_paired_devices") }}'
-  - condition: numeric_state
-    entity_id: sensor.torposition
-    above: 5
-  action:
-  - service: switch.turn_on
-    data: {}
-    target:
-      entity_id: switch.tor
-  - service: notify.mobile_app_sm_g996b
-    data:
-      message: TTS
-      title: Garage
-      data:
-        ttl: 0
-        priority: high
-        media_stream: alarm_stream_max
-        tts_text: Die Garage schlisst
-  - wait_for_trigger:
-    - platform: numeric_state
+    - type: value
+      platform: device
+      device_id: db8b13c767d84865a607aca77975a221
       entity_id: sensor.torposition
+      domain: sensor
+      above: 30
       for:
         hours: 0
         minutes: 0
         seconds: 5
-      below: 6
-    timeout:
-      hours: 0
-      minutes: 0
-      seconds: 30
-      milliseconds: 0
-    continue_on_timeout: false
-  - service: notify.mobile_app_sm_g996b
-    data:
-      message: TTS
-      title: Garage
+    - type: value
+      platform: device
+      device_id: db8b13c767d84865a607aca77975a221
+      entity_id: sensor.torposition
+      domain: sensor
+      below: 20
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 5
+    - platform: state
+      entity_id:
+        - binary_sensor.tor_ist_geschlossen
+      to: "on"
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 3
+    - platform: state
+      entity_id: input_boolean.torteil
+      to: "on"
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 5
+  condition: []
+  action:
+    - choose:
+        - conditions:
+            - type: is_value
+              condition: device
+              device_id: db8b13c767d84865a607aca77975a221
+              entity_id: sensor.torposition
+              domain: sensor
+              above: 30
+          sequence:
+            - service: select.select_option
+              data:
+                option: Tor
+              target:
+                entity_id: select.garage_ptz_preset
+        - conditions:
+            - type: is_value
+              condition: device
+              device_id: db8b13c767d84865a607aca77975a221
+              entity_id: sensor.tor_distanz
+              domain: sensor
+              below: 20
+          sequence:
+            - service: select.select_option
+              data:
+                option: Tuer
+              target:
+                entity_id: select.garage_ptz_preset
+            - delay:
+                hours: 0
+                minutes: 0
+                seconds: 30
+                milliseconds: 0
+            - service: select.select_option
+              data:
+                option: Tuer
+              target:
+                entity_id: select.garage_ptz_preset
+      default: []
+  mode: restart
+- id: "1661601350027"
+  alias: Считана метка Red
+  description: ""
+  trigger:
+    - platform: tag
+      tag_id: 4d4d9d64-59ff-4a65-8d8c-d1a088f46599
+  condition: []
+  action:
+    - service: switch.toggle
+      data: {}
+      target:
+        entity_id: switch.tor
+  mode: single
+- id: "1661607357549"
+  alias: Считана метка Green
+  description: ""
+  trigger:
+    - platform: tag
+      tag_id: 25cf4f63-039d-47b6-8012-32e9e6cb831d
+  condition: []
+  action:
+    - service: light.toggle
+      data: {}
+      target:
+        entity_id: light.sonoffpow_01
+  mode: single
+- id: "1668006470208"
+  alias: Garage - Coming home
+  description: Open tor if Tiguan is coming to home
+  trigger:
+    - platform: device
+      device_id: 52dde1dbd0bd045e5b6181020e86c549
+      domain: device_tracker
+      entity_id: device_tracker.sm_g996b
+      type: enters
+      zone: zone.home
+  condition:
+    - condition: state
+      entity_id: sensor.sm_g996b_bluetooth_connection
+      attribute: connected_paired_devices
+      state: B4:EC:02:94:8A:CF (VW BT 1505)
+      enabled: false
+    - condition: numeric_state
+      entity_id: sensor.torposition
+      below: 10
+    - condition: or
+      conditions:
+        - condition: template
+          value_template:
+            '{{ "68:4E:05:63:56:10 (VOLKSWAGEN-21ED)" in state_attr("sensor.sm_g996b_bluetooth_connection",
+            "connected_paired_devices") }}'
+        - condition: template
+          value_template:
+            '{{ "B4:EC:02:94:8A:CF (VW BT 1505)" in state_attr("sensor.sm_g996b_bluetooth_connection",
+            "connected_paired_devices") }}'
+  action:
+    - service: switch.turn_on
+      data: {}
+      target:
+        entity_id: switch.tor
+    - service: notify.mobile_app_sm_g996b
       data:
-        ttl: 0
-        priority: high
-        media_stream: alarm_stream_max
-        tts_text: Die Garage ist geschlossen
+        message: TTS
+        title: Garage
+        data:
+          ttl: 0
+          priority: high
+          media_stream: alarm_stream_max
+          tts_text: Die Garage öffnet
+  mode: single
+- id: "1668017327174"
+  alias: Garage - Leaving home
+  description: Close tor if Tiguan is leaving home
+  trigger:
+    - platform: device
+      device_id: 52dde1dbd0bd045e5b6181020e86c549
+      domain: device_tracker
+      entity_id: device_tracker.sm_g996b
+      type: leaves
+      zone: zone.home
+  condition:
+    - condition: state
+      entity_id: sensor.sm_g996b_bluetooth_connection
+      attribute: connected_paired_devices
+      state: B4:EC:02:94:8A:CF (VW BT 1505)
+      enabled: false
+    - condition: or
+      conditions:
+        - condition: template
+          value_template:
+            '{{ "68:4E:05:63:56:10 (VOLKSWAGEN-21ED)" in state_attr("sensor.sm_g996b_bluetooth_connection",
+            "connected_paired_devices") }}'
+        - condition: template
+          value_template:
+            '{{ "B4:EC:02:94:8A:CF (VW BT 1505)" in state_attr("sensor.sm_g996b_bluetooth_connection",
+            "connected_paired_devices") }}'
+    - condition: numeric_state
+      entity_id: sensor.torposition
+      above: 5
+  action:
+    - service: switch.turn_on
+      data: {}
+      target:
+        entity_id: switch.tor
+    - service: notify.mobile_app_sm_g996b
+      data:
+        message: TTS
+        title: Garage
+        data:
+          ttl: 0
+          priority: high
+          media_stream: alarm_stream_max
+          tts_text: Die Garage schlisst
+    - wait_for_trigger:
+        - platform: numeric_state
+          entity_id: sensor.torposition
+          for:
+            hours: 0
+            minutes: 0
+            seconds: 5
+          below: 6
+      timeout:
+        hours: 0
+        minutes: 0
+        seconds: 30
+        milliseconds: 0
+      continue_on_timeout: false
+    - service: notify.mobile_app_sm_g996b
+      data:
+        message: TTS
+        title: Garage
+        data:
+          ttl: 0
+          priority: high
+          media_stream: alarm_stream_max
+          tts_text: Die Garage ist geschlossen
   mode: single
 - id: 3d_prtint_is_done
   alias: 3D - Druck ist fertig
-  description: ''
+  description: ""
   trigger:
-  - platform: state
-    entity_id:
-    - sensor.ender_3_s1_pro_current_print_state
-    from:
-    for:
-      hours: 0
-      minutes: 10
-      seconds: 0
-    to: complete
+    - platform: state
+      entity_id:
+        - sensor.ender_3_s1_pro_current_print_state
+      from:
+      for:
+        hours: 0
+        minutes: 10
+        seconds: 0
+      to: complete
   condition: []
   action:
-  - service: notify.telegram_schick_home
-    data:
-      message: "\U0001F3ED 3D Druck ist fertig"
-      data:
-        photo:
-        - url: '{{ state_attr(''sensor.ender_3_s1_pro_thumbnail'',''url'') }}'
-          caption: "\U0001F3ED 3D Druck ist fertig"
-  - wait_for_trigger:
-    - platform: numeric_state
-      entity_id: sensor.ender_3_s1_pro_extruder_temperature
-      below: 70
-    timeout:
-      hours: 0
-      minutes: 10
-      seconds: 0
-      milliseconds: 0
-  - if:
-    - condition: template
-      value_template: '{{ not is_state(''sensor.ender_3_s1_pro_current_print_state'',''printing'')
-
-        and not is_state(''sensor.ender_3_s1_pro_current_print_state'',''paused'')}}'
-    then:
-    - service: switch.turn_off
-      data: {}
-      target:
-        entity_id: switch.tuyaplug1
     - service: notify.telegram_schick_home
       data:
-        message: "\U0001F3ED 3D Drucker ist ausgeschaltet"
+        message: "\U0001F3ED 3D Druck ist fertig"
+        data:
+          photo:
+            - url: "{{ state_attr('sensor.ender_3_s1_pro_thumbnail','url') }}"
+              caption: "\U0001F3ED 3D Druck ist fertig"
+    - wait_for_trigger:
+        - platform: numeric_state
+          entity_id: sensor.ender_3_s1_pro_extruder_temperature
+          below: 70
+      timeout:
+        hours: 0
+        minutes: 10
+        seconds: 0
+        milliseconds: 0
+    - if:
+        - condition: template
+          value_template:
+            "{{ not is_state('sensor.ender_3_s1_pro_current_print_state','printing')
+
+            and not is_state('sensor.ender_3_s1_pro_current_print_state','paused')}}"
+      then:
+        - service: switch.turn_off
+          data: {}
+          target:
+            entity_id: switch.tuyaplug1
+        - service: notify.telegram_schick_home
+          data:
+            message: "\U0001F3ED 3D Drucker ist ausgeschaltet"
   mode: single
-- id: '1674336725023'
+- id: "1674336725023"
   alias: Erinnerung - Mühlabfuhr
-  description: ''
+  description: ""
   use_blueprint:
     path: westenberg/garbage-reminder.yaml
     input:
@@ -384,94 +390,286 @@
       garbage_sensor_3: sensor.papier
       garbage_sensor_4: sensor.restabfall
       notifier: notify.telegram_schick_home
-      day_offset: '1'
-      reminder_time: '18:20:00'
-      reminder_message: 'Folgender Müll wird morgen abgeholt:'
+      day_offset: "1"
+      reminder_time: "18:20:00"
+      reminder_message: "Folgender Müll wird morgen abgeholt:"
       reminder_title: "\U0001F5D1️ Müllabfuhr Erinnerung"
-- id: '1694760290268'
+- id: "1694760290268"
   alias: HASS - CleanUp stale devices
   description: Remove all stale devices from Home Assistant
   trigger:
-  - platform: time
-    at: 00:00:00
+    - platform: time
+      at: 00:00:00
   condition:
-  - condition: time
-    weekday:
-    - mon
+    - condition: time
+      weekday:
+        - mon
   action:
-  - service: button.press
-    data: {}
-    target:
-      entity_id: button.fritz_box_7490_cleanup
-  - service: ble_monitor.cleanup_entries
-    data: {}
-  - service: tts.clear_cache
-    data: {}
+    - service: button.press
+      data: {}
+      target:
+        entity_id: button.fritz_box_7490_cleanup
+    - service: ble_monitor.cleanup_entries
+      data: {}
+    - service: tts.clear_cache
+      data: {}
   mode: single
-- id: '1704829899531'
+- id: "1704829899531"
   alias: Aktualisierung
   description: Aktualisierungsbenachrichtigung
   use_blueprint:
     path: mdegat01/update_notifications.yaml
     input:
       update_entities:
-      - update.duck_dns_update
-      - update.einfahrt_update
-      - update.esphome_update
-      - update.fritz_box_7490_fritz_os
-      - update.ftp_update
-      - update.garage_update
-      - update.garagegate_firmware
-      - update.home_assistant_core_update
-      - update.home_assistant_supervisor_update
-      - update.home_assistant_glow_firmware
-      - update.markise_firmware
-      - update.mosquitto_broker_update
-      - update.nginx_home_assistant_ssl_proxy_update
-      - update.pi_hole_dostupno_veb_obnovlenie
-      - update.pi_hole_dostupno_obnovlenie_iadra
-      - update.pi_hole_dostupno_obnovlenie_ftl
-      - update.samba_share_update
-      - update.sqlite_web_update
-      - update.studio_code_server_update
-      - update.tasmoadmin_update
-      - update.terminal_ssh_update
-      - update.terrasse_update
+        - update.duck_dns_update
+        - update.einfahrt_update
+        - update.esphome_update
+        - update.fritz_box_7490_fritz_os
+        - update.ftp_update
+        - update.garage_update
+        - update.garagegate_firmware
+        - update.home_assistant_core_update
+        - update.home_assistant_supervisor_update
+        - update.home_assistant_glow_firmware
+        - update.markise_firmware
+        - update.mosquitto_broker_update
+        - update.nginx_home_assistant_ssl_proxy_update
+        - update.pi_hole_dostupno_veb_obnovlenie
+        - update.pi_hole_dostupno_obnovlenie_iadra
+        - update.pi_hole_dostupno_obnovlenie_ftl
+        - update.samba_share_update
+        - update.sqlite_web_update
+        - update.studio_code_server_update
+        - update.tasmoadmin_update
+        - update.terminal_ssh_update
+        - update.terrasse_update
+        - update.innen_firmware
+        - update.matter_server_update
+        - update.vlc_update
+        - update.fritz_box_7590_ax_fritz_os
       mobile_app_device: 52dde1dbd0bd045e5b6181020e86c549
-      reminder_hours: '6'
+      reminder_hours: "6"
       run_config_check: true
       send_to_ha: true
       mobile_app_device_2: 52dde1dbd0bd045e5b6181020e86c549
 - id: camera_manage_status_led
   alias: Camera - Manage status LED
   trigger:
-  - platform: sun
-    event: sunrise
-    id: sunrise
-  - platform: sun
-    event: sunset
-    id: sunset
+    - platform: sun
+      event: sunrise
+      id: sunrise
+    - platform: sun
+      event: sunset
+      id: sunset
   condition: []
   action:
-  - choose:
-    - conditions:
-      - condition: trigger
-        id:
-        - sunrise
-      sequence:
-      - service: light.turn_on
-        metadata: {}
-        data: {}
-        target:
-          entity_id: light.innen_status_led
-    - conditions:
-      - condition: trigger
-        id:
-        - sunset
-      sequence:
-      - service: light.turn_off
-        metadata: {}
-        data: {}
-        target:
-          entity_id: light.innen_status_led
+    - choose:
+        - conditions:
+            - condition: trigger
+              id:
+                - sunrise
+          sequence:
+            - service: light.turn_on
+              metadata: {}
+              data: {}
+              target:
+                entity_id: light.innen_status_led
+        - conditions:
+            - condition: trigger
+              id:
+                - sunset
+          sequence:
+            - service: light.turn_off
+              metadata: {}
+              data: {}
+              target:
+                entity_id: light.innen_status_led
+  mode: single
+- id: tv_board_manage
+  alias: TV Board - Verwaltung
+  description: "Funktioniert nur wenn TV aus ist.
+
+    Wenn TV Board ist an und (Niemand ist Zuhause oder Zeit ist zwischen 23:00 und
+    11:00) dann TV Board ausschalten
+
+    Wenn TV Board ist aus und (Jemand ist Zuhause oder Zeit ist zwischen 11:00 and
+    23:00) dann TV Board einschalten"
+  trigger:
+    - platform: state
+      entity_id: group.family
+      for: 00:04:00
+    - platform: time_pattern
+      minutes: /15
+  condition:
+    - condition: or
+      conditions:
+        - condition: template
+          value_template: "{{ is_state('media_player.sony_kd55x8505b', 'off') }}"
+          enabled: false
+        - condition: state
+          entity_id: media_player.sony_kd_55x8505b
+          state: "off"
+          enabled: false
+        - condition: device
+          type: is_off
+          device_id: b27f8710204ef17c5ceec7d600094266
+          entity_id: 392d29df68afcbb2f120844915de46d5
+          domain: switch
+          enabled: false
+        - condition: state
+          entity_id: media_player.tv_gq75qn92catxzg
+          state: "off"
+  action:
+    - alias: Выбор условий для выключения и включения TV Board
+      choose:
+        - conditions:
+            - condition: template
+              value_template:
+                "{{ is_state('switch.tuyaplug2', 'on') and (is_state('group.family',
+                'not_home') or now().hour < 12 or now().hour > 22) }}"
+          sequence:
+            - service: switch.turn_off
+              target:
+                entity_id: switch.tuyaplug2
+              data: {}
+        - conditions:
+            - condition: template
+              value_template:
+                "{{ is_state('switch.tuyaplug2', 'off') and is_state('group.family',
+                'home') and (now().hour > 11 and now().hour < 23) }}"
+          sequence:
+            - service: switch.turn_on
+              target:
+                entity_id: switch.tuyaplug2
+              data: {}
+  mode: single
+- id: "1714732164364"
+  alias: Irrigation - Notify Valve 1
+  description: ""
+  trigger:
+    - platform: state
+      entity_id:
+        - switch.irrigation_zone1_valve
+      to:
+  condition: []
+  action:
+    - service: notify.telegram_schick_home
+      data:
+        title: "\U0001F4A6 Bewässerung"
+        message:
+          "{{ trigger.to_state.attributes.friendly_name }} *{{ trigger.to_state.state
+          }}*"
+  mode: single
+- id: rolladen_close_if_its_hot
+  alias: Rolladen - schliessen wehh es heiss ist
+  description: ""
+  trigger:
+    - platform: numeric_state
+      entity_id: sun.sun
+      attribute: azimuth
+      above: 165
+      for:
+        minutes: 1
+    - platform: numeric_state
+      entity_id: sun.sun
+      attribute: azimuth
+      above: 185
+      for:
+        minutes: 1
+    - platform: numeric_state
+      entity_id: sun.sun
+      attribute: azimuth
+      above: 225
+      for:
+        minutes: 1
+    - platform: numeric_state
+      entity_id: sun.sun
+      attribute: azimuth
+      above: 265
+      for:
+        minutes: 1
+  condition:
+    - alias: Жарче чем 24° и облачность ниже 40%
+      condition: and
+      conditions:
+        - condition: numeric_state
+          entity_id: sensor.rasen_temperature
+          above: 22
+        - condition: numeric_state
+          entity_id: sensor.wetter_openweather_d_cloud_coverage
+          below: 40
+  action:
+    - choose:
+        - conditions:
+            - and:
+                - condition: numeric_state
+                  entity_id: sun.sun
+                  attribute: azimuth
+                  below: 185
+                - condition: numeric_state
+                  entity_id: cover.shellyswitch25_f37a8c
+                  attribute: current_position
+                  above: 40
+          sequence:
+            - service: cover.set_cover_position
+              target:
+                entity_id: cover.shellyswitch25_f37a8c
+              data:
+                position: 33
+        - conditions:
+            - and:
+                - condition: numeric_state
+                  entity_id: sun.sun
+                  attribute: azimuth
+                  above: 184
+                - condition: numeric_state
+                  entity_id: sun.sun
+                  attribute: azimuth
+                  below: 225
+                - condition: numeric_state
+                  entity_id: cover.shellyswitch25_f37b28
+                  attribute: current_position
+                  above: 40
+          sequence:
+            - service: cover.set_cover_position
+              target:
+                entity_id: cover.shellyswitch25_f37b28
+              data:
+                position: 29
+        - conditions:
+            - and:
+                - condition: numeric_state
+                  entity_id: sun.sun
+                  attribute: azimuth
+                  above: 224
+                - condition: numeric_state
+                  entity_id: sun.sun
+                  attribute: azimuth
+                  below: 265
+                - condition: numeric_state
+                  entity_id: cover.shellyswitch25_10eaa4
+                  attribute: current_position
+                  above: 40
+          sequence:
+            - service: cover.set_cover_position
+              target:
+                entity_id: cover.shellyswitch25_10eaa4
+              data:
+                position: 29
+        - conditions:
+            - and:
+                - condition: numeric_state
+                  entity_id: sun.sun
+                  attribute: azimuth
+                  above: 264
+                - condition: numeric_state
+                  entity_id: cover.shellyswitch25_10d315
+                  attribute: current_position
+                  above: 75
+          sequence:
+            - service: cover.set_cover_position
+              target:
+                entity_id: cover.shellyswitch25_10d315
+              data:
+                position: 60
   mode: single
