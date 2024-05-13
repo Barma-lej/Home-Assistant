@@ -26,6 +26,7 @@ input_boolean:
 
 timer:
   alarm_indoor:
+    name: "Alarm drinnen"
     duration: "00:00:05"
 
 automation:
