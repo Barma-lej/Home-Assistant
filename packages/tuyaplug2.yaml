@@ -29,50 +29,50 @@ utility_meter:
     cycle: yearly
 
 # Automations ###################################
-automation:
-  # TV Board on  -> TV off -> Niemand Zuhause -> TV Board off
-  #                           Jemand Zuhause  -> Zeit ist zwischen 23:00 and 11:00 -> TV Board off
-  #          off -> Jemand Zuhause -> Zeit ist zwischen 11:00 and 23:00 -> TV Board on
-  - id: tv_board_manage
-    alias: "TV Board - Verwaltung"
-    trigger:
-      - platform: state
-        entity_id: group.family
-        for: "00:04:00"
+# automation:
+#   # TV Board on  -> TV off -> Niemand Zuhause -> TV Board off
+#   #                           Jemand Zuhause  -> Zeit ist zwischen 23:00 and 11:00 -> TV Board off
+#   #          off -> Jemand Zuhause -> Zeit ist zwischen 11:00 and 23:00 -> TV Board on
+#   - id: tv_board_manage
+#     alias: "TV Board - Verwaltung"
+#     trigger:
+#       - platform: state
+#         entity_id: group.family
+#         for: "00:04:00"
 
-      - platform: time_pattern
-        minutes: "/15"
+#       - platform: time_pattern
+#         minutes: "/15"
 
-    condition:
-      - condition: or
-        conditions:
-          - "{{ is_state('media_player.sony_kd_55x8505b', 'off') }}"
+#     condition:
+#       - condition: or
+#         conditions:
+#           - "{{ is_state('media_player.sony_kd_55x8505b', 'off') }}"
 
-    action:
-      - alias: "Выбор условий для выключения и включения TV Board"
-        choose:
-          - conditions:
-              - "{{ is_state('switch.tuyaplug2', 'on')
-                and is_state('group.family', 'not_home') }}"
-            sequence:
-              - service: switch.turn_off
-                target:
-                  entity_id: switch.tuyaplug2
-          - conditions:
-              - "{{ is_state('switch.tuyaplug2', 'on')
-                and (now().hour < 12 or now().hour > 22) }}"
-            sequence:
-              - service: switch.turn_off
-                target:
-                  entity_id: switch.tuyaplug2
-          - conditions:
-              - "{{ is_state('switch.tuyaplug2', 'off')
-                and is_state('group.family', 'home')
-                and (now().hour > 11 and now().hour < 23) }}"
-            sequence:
-              - service: switch.turn_on
-                target:
-                  entity_id: switch.tuyaplug2
+#     action:
+#       - alias: "Выбор условий для выключения и включения TV Board"
+#         choose:
+#           - conditions:
+#               - "{{ is_state('switch.tuyaplug2', 'on')
+#                 and is_state('group.family', 'not_home') }}"
+#             sequence:
+#               - service: switch.turn_off
+#                 target:
+#                   entity_id: switch.tuyaplug2
+#           - conditions:
+#               - "{{ is_state('switch.tuyaplug2', 'on')
+#                 and (now().hour < 12 or now().hour > 22) }}"
+#             sequence:
+#               - service: switch.turn_off
+#                 target:
+#                   entity_id: switch.tuyaplug2
+#           - conditions:
+#               - "{{ is_state('switch.tuyaplug2', 'off')
+#                 and is_state('group.family', 'home')
+#                 and (now().hour > 11 and now().hour < 23) }}"
+#             sequence:
+#               - service: switch.turn_on
+#                 target:
+#                   entity_id: switch.tuyaplug2
 
 # Customize #####################################
 homeassistant:
