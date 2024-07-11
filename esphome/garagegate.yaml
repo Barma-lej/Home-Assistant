@@ -64,10 +64,12 @@ api:
     key: !secret garagentor_api
 
 ota:
-  safe_mode: true
+  platform: esphome
   password: !secret ota_password
-  reboot_timeout: 10min
+
+safe_mode:
   num_attempts: 5
+  reboot_timeout: 10min
 
 web_server:
   port: 80
