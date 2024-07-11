@@ -41,7 +41,7 @@ yandex_smart_home:
       # - switch.sonoffs26_1
       - switch.tuyaplug2
       # - vacuum.mower
-      - vacuum.robi
+      # - vacuum.robi
     # include_entity_globs:
     #   - sensor.temperature_*
     # exclude_entities:
@@ -92,7 +92,8 @@ yandex_smart_home:
     fan.ventilator:
       name: Вентилятор
       room: Зал
-      type: devices.types.thermostat
+      type: devices.types.ventilation.fan
+    #   type: devices.types.thermostat
 
     light.shellyswitch25_10a36d_channel_2:
       name: Люстра
@@ -241,7 +242,7 @@ yandex_smart_home:
     #   room: Сад
     #   type: devices.types.vacuum_cleaner
 
-    vacuum.robi:
-      name: Пылесос
-      room: Холл
-      type: devices.types.vacuum_cleaner
+    # vacuum.robi:
+    #   name: Пылесос
+    #   room: Холл
+    #   type: devices.types.vacuum_cleaner
