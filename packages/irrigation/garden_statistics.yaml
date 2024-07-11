@@ -259,7 +259,7 @@ automation:
           - switch.irrigation_switches_zone1
           - switch.irrigation_switches_zone2
           - switch.irrigation_switches_zone3
-          - switch.irrigation_switches_pump
+          # - switch.irrigation_switches_pump
         from: "on"
         to: "off"
         variables:
@@ -270,7 +270,7 @@ automation:
           - switch.irrigation_switches_zone1
           - switch.irrigation_switches_zone2
           - switch.irrigation_switches_zone3
-          - switch.irrigation_switches_pump
+          # - switch.irrigation_switches_pump
         from: "off"
         to: "on"
         variables:
