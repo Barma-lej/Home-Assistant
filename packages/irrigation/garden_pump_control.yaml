@@ -73,7 +73,7 @@ automation:
 
     trigger:
       - platform: time_pattern
-        hours: "/2"
+        hours: "/4"
         minutes: "2"
 
     condition:
