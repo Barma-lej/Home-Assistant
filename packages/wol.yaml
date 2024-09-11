@@ -90,6 +90,20 @@ switch:
     turn_off:
       service: shell_command.turn_off_pc13
 
+  - platform: wake_on_lan
+    name: !secret nas1_name
+    mac: !secret nas1_mac
+    host: !secret nas1_host
+    turn_off:
+      service: shell_command.turn_off_nas1
+
+  - platform: wake_on_lan
+    name: !secret nas2_name
+    mac: !secret nas2_mac
+    host: !secret nas2_host
+    turn_off:
+      service: shell_command.turn_off_nas2
+
 shell_command:
   turn_off_pc1: !secret pc1_shutdown
   turn_off_pc2: !secret pc2_shutdown
@@ -104,3 +118,5 @@ shell_command:
   turn_off_pc11: !secret pc2_shutdown
   turn_off_pc12: !secret pc2_shutdown
   turn_off_pc13: !secret pc2_shutdown
+  turn_off_nas1: !secret pc2_shutdown
+  turn_off_nas2: !secret pc2_shutdown
