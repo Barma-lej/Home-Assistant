@@ -5,17 +5,17 @@
 utility_meter:
   shelly_wohnlicht_d:
     unique_id: shelly_wohnlicht_d
-    source: sensor.shellyswitch25_10c7c3_channel_1_energy
+    source: sensor.shelly1pmminig3_34b7da8db254_switch_0_energy
     cycle: daily
 
   shelly_wohnlicht_m:
     unique_id: shelly_wohnlicht_m
-    source: sensor.shellyswitch25_10c7c3_channel_1_energy
+    source: sensor.shelly1pmminig3_34b7da8db254_switch_0_energy
     cycle: monthly
 
   shelly_wohnlicht_y:
     unique_id: shelly_wohnlicht_y
-    source: sensor.shellyswitch25_10c7c3_channel_1_energy
+    source: sensor.shelly1pmminig3_34b7da8db254_switch_0_energy
     cycle: yearly
 
 # Automation ########################################################
@@ -37,11 +37,11 @@ automation:
     action:
       - service: light.toggle
         data:
-          entity_id: light.shellyswitch25_10c7c3_channel_1
+          entity_id: light.shelly1pmminig3_34b7da8db254_switch_0
 
       - wait_for_trigger:
           - platform: state
-            entity_id: light.shellyswitch25_10c7c3_channel_1
+            entity_id: light.shelly1pmminig3_34b7da8db254_switch_0
         timeout: 1
         continue_on_timeout: true
 
@@ -49,19 +49,19 @@ automation:
         data:
           target: "{{ trigger.event.data.chat_id }}"
           message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
-          message: "💡 {{ state_attr('light.shellyswitch25_10c7c3_channel_1', 'friendly_name') }} ist {{ states('light.shellyswitch25_10c7c3_channel_1') }}"
+          message: "💡 {{ state_attr('light.shelly1pmminig3_34b7da8db254_switch_0', 'friendly_name') }} ist {{ states('light.shelly1pmminig3_34b7da8db254_switch_0') }}"
 
 # Customize #########################################################
 homeassistant:
   customize:
-    light.shellyswitch25_10c7c3_channel_1:
+    light.shelly1pmminig3_34b7da8db254_switch_0:
       friendly_name: Wohnlicht
       icon: mdi:vanity-light
 
-    sensor.shellyswitch25_10c7c3_channel_1_power:
+    sensor.shelly1pmminig3_34b7da8db254_switch_0_power:
       friendly_name: Leistung (Wohnlicht)
       icon: mdi:gauge
-    sensor.shellyswitch25_10c7c3_channel_1_energy:
+    sensor.shelly1pmminig3_34b7da8db254_switch_0_energy:
       friendly_name: Verbrauch (Wohnlicht)
     sensor.shelly_wohnlicht_d:
       friendly_name: Verbrauch Täglich (Wohnlicht)
@@ -73,19 +73,9 @@ homeassistant:
       friendly_name: Verbrauch Jahrlich (Wohnlicht)
       icon: mdi:lightning-bolt
 
-    binary_sensor.shellyswitch25_10c7c3_channel_overpowering:
+    binary_sensor.shelly1pmminig3_34b7da8db254_switch_0_overpowering:
       friendly_name: Überspannung (Wohnlicht)
       icon: mdi:flash-alert
-    binary_sensor.shellyswitch25_10c7c3_overheating:
+    binary_sensor.shelly1pmminig3_34b7da8db254_switch_0_overheating:
       friendly_name: Überhitzen (Wohnlicht)
       icon: mdi:thermometer-alert
-
-    #    switch.shellyswitch25_10c7c3_2:
-    #      friendly_name: Flur Licht
-    #    sensor.shellyswitch25_10c7c3_channel_2_power:
-    #      friendly_name: Flur Energie
-    #    sensor.shellyswitch25_10c7c3_channel_2_energy:
-    #      friendly_name: Verbrauch (Flur)
-    binary_sensor.shellyswitch25_10c7c3_channel_2_overpowering:
-      friendly_name: Überspannung (Wohnlicht 2)
-      icon: mdi:flash-alert

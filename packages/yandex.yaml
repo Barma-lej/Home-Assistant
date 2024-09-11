@@ -19,7 +19,8 @@ yandex_smart_home:
       - cover.shellyswitch25_10d315
       - fan.ventilator
       - light.shellyswitch25_10a36d_channel_2
-      - light.shellyswitch25_10c7c3_channel_1
+      # - light.shellyswitch25_10c7c3_channel_1
+      - light.shelly1pmminig3_34b7da8db254_switch_0
       - light.sonoffbnsz01
       - light.sonoffpow_01
       # - light.sonoffpow_02
@@ -99,7 +100,11 @@ yandex_smart_home:
       name: Люстра
       room: Столовая
       type: devices.types.light
-    light.shellyswitch25_10c7c3_channel_1:
+    # light.shellyswitch25_10c7c3_channel_1:
+    #   name: Люстра
+    #   room: Зал
+    #   type: devices.types.light
+    light.shelly1pmminig3_34b7da8db254_switch_0:
       name: Люстра
       room: Зал
       type: devices.types.light
