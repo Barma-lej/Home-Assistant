@@ -58,8 +58,7 @@ http:
   login_attempts_threshold: 15
   use_x_forwarded_for: true
   trusted_proxies:
-    - 172.30.32.0/24
-    - 172.30.33.0/24
+    - 172.30.32.0/23
 
 logger:
   # default: critical
@@ -133,20 +132,20 @@ tts:
     voice: Hans
     text_type: ssml
 
-  - platform: google_cloud
-    key_file: !secret key_file
-    language: de-DE
-    gender: male
-    voice: de-DE-Wavenet-D
-    encoding: linear16
-    speed: 0.9
-    pitch: -2.5
-    gain: -5.0
-    text_type: ssml
-    profiles:
-      - medium-bluetooth-speaker-class-device
-      - telephony-class-application
-      - wearable-class-device
+  # - platform: google_cloud
+  #   google_tts_key_file: !secret key_file
+  #   language: de-DE
+  #   gender: male
+  #   voice: de-DE-Wavenet-D
+  #   encoding: linear16
+  #   speed: 0.9
+  #   pitch: -2.5
+  #   gain: -5.0
+  #   text_type: ssml
+  #   profiles:
+  #     - medium-bluetooth-speaker-class-device
+  #     - telephony-class-application
+  #     - wearable-class-device
 
   - platform: google_translate
 
