@@ -7,7 +7,7 @@ substitutions:
   device_name: garagegate
   room: Garage
   friendly_name: Tor
-  project_version: "2023.11.11"
+  project_version: "2024.09.05"
   device_description: "Garagentorsteuerung mit der Positionskontrolle von Garagentoren"
 
   # Webserver credentials
@@ -21,8 +21,6 @@ substitutions:
   # Ultrasonic sensor
   echo_pin: GPIO13
   trigger_pin: GPIO12
-
-
 
 esphome:
   name: '${device_name}'
@@ -254,7 +252,7 @@ script:
       pos: float
     then:
       - logger.log:
-          format: "The desire position - %.1f; The cover position - %.1f "
+          format: "The desired position - %.1f; The cover position - %.1f "
           args: [ 'pos', 'id(gate).position' ]
 
       - if:
@@ -264,7 +262,7 @@ script:
             - lambda: id(gate_open)->execute(id(gate).position);
             - script.wait: gate_open
             - wait_until:
-               - lambda: return id(gate).position == 1.0 ;
+                - lambda: return id(gate).position == 1.0 ;
           else:
             - if:
                 condition:
@@ -320,8 +318,8 @@ sensor:
       #     send_every: 5
       #     send_first_at: 1
       - lambda: |-
-          float MIN_ERROR_WINDOW = 1.5;
-          float MAX_ERROR_WINDOW = 1.57;
+          float MIN_ERROR_WINDOW = 1.27; // 1.5 - (offset)
+          float MAX_ERROR_WINDOW = 1.34; // 1.57 - (offset)
           // float MAX_DIFFERENCE = 0.75;  // adjust this!
           float MIN_DIFFERENCE = 0.0499;  // adjust this!
           static float last_value = NAN;
@@ -354,28 +352,41 @@ sensor:
         - cover.template.publish:
             id: gate
             position: !lambda |-
-              // ESP_LOGD("custom", "The value of end_stop_bottom is: %s", id(end_stop_bottom).state ? "ON" : "OFF");
-              // WARNING Вывод в лог (ESP_LOGD) значения id(gate).current_operation вызовет ОШИБКУ и придётся прошивать через USB 
-              // ESP_LOGD("custom", "The value last_action: %s", id(last_action).c_str());
               if (id(end_stop_bottom).state) {
                 return 0;
-              } else if (id(end_stop_top).state) {
+              } else if (id(end_stop_top).state || x < 0.1) {
                 return 1;
+              } else if (id(part).state) {
+                  return 0.13;
               } else {
-                if (id(part).state) {
-                  return 0.05;
-                } else {
-                  if (x < 0.1) {
-                    return 1;
-                  } else {
-                    return 1 - x / 2.4;
-                  }
-                }
+                return 1 - x / 2.4;
               }
         - sensor.template.publish:
             id: pos_sensor
             state:  !lambda |-
               return (id(gate).position * 100);
+
+        # - cover.template.publish:
+        #     id: gate
+        #     position: !lambda |-
+        #       // ESP_LOGD("custom", "The value of end_stop_bottom is: %s", id(end_stop_bottom).state ? "ON" : "OFF");
+        #       // WARNING Вывод в лог (ESP_LOGD) значения id(gate).current_operation вызовет ОШИБКУ и придётся прошивать через USB 
+        #       // ESP_LOGD("custom", "The value last_action: %s", id(last_action).c_str());
+        #       if (id(end_stop_bottom).state) {
+        #         return 0;
+        #       } else if (id(end_stop_top).state) {
+        #         return 1;
+        #       } else {
+        #         if (id(part).state) {
+        #           return 0.13;
+        #         } else {
+        #           if (x < 0.1) {
+        #             return 1;
+        #           } else {
+        #             return 1 - x / 2.4;
+        #           }
+        #         }
+        #       }
 
   - platform: template
     name: "${friendly_name}position"
