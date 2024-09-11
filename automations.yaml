@@ -239,7 +239,7 @@
     enabled: false
   - condition: numeric_state
     entity_id: sensor.torposition
-    below: 10
+    below: 15
   - condition: or
     conditions:
     - condition: template
@@ -249,12 +249,11 @@
       value_template: '{{ "B4:EC:02:94:8A:CF (VW BT 1505)" in state_attr("sensor.sm_g996b_bluetooth_connection",
         "connected_paired_devices") }}'
   action:
-  - service: switch.turn_on
-    data: {}
+  - data: {}
     target:
       entity_id: switch.tor
-  - service: notify.mobile_app_sm_g996b
-    data:
+    action: switch.turn_on
+  - data:
       message: TTS
       title: Garage
       data:
@@ -262,6 +261,7 @@
         priority: high
         media_stream: alarm_stream_max
         tts_text: Die Garage öffnet
+    action: notify.mobile_app_sm_g996b
   mode: single
 - id: '1668017327174'
   alias: Garage - Leaving home
@@ -289,14 +289,13 @@
         "connected_paired_devices") }}'
   - condition: numeric_state
     entity_id: sensor.torposition
-    above: 5
+    above: 15
   action:
-  - service: switch.turn_on
-    data: {}
+  - data: {}
     target:
       entity_id: switch.tor
-  - service: notify.mobile_app_sm_g996b
-    data:
+    action: switch.turn_on
+  - data:
       message: TTS
       title: Garage
       data:
@@ -304,6 +303,7 @@
         priority: high
         media_stream: alarm_stream_max
         tts_text: Die Garage schlisst
+    action: notify.mobile_app_sm_g996b
   - wait_for_trigger:
     - platform: numeric_state
       entity_id: sensor.torposition
@@ -318,8 +318,7 @@
       seconds: 30
       milliseconds: 0
     continue_on_timeout: false
-  - service: notify.mobile_app_sm_g996b
-    data:
+  - data:
       message: TTS
       title: Garage
       data:
@@ -327,6 +326,7 @@
         priority: high
         media_stream: alarm_stream_max
         tts_text: Die Garage ist geschlossen
+    action: notify.mobile_app_sm_g996b
   mode: single
 - id: 3d_prtint_is_done
   alias: 3D - Druck ist fertig
@@ -442,6 +442,8 @@
       - update.matter_server_update
       - update.vlc_update
       - update.fritz_box_7590_ax_fritz_os
+      - update.music_assistant_server_update
+      - update.shelly1pmminig3_34b7da8db254_firmware_update
       mobile_app_device: 52dde1dbd0bd045e5b6181020e86c549
       reminder_hours: '6'
       run_config_check: true
@@ -537,8 +539,92 @@
         data: {}
   mode: single
 - id: rolladen_close_if_its_hot
-  alias: Rolladen - schliessen wehh es heiss ist
-  description: Rolladen - schliessen wehh es heiss ist
+  alias: Rolladen - schliessen wehn es heiss ist
+  description: Rolladen - schliessen wehn es heiss ist
+  trigger:
+  - platform: numeric_state
+    entity_id: sun.sun
+    attribute: azimuth
+    above: 150
+    for:
+      minutes: 1
+  - platform: numeric_state
+    entity_id: sun.sun
+    attribute: azimuth
+    above: 180
+    for:
+      minutes: 1
+  - platform: numeric_state
+    entity_id: sun.sun
+    attribute: azimuth
+    above: 220
+    for:
+      minutes: 1
+  - platform: numeric_state
+    entity_id:
+    - sun.sun
+    attribute: azimuth
+    above: 240
+    for:
+      minutes: 1
+  - platform: numeric_state
+    entity_id:
+    - weather.openweathermap
+    attribute: cloud_coverage
+    for:
+      minutes: 1
+    below: 40
+  condition:
+  - condition: template
+    value_template: '{{ ( min_azimuth < state_attr(''sun.sun'',''azimuth'') | float(0)
+      < max_azimuth and state_attr(''sun.sun'',''elevation'') | float(0) > min_elevation
+      ) and ( states(''sensor.rasen_temperature'') | float(0) > temperature or states(''sensor.ble_temperature_temperatur_gt'')
+      | float(0) > temperature_indoor )  and state_attr(''weather.openweathermap'',
+      ''cloud_coverage'') | int(100) < cloud_coverage }}'
+  action:
+  - repeat:
+      for_each:
+      - entity: cover.shellyswitch25_f37a8c
+        azimuth: 150
+        above_position: 40
+        to_position: 0
+      - entity: cover.shellyswitch25_f37b28
+        azimuth: 180
+        above_position: 40
+        to_position: 0
+      - entity: cover.shellyswitch25_10eaa4
+        azimuth: 220
+        above_position: 40
+        to_position: 0
+      - entity: cover.shellyswitch25_10d315
+        azimuth: 240
+        above_position: 75
+        to_position: 60
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ repeat.item.azimuth <= state_attr(''sun.sun'', ''azimuth'')
+            and state_attr(repeat.item.entity, ''current_position'') > repeat.item.above_position
+            and (( as_timestamp(now()) - as_timestamp(states[repeat.item.entity].last_changed,
+            0) ) / 60 ) > max_changed }}'
+        then:
+        - target:
+            entity_id: '{{ repeat.item.entity }}'
+          data:
+            position: '{{ repeat.item.to_position }}'
+          action: cover.set_cover_position
+  trigger_variables:
+    temperature: 22
+    temperature_indoor: 22
+    cloud_coverage: 40
+    min_azimuth: 150
+    max_azimuth: 300
+    min_elevation: 10
+    max_changed: 240
+  mode: single
+- id: rolladen_close_if_its_hot1
+  alias: Rolladen - schliessen wehn es heiss ist1
+  description: Rolladen - schliessen wehn es heiss ist
   trigger:
   - platform: numeric_state
     entity_id:
@@ -620,7 +706,7 @@
       minutes: 1
       seconds: 0
     attribute: elevation
-    below: 14
+    below: 9
     id: elevation
   - platform: state
     entity_id:
@@ -648,47 +734,22 @@
           below: 40
           attribute: cloud_coverage
       sequence:
-      - service: cover.set_cover_position
-        target:
+      - target:
           device_id: f601cdeb470db8fab8cf47dd38761e97
         data:
           position: 100
+        action: cover.set_cover_position
     - conditions:
       - condition: trigger
         id:
         - elevation
         - regen
       sequence:
-      - service: cover.set_cover_position
-        target:
+      - target:
           device_id: f601cdeb470db8fab8cf47dd38761e97
         data:
           position: 0
-  mode: single
-- id: hacs_updates
-  alias: HACS - Update Available Notifications
-  description: ''
-  trigger:
-  - platform: numeric_state
-    entity_id: sensor.hacs
-    above: 0
-    enabled: false
-  - platform: state
-    entity_id:
-    - sensor.hacs
-  condition:
-  - condition: numeric_state
-    entity_id: sensor.hacs
-    above: 2
-  action:
-  - service: persistent_notification.create
-    data:
-      title: HACS Aktualisierung verfügbar
-      message: "{{ states('sensor.hacs') }} Aktualisierung/en verfügbar. [HACS Öffnen](https://barma.duckdns.org/hacs)<br>
-        {% set repos = state_attr('sensor.hacs', 'repositories') %} {% for repo in
-        repos -%}\n  <p>**{{ repo.display_name }}**. Version: {{ repo.installed_version
-        }} -> [{{ repo.available_version }}](https://github.com/{{ repo.name }}/releases/)<br><p>\n{%-
-        endfor %}"
+        action: cover.set_cover_position
   mode: single
 - id: vacuum_when_nobody_home
   alias: Staubsauger - Niemand zu Hause ist
