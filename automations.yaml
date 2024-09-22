@@ -4,14 +4,14 @@
   - event: start
     platform: homeassistant
   action:
-  - data:
+  - action: mqtt.publish
+    data:
       payload: '1'
       topic: sonoffs/cmnd/state
-    service: mqtt.publish
-  - data:
+  - action: mqtt.publish
+    data:
       payload: '1'
       topic: sonoffs/tele/STATE
-    service: mqtt.publish
 - id: rolladen_auf
   alias: Rolladen - Auf
   description: ''
@@ -771,4 +771,27 @@
   - service: script.robi_flur
     metadata: {}
     data: {}
+  mode: single
+- id: '1726090038559'
+  alias: HA - Renew certificate
+  description: ''
+  trigger:
+  - platform: time
+    at: 04:00:00
+  condition:
+  - condition: template
+    value_template: '{% set expired = (states(''sensor.barma_partia_de_cert_expiry'')
+      | as_datetime | as_local) %}
+
+      {{ (expired.date() - now().date()).days < 7 }}'
+  action:
+  - action: hassio.addon_start
+    metadata: {}
+    data:
+      addon: core_letsencrypt
+    enabled: false
+  - action: hassio.addon_restart
+    metadata: {}
+    data:
+      addon: core_letsencrypt
   mode: single

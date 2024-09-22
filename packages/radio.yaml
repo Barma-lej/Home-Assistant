@@ -1,34 +1,35 @@
 # Radio
 
 # Recorder ##########################################################
-recorder:
-  exclude:
-    entities:
-      - input_number.radio_volume
-      - input_select.radio_station
-      - input_select.radio_player
-      # - group.radio
-      - automation.radio_stop
-      - automation.radio_stream
-      - automation.radio_volume
-      - script.radio
-      - script.radio_stop
+# recorder:
+#   exclude:
+#     entities:
+#       - input_number.radio_volume
+#       - input_select.radio_station
+#       - input_select.radio_player
+#       # - group.radio
+#       - automation.radio_stop
+#       - automation.radio_stream
+#       - automation.radio_volume
+#       - script.radio
+#       - script.radio_stop
 
 # Logbook ###########################################################
-logbook:
-  exclude:
-    entities:
-      - input_number.radio_volume
-      - input_select.radio_station
-      - input_select.radio_player
-      # - group.radio
-      - automation.radio_stop
-      - automation.radio_stream
-      - automation.radio_volume
-      - script.radio
-      - script.radio_stop
+# logbook:
+#   exclude:
+#     entities:
+#       - input_number.radio_volume
+#       - input_select.radio_station
+#       - input_select.radio_player
+#       # - group.radio
+#       - automation.radio_stop
+#       - automation.radio_stream
+#       - automation.radio_volume
+#       - script.radio
+#       - script.radio_stop
 
 # Input Numbers #####################################################
+# moved to UI
 input_number:
   radio_volume:
     name: Lautstärke
@@ -77,16 +78,6 @@ input_select:
     initial: Nest Mini
     icon: mdi:speaker-wireless
 
-# Groups ############################################################
-# group:
-#   radio:
-#     name: Radio
-#     icon: mdi:radio
-#     entities:
-#       - input_select.radio_station
-#       - input_select.radio_player
-#       - input_number.radio_volume
-
 # Automations #######################################################
 automation:
   # Stops the radio #
@@ -97,17 +88,36 @@ automation:
         entity_id: input_select.radio_station
         to: "Stop"
     action:
-      service: script.radio_stop
+      action: script.radio_stop
 
   # Streaming the radio
   # home_group определяем в Google Home APP
   - id: radio_stream
     alias: Radio - Stream
     trigger:
-      platform: state
-      entity_id: input_select.radio_station
+      - platform: state
+        entity_id: input_select.radio_station
+      - platform: state
+        entity_id: input_select.radio_player
     action:
-      service: script.radio
+      - action: media_player.turn_off
+        target:
+          entity_id: >-
+            {% set entities = {
+              'Garten':'media_player.googlehome9539',
+              'Nest Mini':'media_player.nest_mini',
+              'Sound Blaster':'media_player.soundblaster',
+              'Home Mini Flur':'media_player.flur',
+              'Home Mini Kristina':'media_player.kristina',
+              'Überall':'media_player.home_group',
+              'Erdgeschoss':'media_player.erdgeschoss',
+              }
+            %}
+            {{ iif(trigger.from_state in entities, entities[trigger.from_state], 'media_player.nest_mini') }}
+      # - action: notify.persistent_notification
+      #   data:
+      #     message: "{{ trigger.from_state }}"
+      - action: script.radio
 
   # Set radio volume
   - id: radio_volume
@@ -116,17 +126,21 @@ automation:
       platform: state
       entity_id: input_number.radio_volume
     action:
-      service: media_player.volume_set
+      action: media_player.volume_set
       data:
         entity_id: >
-          {% if is_state("input_select.radio_player","Garten") %} media_player.googlehome9539
-          {% elif is_state("input_select.radio_player","Nest Mini") %} media_player.nest_mini
-          {% elif is_state("input_select.radio_player","Sound Blaster") %} media_player.soundblaster
-          {% elif is_state("input_select.radio_player","Home Mini Flur") %} media_player.flur
-          {% elif is_state("input_select.radio_player","Home Mini Kristina") %} media_player.kristina
-          {% elif is_state("input_select.radio_player","Überall") %} media_player.home_group
-          {% elif is_state("input_select.radio_player","Erdgeschoss") %} media_player.erdgeschoss
-          {% endif %}
+          {% set entities = {
+            'Garten':'media_player.googlehome9539',
+            'Nest Mini':'media_player.nest_mini',
+            'Sound Blaster':'media_player.soundblaster',
+            'Home Mini Flur':'media_player.flur',
+            'Home Mini Kristina':'media_player.kristina',
+            'Überall':'media_player.home_group',
+            'Erdgeschoss':'media_player.erdgeschoss',
+            }
+          %}
+          {% set state = states('input_select.radio_player') %}
+          {{ iif(state in entities, entities[state], 'media_player.nest_mini') }}
         volume_level: "{{ states('input_number.radio_volume') }}"
 
 # Scripts ###########################################################
@@ -137,91 +151,106 @@ script:
     description: "Turns on the radio"
     icon: mdi:play
     sequence:
-      #      - service: media_player.volume_set
+      #      - action: media_player.volume_set
       #        data:
       #          entity_id: media_player.google_home
       #          volume_level: "0.25"
-      #      - service: media_player.volume_set
+      #      - action: media_player.volume_set
       #        data:
       #          entity_id: media_player.soundblaster
       #          volume_level: "0.25"
-      #      - service: media_player.volume_set
+      #      - action: media_player.volume_set
       #        data:
       #          entity_id: media_player.flur
       #          volume_level: "0.25"
-      #      - service: media_player.volume_set
+      #      - action: media_player.volume_set
       #        data:
       #          entity_id: media_player.kristina
       #          volume_level: "0.25"
-      - service: media_player.play_media
-        #      - service: media_extractor.play_media
+      #      - action: media_extractor.play_media
+      - action: media_player.play_media
+        target:
+          entity_id: >-
+            {% set entities = {
+              'Garten':'media_player.googlehome9539',
+              'Nest Mini':'media_player.nest_mini',
+              'Sound Blaster':'media_player.soundblaster',
+              'Home Mini Flur':'media_player.flur',
+              'Home Mini Kristina':'media_player.kristina',
+              'Überall':'media_player.home_group',
+              'Erdgeschoss':'media_player.erdgeschoss',
+              'Yandex Station':'media_player.yandex_station_lb0000000000002397130000767dab00',
+              }
+            %}
+            {% set state = states('input_select.radio_player') %}
+            {{ iif(state in entities, entities[state], 'media_player.nest_mini') }}
         data:
-          entity_id: >
-            {% if is_state("input_select.radio_player","Garten") %} media_player.googlehome9539
-            {% elif is_state("input_select.radio_player","Nest Mini") %} media_player.nest_mini
-            {% elif is_state("input_select.radio_player","Sound Blaster") %} media_player.soundblaster
-            {% elif is_state("input_select.radio_player","Home Mini Flur") %} media_player.flur
-            {% elif is_state("input_select.radio_player","Home Mini Kristina") %} media_player.kristina
-            {% elif is_state("input_select.radio_player","Überall") %} media_player.home_group
-            {% elif is_state("input_select.radio_player","Erdgeschoss") %} media_player.erdgeschoss
-            {% endif %}
-          media_content_id: >
-            {% if is_state("input_select.radio_station","Europa Plus") %} http://ep256.hostingradio.ru:8052/europaplus256.mp3
-            {% elif is_state("input_select.radio_station","Русское радио") %} https://rusradio.hostingradio.ru/rusradio96.aacp
-            {% elif is_state("input_select.radio_station","Comedy Radio") %} https://pub0202.101.ru:8443/stream/air/aac/64/202
-            {% elif is_state("input_select.radio_station","Авторадио") %} https://pub0202.101.ru:8443/stream/air/aac/64/100
-            {% elif is_state("input_select.radio_station","Deep House") %} https://pub0101.101.ru/stream/trust/mp3/128/173
-            {% elif is_state("input_select.radio_station","Tropical House") %} https://pub0201.101.ru/stream/pro/aac/64/364
-            {% elif is_state("input_select.radio_station","Trans House Deep") %} https://pub0302.101.ru:8443/stream/personal/aacp/64/1691459
-            {% elif is_state("input_select.radio_station","Lo-fi Chillhop") %} https://pub0201.101.ru/stream/pro/aac/64/358
-            {% elif is_state("input_select.radio_station","Office Lounge") %} https://pub0201.101.ru/stream/pro/aac/64/30
-            {% elif is_state("input_select.radio_station","Relax Natur") %} https://pub0101.101.ru/stream/trust/mp3/128/263
-            {% elif is_state("input_select.radio_station","Relax FM") %} https://pub0202.101.ru:8443/stream/air/aac/64/200
-            {% elif is_state("input_select.radio_station","Relax Gold") %} https://pub0201.101.ru/stream/trust/mp3/128/266
-            {% elif is_state("input_select.radio_station","New Age") %} https://pub0101.101.ru/stream/pro/aac/64/120
-            {% elif is_state("input_select.radio_station","Pink Floyd") %} https://pub0202.101.ru:8443/stream/pro/aac/64/53
-            {% elif is_state("input_select.radio_station","Enigma") %} https://pub0201.101.ru/stream/pro/aac/64/175
-            {% elif is_state("input_select.radio_station","Mainstream") %} https://pub0201.101.ru/stream/pro/aac/64/87
-            {% elif is_state("input_select.radio_station","Маруся ФМ") %} http://radio-holding.ru:9000/marusya_aac_64
-            {% elif is_state("input_select.radio_station","Sex") %} https://pub0202.101.ru:8443/stream/pro/aac/64/27
-            {% endif %}
           media_content_type: "music"
+          media_content_id: >-
+            {% set stations = {
+              'Europa Plus':'http://ep256.hostingradio.ru:8052/europaplus256.mp3',
+              'Русское радио':'https://rusradio.hostingradio.ru/rusradio96.aacp',
+              'Comedy Radio':'https://pub0202.101.ru:8443/stream/air/aac/64/202',
+              'Авторадио':'https://pub0202.101.ru:8443/stream/air/aac/64/100',
+              'Deep House':'https://pub0101.101.ru/stream/trust/mp3/128/173',
+              'Tropical House':'https://pub0201.101.ru/stream/pro/aac/64/364',
+              'Trans House Deep':'https://pub0302.101.ru:8443/stream/personal/aacp/64/1691459',
+              'Lo-fi Chillhop':'https://pub0201.101.ru/stream/pro/aac/64/358',
+              'Office Lounge':'https://pub0201.101.ru/stream/pro/aac/64/30',
+              'Relax Natur':'https://pub0101.101.ru/stream/trust/mp3/128/263',
+              'Relax FM':'https://pub0202.101.ru:8443/stream/air/aac/64/200',
+              'Relax Gold':'https://pub0201.101.ru/stream/trust/mp3/128/266',
+              'New Age':'https://pub0101.101.ru/stream/pro/aac/64/120',
+              'Pink Floyd':'https://pub0202.101.ru:8443/stream/pro/aac/64/53',
+              'Enigma':'https://pub0201.101.ru/stream/pro/aac/64/175',
+              'Mainstream':'https://pub0201.101.ru/stream/pro/aac/64/87',
+              'Маруся ФМ':'http://radio-holding.ru:9000/marusya_aac_64',
+              'Sex':'https://pub0202.101.ru:8443/stream/pro/aac/64/27',
+              }
+            %}
+            {% set state = states('input_select.radio_station') %}
+            {{ iif(state in stations, stations[state], 'Stop') }}
 
   radio_stop:
     alias: Radio - Stop
     description: "Turns off the radio"
     icon: mdi:stop
     sequence:
-      # - service: media_player.volume_set
+      # - action: media_player.volume_set
       #   data:
       #     entity_id: media_player.nest_mini
       #     volume_level: "0.25"
-      # - service: media_player.volume_set
+      # - action: media_player.volume_set
       #   data:
       #     entity_id: media_player.google_home
       #     volume_level: "0.25"
-      # - service: media_player.volume_set
+      # - action: media_player.volume_set
       #   data:
       #     entity_id: media_player.soundblaster
       #     volume_level: "0.25"
-      # - service: media_player.volume_set
+      # - action: media_player.volume_set
       #   data:
       #     entity_id: media_player.flur
       #     volume_level: "0.25"
-      # - service: media_player.volume_set
+      # - action: media_player.volume_set
       #   data:
       #     entity_id: media_player.kristina
       #     volume_level: "0.25"
-      - service: media_player.turn_off
-        data:
-          entity_id: >
-            {% if is_state("input_select.radio_player", "Garten") %} media_player.googlehome9539
-            {% elif is_state("input_select.radio_player","Nest Mini") %} media_player.nest_mini
-            {% elif is_state("input_select.radio_player","Sound Blaster") %} media_player.soundblaster
-            {% elif is_state("input_select.radio_player","Home Mini Flur") %} media_player.flur
-            {% elif is_state("input_select.radio_player","Home Mini Kristina") %} media_player.kristina
-            {% elif is_state("input_select.radio_player","Überall") %} media_player.home_group
-            {% endif %}
+      - action: media_player.turn_off
+        target:
+          entity_id: >-
+            {% set entities = {
+              'Garten':'media_player.googlehome9539',
+              'Nest Mini':'media_player.nest_mini',
+              'Sound Blaster':'media_player.soundblaster',
+              'Home Mini Flur':'media_player.flur',
+              'Home Mini Kristina':'media_player.kristina',
+              'Überall':'media_player.home_group',
+              'Erdgeschoss':'media_player.erdgeschoss',
+              }
+            %}
+            {% set state = states('input_select.radio_player') %}
+            {{ iif(state in entities, entities[state], 'media_player.nest_mini') }}
 
 # Customize #########################################################
 # homeassistant:
