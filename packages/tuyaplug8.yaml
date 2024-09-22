@@ -33,36 +33,36 @@ homeassistant:
   customize:
     # Switch ##########
     switch.tuyaplug8:
-      friendly_name: Tuyaplug8
-      icon: mdi:desktop-tower-monitor
+      friendly_name: Garagentor Schalter
+      icon: mdi:garage-alert
     switch.tuyaplug8_childlock:
-      friendly_name: Kindersicherung (Tuyaplug8)
+      friendly_name: Kindersicherung (Garagentor Schalter)
       icon: mdi:account-lock
     switch.tuyaplug8_overcharge:
-      friendly_name: Überladung (Tuyaplug8)
+      friendly_name: Überladung (Garagentor Schalter)
       icon: mdi:battery-alert-variant
 
     # Sensor ##########
     sensor.tuyaplug8_current:
-      friendly_name: Stromstärke (Tuyaplug8)
+      friendly_name: Stromstärke (Garagentor Schalter)
       # icon: mdi:current-ac
 
     sensor.tuyaplug8_power:
-      friendly_name: Leistung (Tuyaplug8)
+      friendly_name: Leistung (Garagentor Schalter)
       # icon: mdi:lightning-bolt
 
     sensor.tuyaplug8_energy:
-      friendly_name: Verbrauch (Tuyaplug8)
+      friendly_name: Verbrauch (Garagentor Schalter)
       # icon: mdi:counter
 
     sensor.tuyaplug8_energy_daily:
-      friendly_name: Verbrauch Täglich (Tuyaplug8)
+      friendly_name: Verbrauch Täglich (Garagentor Schalter)
       # icon: mdi:counter
 
     sensor.tuyaplug8_energy_monthly:
-      friendly_name: Verbrauch Monatlich (Tuyaplug8)
+      friendly_name: Verbrauch Monatlich (Garagentor Schalter)
       # icon: mdi:counter
 
     sensor.tuyaplug8_energy_yearly:
-      friendly_name: Verbrauch Jahrlich (Tuyaplug8)
+      friendly_name: Verbrauch Jahrlich (Garagentor Schalter)
       # icon: mdi:counter

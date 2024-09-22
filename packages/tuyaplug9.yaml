@@ -33,36 +33,36 @@ homeassistant:
   customize:
     # Switch ##########
     switch.tuyaplug9:
-      friendly_name: Tuyaplug9
-      icon: mdi:desktop-tower-monitor
+      friendly_name: Terrasse Kamera
+      icon: mdi:cctv-off
     switch.tuyaplug9_childlock:
-      friendly_name: Kindersicherung (Tuyaplug9)
+      friendly_name: Kindersicherung (Terrasse Kamera)
       icon: mdi:account-lock
     switch.tuyaplug9_overcharge:
-      friendly_name: Überladung (Tuyaplug9)
+      friendly_name: Überladung (Terrasse Kamera)
       icon: mdi:battery-alert-variant
 
     # Sensor ##########
     sensor.tuyaplug9_current:
-      friendly_name: Stromstärke (Tuyaplug9)
+      friendly_name: Stromstärke (Terrasse Kamera)
       # icon: mdi:current-ac
 
     sensor.tuyaplug9_power:
-      friendly_name: Leistung (Tuyaplug9)
+      friendly_name: Leistung (Terrasse Kamera)
       # icon: mdi:lightning-bolt
 
     sensor.tuyaplug9_energy:
-      friendly_name: Verbrauch (Tuyaplug9)
+      friendly_name: Verbrauch (Terrasse Kamera)
       # icon: mdi:counter
 
     sensor.tuyaplug9_energy_daily:
-      friendly_name: Verbrauch Täglich (Tuyaplug9)
+      friendly_name: Verbrauch Täglich (Terrasse Kamera)
       # icon: mdi:counter
 
     sensor.tuyaplug9_energy_monthly:
-      friendly_name: Verbrauch Monatlich (Tuyaplug9)
+      friendly_name: Verbrauch Monatlich (Terrasse Kamera)
       # icon: mdi:counter
 
     sensor.tuyaplug9_energy_yearly:
-      friendly_name: Verbrauch Jahrlich (Tuyaplug9)
+      friendly_name: Verbrauch Jahrlich (Terrasse Kamera)
       # icon: mdi:counter
