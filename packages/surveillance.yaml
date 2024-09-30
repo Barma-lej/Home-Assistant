@@ -1,4 +1,4 @@
-# Manage a survilance system
+# Manage a surveillance system
 
 scene:
   - id: "Camera - Detection on"
@@ -47,7 +47,7 @@ automation:
                 value_template: >
                   {{ trigger.event.data.path is search("\d\.mp4$") }}
             sequence:
-              - service: shell_command.cam_convert
+              - action: shell_command.cam_convert
                 data:
                   file_in: "{{ trigger.event.data.path }}"
                   file_out: >
@@ -57,7 +57,7 @@ automation:
               - condition: template
                 value_template: "{{ 'e.mp4' in trigger.event.data.path }}"
             sequence:
-              - service: notify.telegram_schick_home
+              - action: notify.telegram_schick_home
                 data:
                   title: Surveillance
                   message: "Bewegung erkannt!"
@@ -75,7 +75,7 @@ automation:
                             🏃 *Bewegung erkannt!*
                           {% endif -%}
                         timeout: 1000
-              - service: shell_command.cam_remove_file
+              - action: shell_command.cam_remove_file
                 data:
                   file_in: >
                     {{ trigger.event.data.path | regex_replace( find="e\.mp4$", replace=".mp4", ignorecase=False ) }}
@@ -84,7 +84,7 @@ automation:
               - condition: template
                 value_template: "{{ '.jpg' in trigger.event.data.path }}"
             sequence:
-              - service: notify.telegram_schick_home
+              - action: notify.telegram_schick_home
                 data:
                   title: Surveillance
                   message: "Bewegung erkannt!"
@@ -102,8 +102,8 @@ automation:
                             🏃 *Bewegung erkannt!*
                           {% endif -%}
 
-  - id: camera_manage_sending_to_ftp
-    alias: "Camera - Manage sending to FTP"
+  - id: camera_surveillance_management
+    alias: "Camera - Surveillance Management"
     trigger:
       - platform: state
         entity_id: group.family
@@ -117,7 +117,7 @@ automation:
         or is_state('group.family', 'not_home') }}"
 
     action:
-      - service: scene.turn_on
+      - action: scene.turn_on
         target:
           entity_id: scene.camera_detection_on
 
@@ -146,67 +146,32 @@ automation:
           minutes: 0
           seconds: 1
           milliseconds: 000
-      - service: button.press
+      - action: button.press
         entity_id: button.garage_ptz_stop
-      - service: button.press
+      - action: button.press
         entity_id: button.innen_ptz_stop
-# Script ############################################################
-#script:
-########################################
-## Script to record and sent motion video to telegram
-## is passed:
-##   {{ camera }} Camera entity_id
-##   {{ file }} Record file full name
-##   {{ caption }}
-########################################
-#  record_motion:
-#    sequence:
-#    - service: camera.record
-#      data:
-#        entity_id: camera.{{ camera }}
-#        filename: "{{ file }}"
-#        lookback: 30
-#        duration: 30
-##    - delay: 00:00:45
-##    - service: notify.telegram_schick_home
-##      data:
-##        title: Surveillance
-##        message: "Bewegung erkannt!"
-##        data:
-##          video:
-##            - file: "{{ file }}"
-##              caption: "{{ caption }}"
-##    - service: shell_command.delete_file
-##      data:
-##        file_path: "{{ file }}"
 
-# type: custom:webrtc-camera
-# entity: camera.reolink_e1_zoom_profile000_mainstream
-# webrtc: true
-# muted: false
-# ptz:
-#   service: onvif.ptz
-#   data_left:
-#     entity_id: camera.reolink_e1_zoom_profile001_substream
-#     pan: LEFT
-#     move_mode: ContinuousMove
-#   data_right:
-#     entity_id: camera.reolink_e1_zoom_profile001_substream
-#     pan: RIGHT
-#     move_mode: ContinuousMove
-#   data_up:
-#     entity_id: camera.reolink_e1_zoom_profile001_substream
-#     tilt: UP
-#     move_mode: ContinuousMove
-#   data_down:
-#     entity_id: camera.reolink_e1_zoom_profile001_substream
-#     tilt: DOWN
-#     move_mode: ContinuousMove
-#   data_zoom_in:
-#     entity_id: camera.reolink_e1_zoom_profile001_substream
-#     zoom: ZOOM_IN
-#     move_mode: ContinuousMove
-#   data_zoom_out:
-#     entity_id: camera.reolink_e1_zoom_profile001_substream
-#     zoom: ZOOM_OUT
-#     move_mode: ContinuousMove
+# Script ############################################################
+script:
+  camera_ptz:
+    alias: Camera - PTZ Control
+    icon: mdi:arrow-all
+    sequence:
+      - action: reolink_cctv.ptz_control
+        data:
+          entity_id: "{{ entity_id }}"
+          command: "{{ command }}"
+
+      - delay: "00:00:01"
+
+      - action: reolink_cctv.ptz_control
+        data:
+          entity_id: "{{ entity_id }}"
+          command: STOP
+
+homeassistant:
+  customize:
+    automation.camera_upload_to_telegram:
+      icon: mdi:send
+    automation.camera_surveillance_management:
+      icon: mdi:cctv
