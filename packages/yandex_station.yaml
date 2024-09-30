@@ -2,6 +2,8 @@ yandex_station:
   media_players:
     - entity_id: media_player.chromecast
       name: Chromecast
+    - entity_id: media_player.chromecast_ultra
+      name: Chromecast Ultra
     - entity_id: media_player.nest_mini
       name: Nest Mini
     - entity_id: media_player.garten
@@ -22,7 +24,7 @@ yandex_station:
     - entity_id: media_player.tv_gq75qn92catxzg
       name: Mein Samsung TV
       media_content_type: url # важно для интеграции SamsungTV из HACS
-    - entity_id: media_player.tv_gq75qn92catxzg_3
+    - entity_id: media_player.tv_gq75qn92catxzg_mass
       name: Mein Samsung TV MediaAssistant
       media_content_type: url # важно для интеграции SamsungTV из HACS
     - entity_id: media_player.vlc_nuc
