@@ -120,3 +120,35 @@ shell_command:
   turn_off_pc13: !secret pc2_shutdown
   turn_off_nas1: !secret pc2_shutdown
   turn_off_nas2: !secret pc2_shutdown
+
+# Customize #########################################################
+homeassistant:
+  customize:
+    switch.anatolij_pc:
+      icon: hass:desktop-tower-monitor
+    switch.schick_nb:
+      icon: hass:laptop
+    switch.schick_nb_wlan:
+      icon: hass:laptop
+    switch.kristina_nb:
+      icon: hass:laptop
+    switch.kristina_nb_de79b3m13:
+      icon: hass:laptop
+    switch.veronika_nb:
+      icon: hass:laptop
+    switch.meister_pc:
+      icon: hass:desktop-tower-monitor
+    switch.sergej_pc:
+      icon: hass:desktop-tower-monitor
+    switch.larissa_aej_1024:
+      icon: hass:desktop-tower-monitor
+    switch.beastly_v2:
+      icon: hass:desktop-tower-monitor
+    switch.beastlynb_pc:
+      icon: hass:laptop
+    switch.beastly_nb2:
+      icon: hass:laptop
+    switch.schick_nas:
+      icon: hass:nas
+    switch.q119_nas:
+      icon: hass:nas
