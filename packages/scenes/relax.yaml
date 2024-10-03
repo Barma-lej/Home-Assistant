@@ -15,12 +15,12 @@ script:
     alias: Scene - Relax
     mode: single
     sequence:
-      - service: scene.turn_on
+      - action: scene.turn_on
         target:
           entity_id: scene.relax
         data:
           transition: 2.5
-      - service: media_player.play_media
+      - action: media_player.play_media
         target:
           entity_id: media_player.chromecast
         data:
@@ -31,22 +31,22 @@ script:
     alias: Scene - TV
     mode: single
     sequence:
-      - service: scene.turn_on
+      - action: scene.turn_on
         target:
           entity_id: scene.relax
         data:
           transition: 2.5
-      - service: media_player.turn_on
+      - action: media_player.turn_on
         target:
           entity_id: media_player.sony_kd_55x8505b
       - wait_for_trigger:
-          - platform: state
+          - trigger: state
             entity_id: media_player.sony_kd_55x8505b
             to: "on"
             for: 10
         timeout: "00:00:20"
         continue_on_timeout: true
-      - service: media_player.select_source
+      - action: media_player.select_source
         target:
           entity_id: media_player.sony_kd_55x8505b
         data:

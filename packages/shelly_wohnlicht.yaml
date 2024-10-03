@@ -23,29 +23,29 @@ automation:
   - id: telegram_wohnlicht
     alias: "Telegram - Wohnlicht"
     mode: parallel
-    trigger:
-      - platform: event
+    triggers:
+      - trigger: event
         event_type: telegram_command
         event_data:
           command: "/wohnlicht"
 
-      - platform: event
+      - trigger: event
         event_type: telegram_callback
         event_data:
           command: "/wohnlicht"
 
-    action:
-      - service: light.toggle
+    actions:
+      - action: light.toggle
         data:
           entity_id: light.shelly1pmminig3_34b7da8db254_switch_0
 
       - wait_for_trigger:
-          - platform: state
+          - trigger: state
             entity_id: light.shelly1pmminig3_34b7da8db254_switch_0
         timeout: 1
         continue_on_timeout: true
 
-      - service: script.telegram_callback
+      - action: script.telegram_callback
         data:
           target: "{{ trigger.event.data.chat_id }}"
           message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"

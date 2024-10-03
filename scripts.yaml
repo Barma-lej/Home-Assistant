@@ -1,79 +1,82 @@
 wled_loop:
   alias: WLED loop
   sequence:
-  - repeat:
-      sequence:
-      - choose:
-        - conditions:
-          - condition: state
-            entity_id: input_select.wled_effects_loop
-            state: Zufällig
-          sequence:
-          - service: light.turn_on
-            target:
-              entity_id:
-              - light.wled
-              - light.wled_soundreactive_segment_1
-              - light.wled_soundreactive_segment_2
-              - light.wled_soundreactive_segment_3
-              - light.wled_soundreactive_segment_4
-              - light.wled_soundreactive_segment_5
-            data:
-              effect: '{{ state_attr(''light.wled'', ''effect_list'') | random }}'
-          - service: select.select_option
-            target:
-              entity_id:
-              - select.wled_color_palette
-              - select.wled_soundreactive_segment_1_color_palette
-              - select.wled_soundreactive_segment_2_color_palette
-              - select.wled_soundreactive_segment_3_color_palette
-              - select.wled_soundreactive_segment_4_color_palette
-              - select.wled_soundreactive_segment_5_color_palette
-            data:
-              option: '{{ state_attr(''select.wled_color_palette'', ''options'') |
-                random }}'
-        - conditions:
-          - condition: state
-            entity_id: input_select.wled_effects_loop
-            state: Nacheinander
-          sequence:
-          - service: light.turn_on
-            target:
-              entity_id:
-              - light.wled
-              - light.wled_soundreactive_segment_1
-              - light.wled_soundreactive_segment_2
-              - light.wled_soundreactive_segment_3
-              - light.wled_soundreactive_segment_4
-              - light.wled_soundreactive_segment_5
-            data:
-              effect: "{% set list = state_attr('light.wled', 'effect_list') | reject('search','♪')
-                | reject('search','Reserved') | list %} {% set item_index = list.index(state_attr('light.wled',
-                'effect')) | int(0) %} {% if (item_index + 1) < ((list | length) |
-                int(0)) %}\n  {{ state_attr('light.wled', 'effect_list')[item_index
-                + 1] }}\n{% else %}\n  {{ state_attr('light.wled', 'effect_list')[0]
-                }}\n{% endif %}"
-          - service: select.select_option
-            target:
-              entity_id:
-              - select.wled_color_palette
-              - select.wled_soundreactive_segment_1_color_palette
-              - select.wled_soundreactive_segment_2_color_palette
-              - select.wled_soundreactive_segment_3_color_palette
-              - select.wled_soundreactive_segment_4_color_palette
-              - select.wled_soundreactive_segment_5_color_palette
-            data:
-              option: '{{ state_attr(''select.wled_color_palette'', ''options'') |
-                random }}'
-      - delay: '{{ states(''input_number.wled_effect_time'') | int }}'
-      while:
-      - condition: or
-        conditions:
-        - condition: state
-          entity_id: input_select.wled_effects_loop
-          state: Zufällig
-        - condition: state
-          entity_id: input_select.wled_effects_loop
-          state: Nacheinander
+    - repeat:
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: state
+                    entity_id: input_select.wled_effects_loop
+                    state: Zufällig
+                sequence:
+                  - action: light.turn_on
+                    target:
+                      entity_id:
+                        - light.wled
+                        - light.wled_soundreactive_segment_1
+                        - light.wled_soundreactive_segment_2
+                        - light.wled_soundreactive_segment_3
+                        - light.wled_soundreactive_segment_4
+                        - light.wled_soundreactive_segment_5
+                    data:
+                      effect: "{{ state_attr('light.wled', 'effect_list') | random }}"
+                  - action: select.select_option
+                    target:
+                      entity_id:
+                        - select.wled_color_palette
+                        - select.wled_soundreactive_segment_1_color_palette
+                        - select.wled_soundreactive_segment_2_color_palette
+                        - select.wled_soundreactive_segment_3_color_palette
+                        - select.wled_soundreactive_segment_4_color_palette
+                        - select.wled_soundreactive_segment_5_color_palette
+                    data:
+                      option:
+                        "{{ state_attr('select.wled_color_palette', 'options') |
+                        random }}"
+              - conditions:
+                  - condition: state
+                    entity_id: input_select.wled_effects_loop
+                    state: Nacheinander
+                sequence:
+                  - action: light.turn_on
+                    target:
+                      entity_id:
+                        - light.wled
+                        - light.wled_soundreactive_segment_1
+                        - light.wled_soundreactive_segment_2
+                        - light.wled_soundreactive_segment_3
+                        - light.wled_soundreactive_segment_4
+                        - light.wled_soundreactive_segment_5
+                    data:
+                      effect:
+                        "{% set list = state_attr('light.wled', 'effect_list') | reject('search','♪')
+                        | reject('search','Reserved') | list %} {% set item_index = list.index(state_attr('light.wled',
+                        'effect')) | int(0) %} {% if (item_index + 1) < ((list | length) |
+                        int(0)) %}\n  {{ state_attr('light.wled', 'effect_list')[item_index
+                        + 1] }}\n{% else %}\n  {{ state_attr('light.wled', 'effect_list')[0]
+                        }}\n{% endif %}"
+                  - action: select.select_option
+                    target:
+                      entity_id:
+                        - select.wled_color_palette
+                        - select.wled_soundreactive_segment_1_color_palette
+                        - select.wled_soundreactive_segment_2_color_palette
+                        - select.wled_soundreactive_segment_3_color_palette
+                        - select.wled_soundreactive_segment_4_color_palette
+                        - select.wled_soundreactive_segment_5_color_palette
+                    data:
+                      option:
+                        "{{ state_attr('select.wled_color_palette', 'options') |
+                        random }}"
+          - delay: "{{ states('input_number.wled_effect_time') | int }}"
+        while:
+          - condition: or
+            conditions:
+              - condition: state
+                entity_id: input_select.wled_effects_loop
+                state: Zufällig
+              - condition: state
+                entity_id: input_select.wled_effects_loop
+                state: Nacheinander
   mode: single
   icon: mdi:sync

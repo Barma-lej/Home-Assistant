@@ -30,17 +30,17 @@ automation:
     alias: Camera - Upload to Telegram
     description: Отправка файлов в Telegram
     mode: parallel
-    trigger:
-      platform: event
+    triggers:
+      trigger: event
       event_type: folder_watcher
       event_data:
         event_type: closed
 
-    condition:
+    conditions:
       condition: template
       value_template: "{{ 'cams' in trigger.event.data.path }}"
 
-    action:
+    actions:
       - choose:
           - conditions:
               - condition: template
@@ -104,19 +104,19 @@ automation:
 
   - id: camera_surveillance_management
     alias: "Camera - Surveillance Management"
-    trigger:
-      - platform: state
+    triggers:
+      - trigger: state
         entity_id: group.family
         for: "00:04:00"
 
-      - platform: time_pattern
+      - trigger: time_pattern
         minutes: "/15"
 
-    condition:
+    conditions:
       - "{{ (now().hour < 12 or now().hour > 22)
         or is_state('group.family', 'not_home') }}"
 
-    action:
+    actions:
       - action: scene.turn_on
         target:
           entity_id: scene.camera_detection_on
@@ -124,8 +124,8 @@ automation:
   # PTZ control with buttons
   - id: camera_ptz_buttons_control
     alias: "Camera - PTZ buttons control"
-    trigger:
-      platform: state
+    triggers:
+      trigger: state
       entity_id:
         - button.garage_ptz_up
         - button.garage_ptz_down
@@ -140,7 +140,7 @@ automation:
         - button.innen_ptz_zoom_in
         - button.innen_ptz_zoom_out
 
-    action:
+    actions:
       - delay:
           hours: 0
           minutes: 0

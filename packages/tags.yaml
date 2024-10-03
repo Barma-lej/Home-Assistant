@@ -1,4 +1,4 @@
-#- platform: event
+#- trigger: event
 #  event_type: tag_scanned
 #  event_data:
 #    device_id: e8348b50ff407de5
@@ -8,12 +8,12 @@
 automation:
   - id: tags_wandlicht_toggle
     alias: Tags - Wandlicht toggle
-    trigger:
-      platform: event
+    triggers:
+      trigger: event
       event_type: tag_scanned
       event_data:
         tag_id: 4d4d9d64-59ff-4a65-8d8c-d1a088f46599
-    action:
-      - service: light.toggle
+    actions:
+      - action: light.toggle
         data:
           entity_id: light.sonoffpow_01

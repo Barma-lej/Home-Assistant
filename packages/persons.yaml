@@ -11,18 +11,18 @@ automation:
     alias: Nataljas night shift
     description: Set Natalja's night shift
 
-    trigger:
-      - platform: time
+    triggers:
+      - trigger: time
         at:
           - "07:00"
           - "19:00"
 
-    condition:
+    conditions:
       condition: template
       value_template: "{{ is_state('calendar.dienstplan_natalja_schick','on') }}"
 
-    action:
-      - service: >-
+    actions:
+      - action: >-
           {% set night_shift_start = as_timestamp(states.calendar.dienstplan_natalja_schick.attributes.start_time) %}
           {% if (( night_shift_start - as_timestamp(now()) ) < 86400 )
             and (( night_shift_start - as_timestamp(now()) ) > 0 ) %}

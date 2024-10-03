@@ -7,11 +7,11 @@ switch:
         unique_id: irrigation_watering
         value_template: "{{ states('sensor.sonoffpow_02_energy_power') | float(0) > 100 }}"
         turn_on:
-          service: switch.turn_on
+          action: switch.turn_on
           target:
             entity_id: switch.sonoffpow_02
         turn_off:
-          service: switch.turn_off
+          action: switch.turn_off
           target:
             entity_id: switch.sonoffpow_02
         icon_template: "{{ 'mdi:water-pump' if is_state('switch.irrigation_watering', 'on') else 'mdi:water-pump-off' }}"
@@ -55,7 +55,7 @@ switch:
 # Sensors ###########################################################
 template:
   - trigger:
-      - platform: state
+      - trigger: state
         entity_id:
           - switch.irrigation_switches_zone1
           - switch.irrigation_switches_zone2
@@ -253,8 +253,8 @@ automation:
     alias: Irrigation - Notify
     mode: parallel
 
-    trigger:
-      - platform: state
+    triggers:
+      - trigger: state
         entity_id:
           - switch.irrigation_switches_zone1
           - switch.irrigation_switches_zone2
@@ -265,7 +265,7 @@ automation:
         variables:
           action: "Ende"
 
-      - platform: state
+      - trigger: state
         entity_id:
           - switch.irrigation_switches_zone1
           - switch.irrigation_switches_zone2
@@ -276,12 +276,12 @@ automation:
         variables:
           action: "Start"
 
-    # condition:
+    # conditions:
     # - condition: template
     #   value_template: "{{ trigger.to_state.state != trigger.from_state.state }}"
 
-    action:
-      - service: notify.telegram_schick_home
+    actions:
+      - action: notify.telegram_schick_home
         data:
           title: 💦 Bewässerung
           message: "{{ action }} *{{ trigger.from_state.attributes.friendly_name}}*"

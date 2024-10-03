@@ -23,36 +23,36 @@ automation:
   # - id: rolladen_close_if_its_hot
   #   alias: Rolladen - schliessen wehh es heiss ist
   #   mode: single
-  #   trigger:
-  #     - platform: numeric_state
+  #   triggers:
+  #     - trigger: numeric_state
   #       entity_id: sun.sun
   #       attribute: azimuth
   #       above: 165
   #       for:
   #         minutes: 1
 
-  #     - platform: numeric_state
+  #     - trigger: numeric_state
   #       entity_id: sun.sun
   #       attribute: azimuth
   #       above: 185
   #       for:
   #         minutes: 1
 
-  #     - platform: numeric_state
+  #     - trigger: numeric_state
   #       entity_id: sun.sun
   #       attribute: azimuth
   #       above: 225
   #       for:
   #         minutes: 1
 
-  #     - platform: numeric_state
+  #     - trigger: numeric_state
   #       entity_id: sun.sun
   #       attribute: azimuth
   #       above: 265
   #       for:
   #         minutes: 1
 
-  #   condition:
+  #   conditions:
   #     alias: "Жарче чем 24° и облачность ниже 40%"
   #     and:
   #       - condition: numeric_state
@@ -62,7 +62,7 @@ automation:
   #         entity_id: "sensor.wetter_openweather_d_cloud_coverage"
   #         below: 20
 
-  #   action:
+  #   actions:
   #     - choose:
   #         - conditions:
   #             - and:
@@ -75,7 +75,7 @@ automation:
   #                   attribute: current_position
   #                   above: 40
   #           sequence:
-  #             - service: cover.set_cover_position
+  #             - action: cover.set_cover_position
   #               target:
   #                 entity_id: cover.shellyswitch25_f37a8c
   #               data:
@@ -96,7 +96,7 @@ automation:
   #                   attribute: current_position
   #                   above: 40
   #           sequence:
-  #             - service: cover.set_cover_position
+  #             - action: cover.set_cover_position
   #               target:
   #                 entity_id: cover.shellyswitch25_f37b28
   #               data:
@@ -117,7 +117,7 @@ automation:
   #                   attribute: current_position
   #                   above: 40
   #           sequence:
-  #             - service: cover.set_cover_position
+  #             - action: cover.set_cover_position
   #               target:
   #                 entity_id: cover.shellyswitch25_10eaa4
   #               data:
@@ -134,7 +134,7 @@ automation:
   #                   attribute: current_position
   #                   above: 75
   #           sequence:
-  #             - service: cover.set_cover_position
+  #             - action: cover.set_cover_position
   #               target:
   #                 entity_id: cover.shellyswitch25_10d315
   #               data:
@@ -143,29 +143,29 @@ automation:
   - id: telegram_rollade_1
     alias: "Telegram - Rollade 1"
     mode: restart
-    trigger:
-      - platform: event
+    triggers:
+      - trigger: event
         event_type: telegram_command
         event_data:
           command: "/rollade_1"
 
-      - platform: event
+      - trigger: event
         event_type: telegram_callback
         event_data:
           command: "/rollade_1"
 
-    action:
-      - service: script.cover_one_button
+    actions:
+      - action: script.cover_one_button
         data:
           entity_id: shellyswitch25_f37a8c
 
       - wait_for_trigger:
-          - platform: state
+          - trigger: state
             entity_id: cover.shellyswitch25_f37a8c
         timeout: "00:00:02"
         continue_on_timeout: true
 
-      - service: script.telegram_callback
+      - action: script.telegram_callback
         data:
           target: "{{ trigger.event.data.chat_id }}"
           message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"

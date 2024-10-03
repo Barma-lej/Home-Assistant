@@ -22,29 +22,29 @@ utility_meter:
 #   - id: telegram_sonoffpow_02
 #     alias: "Telegram - Sonoffpow_02"
 #     mode: parallel
-#     trigger:
-#       - platform: event
+#     triggers:
+#       - trigger: event
 #         event_type: telegram_command
 #         event_data:
 #           command: "/ambiente_wohnen"
 
-#       - platform: event
+#       - trigger: event
 #         event_type: telegram_callback
 #         event_data:
 #           command: "/ambiente_wohnen"
 
-#     action:
-#       - service: light.toggle
+#     actions:
+#       - action: light.toggle
 #         data:
 #           entity_id: light.sonoffpow_02
 
 #       - wait_for_trigger:
-#           - platform: state
+#           - trigger: state
 #             entity_id: light.sonoffpow_02
 #         timeout: "00:00:05"
 #         continue_on_timeout: true
 
-#       - service: script.telegram_callback
+#       - action: script.telegram_callback
 #         data:
 #           target: "{{ trigger.event.data.chat_id }}"
 #           message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"

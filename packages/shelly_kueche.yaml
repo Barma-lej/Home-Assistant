@@ -38,42 +38,42 @@ automation:
   - id: telegram_kueche
     alias: "Telegram - Kueche"
     mode: parallel
-    trigger:
-      - platform: event
+    triggers:
+      - trigger: event
         event_type: telegram_command
         event_data:
           command: "/kuechenlicht"
-      - platform: event
+      - trigger: event
         event_type: telegram_callback
         event_data:
           command: "/kuechenlicht"
 
-      - platform: event
+      - trigger: event
         event_type: telegram_command
         event_data:
           command: "/essecke"
-      - platform: event
+      - trigger: event
         event_type: telegram_callback
         event_data:
           command: "/essecke"
 
-    action:
+    actions:
       - choose:
           - conditions:
               - condition: template
                 value_template: "{{ trigger.event.data.command == '/kuechenlicht' }}"
             sequence:
-              - service: light.toggle
+              - action: light.toggle
                 data:
                   entity_id: light.shellyswitch25_10a36d_channel_1
 
               - wait_for_trigger:
-                  - platform: state
+                  - trigger: state
                     entity_id: light.shellyswitch25_10a36d_channel_1
                 continue_on_timeout: true
                 timeout: "00:00:01"
 
-              - service: script.telegram_callback
+              - action: script.telegram_callback
                 data:
                   target: "{{ trigger.event.data.chat_id }}"
                   message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
@@ -83,17 +83,17 @@ automation:
               - condition: template
                 value_template: "{{ trigger.event.data.command == '/essecke' }}"
             sequence:
-              - service: light.toggle
+              - action: light.toggle
                 data:
                   entity_id: light.shellyswitch25_10a36d_channel_2
 
               - wait_for_trigger:
-                  - platform: state
+                  - trigger: state
                     entity_id: light.shellyswitch25_10a36d_channel_2
                 continue_on_timeout: true
                 timeout: "00:00:01"
 
-              - service: script.telegram_callback
+              - action: script.telegram_callback
                 data:
                   target: "{{ trigger.event.data.chat_id }}"
                   message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"

@@ -23,29 +23,29 @@ automation:
   - id: telegram_rollade_3
     alias: "Telegram - Rollade 3"
     mode: restart
-    trigger:
-      - platform: event
+    triggers:
+      - trigger: event
         event_type: telegram_command
         event_data:
           command: "/rollade_3"
 
-      - platform: event
+      - trigger: event
         event_type: telegram_callback
         event_data:
           command: "/rollade_3"
 
-    action:
-      - service: script.cover_one_button
+    actions:
+      - action: script.cover_one_button
         data:
           entity_id: shellyswitch25_10eaa4
 
       - wait_for_trigger:
-          - platform: state
+          - trigger: state
             entity_id: cover.shellyswitch25_10eaa4
         timeout: "00:00:02"
         continue_on_timeout: true
 
-      - service: script.telegram_callback
+      - action: script.telegram_callback
         data:
           target: "{{ trigger.event.data.chat_id }}"
           message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"

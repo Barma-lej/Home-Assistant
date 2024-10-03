@@ -15,23 +15,23 @@ automation:
   #####################################################################
   - id: irrigation_master_control_switch
     alias: Irrigation - Master Control Switch
-    trigger:
-      - platform: state
+    triggers:
+      - trigger: state
         entity_id: input_boolean.irrigation_master_control_switch
 
-      - platform: homeassistant
+      - trigger: homeassistant
         event: start
 
-    action:
+    actions:
       # Stop both cycles ####################
-      - service: input_boolean.turn_off
+      - action: input_boolean.turn_off
         data:
           entity_id:
             - input_boolean.irrigation_cycle1_manual_run
             - input_boolean.irrigation_cycle2_manual_run
 
       # Turn all Irrigation automations on or off (EXCEPT this one!)
-      - service: >
+      - action: >
           {% if is_state('input_boolean.irrigation_master_control_switch', 'on') %}
             automation.turn_on
           {% else %}
@@ -46,7 +46,7 @@ automation:
             {%- endfor %}
 
       # Turn all Weather Irrigation automations on or off
-      #      - service: >
+      #      - action: >
       #          {% if is_state('input_boolean.irrigation_master_control_switch', 'on') %}
       #            automation.turn_on
       #          {% else %}
@@ -59,22 +59,22 @@ automation:
       #            {%- endfor %}
 
       # Turn off all pulsetimes on Tasmota
-      - service: mqtt.publish
+      - action: mqtt.publish
         data:
           topic: sonoff4ch/cmnd/pulsetime1
           payload: 0
 
-      - service: mqtt.publish
+      - action: mqtt.publish
         data:
           topic: sonoff4ch/cmnd/pulsetime2
           payload: 0
 
-      - service: mqtt.publish
+      - action: mqtt.publish
         data:
           topic: sonoff4ch/cmnd/pulsetime3
           payload: 0
 
-      - service: mqtt.publish
+      - action: mqtt.publish
         data:
           topic: sonoff4ch/cmnd/pulsetime4
           payload: 0

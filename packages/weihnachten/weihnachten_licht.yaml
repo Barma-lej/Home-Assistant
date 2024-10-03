@@ -20,28 +20,28 @@ automation:
   # Weihnachten licht an am Abend
   - id: weihnachten_licht_an
     alias: Weihnachten - Licht An
-    trigger:
+    triggers:
       # 15 minutes before sunset
-      - platform: sun
+      - trigger: sun
         event: sunset
         offset: "-00:15:00"
 
-    condition:
+    conditions:
       - condition: state
         entity_id: group.family_wlan
         alias: Is anybody home
         state: "home"
 
-    action:
-      - service: switch.turn_on
+    actions:
+      - action: switch.turn_on
         data:
           entity_id: switch.weihnachten
 
   # Weihnachten licht an wenn jemand kommt
   - id: weihnachten_licht_an_wenn_jemand_kommt
     alias: Weihnachten - Licht An wenn jemand kommt
-    trigger:
-      - platform: state
+    triggers:
+      - trigger: state
         entity_id:
           - group.family_wlan
           - group.family
@@ -52,10 +52,10 @@ automation:
           minutes: 3
           seconds: 0
 
-    condition: "{{ state_attr('sun.sun', 'elevation') < 4 }}"
+    conditions: "{{ state_attr('sun.sun', 'elevation') < 4 }}"
 
-    action:
-      - service: switch.turn_on
+    actions:
+      - action: switch.turn_on
         data:
           entity_id: switch.weihnachten
 
@@ -63,11 +63,11 @@ automation:
   - id: weihnachten_licht_an_anatolij
     # Anatolij Arbeit
     alias: Weihnachten - Licht An Anatolij
-    trigger:
-      - platform: time
+    triggers:
+      - trigger: time
         at: "08:20:00"
 
-    condition:
+    conditions:
       condition: and
       conditions:
         # After 15 minutes after sunrise
@@ -84,41 +84,41 @@ automation:
             - thu
             - fri
 
-    action:
-      - service: switch.turn_on
+    actions:
+      - action: switch.turn_on
         data:
           entity_id: switch.weihnachten
 
   # Einschalten wenn Natalja hat Dienst
   # - id: weihnachten_licht_an_natalja
   #   alias: Weihnachten - Licht An Natalja
-  #   trigger:
-  #     - platform: time
+  #   triggers:
+  #     - trigger: time
   #       at: "06:45:00"
 
-  #   condition:
+  #   conditions:
   #     - condition: state
   #       entity_id: input_boolean.nataljas_night_shift
   #       state: "on"
 
-  #   action:
-  #     - service: switch.turn_on
+  #   actions:
+  #     - action: switch.turn_on
   #       data:
   #         entity_id: switch.weihnachten
 
   # Weihnachten licht aus
   - id: weihnachten_licht_aus
     alias: Weihnachten - Licht Aus
-    trigger:
-      - platform: time
+    triggers:
+      - trigger: time
         at:
           - "00:00:00"
           - "09:30:00"
-      - platform: sun
+      - trigger: sun
         event: sunrise
         offset: "00:15:00"
 
-      - platform: state
+      - trigger: state
         entity_id:
           - group.family_wlan
           - group.family
@@ -129,8 +129,8 @@ automation:
           minutes: 5
           seconds: 0
 
-    action:
-      - service: switch.turn_off
+    actions:
+      - action: switch.turn_off
         data:
           entity_id: switch.weihnachten
 
@@ -139,24 +139,24 @@ automation:
   # # Weihnachten licht draussen an
   # - id: weihnachten_licht_draussen_an
   #   alias: Weihnachten - Licht Draussen An
-  #   trigger:
-  #     - platform: sun
+  #   triggers:
+  #     - trigger: sun
   #       event: sunset
   #       offset: "00:20:00"
 
-  #   action:
-  #     - service: switch.turn_on
+  #   actions:
+  #     - action: switch.turn_on
   #       data:
   #         entity_id: switch.weihnachten_draussen
 
   # # Weihnachten licht draussen aus
   # - id: weihnachten_licht_draussen_aus
   #   alias: Weihnachten - Licht Draussen Aus
-  #   trigger:
-  #     - platform: time
+  #   triggers:
+  #     - trigger: time
   #       at: "23:00:00"
 
-  #   action:
-  #     - service: switch.turn_off
+  #   actions:
+  #     - action: switch.turn_off
   #       data:
   #         entity_id: switch.weihnachten_draussen

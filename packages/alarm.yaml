@@ -5,11 +5,11 @@ switch:
         friendly_name: Sirene
         value_template: "{{ is_state('input_boolean.alarm_indoor', 'on') }}"
         turn_on:
-          - service: input_boolean.turn_on
+          - action: input_boolean.turn_on
             target:
               entity_id: input_boolean.alarm_indoor
         turn_off:
-          - service: input_boolean.turn_off
+          - action: input_boolean.turn_off
             target:
               entity_id: input_boolean.alarm_indoor
         icon_template: >-
@@ -34,22 +34,22 @@ automation:
     alias: "Alarm - play loop"
     description: "Alarm Widergabe"
     mode: single
-    trigger:
-      - platform: event
+    triggers:
+      - trigger: event
         event_type: timer.finished
         event_data:
           entity_id: timer.alarm_indoor
-      - platform: state
+      - trigger: state
         entity_id: input_boolean.alarm_indoor
         from: "off"
         to: "on"
-    condition:
+    conditions:
       - condition: state
         entity_id: input_boolean.alarm_indoor
         state: "on"
-    action:
-      - service: script.alarm_play
-      - service: timer.start
+    actions:
+      - action: script.alarm_play
+      - action: timer.start
         data:
           duration: "0:00:05"
         target:
@@ -59,25 +59,25 @@ automation:
     alias: "Alarm - play stop"
     description: "Alarm stoppen"
     mode: single
-    trigger:
-      - platform: state
+    triggers:
+      - trigger: state
         entity_id: input_boolean.alarm_indoor
         from: "on"
         to: "off"
-    action:
-      - service: switch.turn_off
+    actions:
+      - action: switch.turn_off
         target:
           entity_id: switch.garage_siren_on_event
-      - service: timer.finish
+      - action: timer.finish
         target:
           entity_id: timer.alarm_indoor
-      - service: media_player.media_stop
+      - action: media_player.media_stop
         target:
           entity_id: media_player.home_group
-      - service: homeassistant.turn_off
+      - action: homeassistant.turn_off
         target:
           entity_id: script.alarm_play
-      - service: media_player.volume_set
+      - action: media_player.volume_set
         target:
           entity_id: media_player.home_group
         data:
@@ -87,18 +87,18 @@ automation:
   - id: alarm_notify
     alias: "Alarm - Notify"
     mode: parallel
-    trigger:
-      - platform: state
+    triggers:
+      - trigger: state
         entity_id: input_boolean.alarm_indoor
         from: "off"
         to: "on"
 
-    action:
+    actions:
       - alias: "Repeat a few times"
         repeat:
           count: 4
           sequence:
-            - service: notify.telegram_schick_home
+            - action: notify.telegram_schick_home
               data:
                 title: 🚨👮🆘 Alarm aufgelöst!!!
                 message: "Etwas passiert!!!"
@@ -107,29 +107,29 @@ automation:
   - id: telegram_alarm
     alias: "Telegram - Alarm toggle"
     mode: parallel
-    trigger:
-      - platform: event
+    triggers:
+      - trigger: event
         event_type: telegram_command
         event_data:
           command: "/alarm"
 
-      - platform: event
+      - trigger: event
         event_type: telegram_callback
         event_data:
           command: "/alarm"
 
-    action:
-      - service: switch.toggle
+    actions:
+      - action: switch.toggle
         data:
           entity_id: switch.alarm_play
 
       - wait_for_trigger:
-          - platform: state
+          - trigger: state
             entity_id: switch.alarm_play
         timeout: 5
         continue_on_timeout: true
 
-      - service: script.telegram_callback
+      - action: script.telegram_callback
         data:
           target: "{{ trigger.event.data.user_id }}"
           message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
@@ -141,17 +141,17 @@ script:
     description: "Turns on a siren on the speakers"
     icon: mdi:alarm-light
     sequence:
-      - service: switch.turn_on
+      - action: switch.turn_on
         target:
           entity_id: switch.garage_siren_on_event
 
-      - service: media_player.volume_set
+      - action: media_player.volume_set
         target:
           entity_id: media_player.home_group
         data:
           volume_level: 1
 
-      - service: media_player.play_media
+      - action: media_player.play_media
         target:
           entity_id: media_player.home_group
         data:
@@ -163,7 +163,7 @@ script:
 
       - delay: 00:00:10
 
-      - service: tts.amazon_polly_say
+      - action: tts.amazon_polly_say
         data:
           entity_id: media_player.home_group
           message: |-
@@ -176,13 +176,13 @@ script:
 
   # alarm_test:
   #   sequence:
-  #     - service: media_player.volume_set
+  #     - action: media_player.volume_set
   #       target:
   #         entity_id: media_player.nest_mini
   #       data:
   #         volume_level: 0.6
 
-  #     - service: media_player.play_media
+  #     - action: media_player.play_media
   #       target:
   #         entity_id: media_player.nest_mini
   #       data:
@@ -194,7 +194,7 @@ script:
 
   #     - delay: 00:00:10
 
-  #     - service: tts.amazon_polly_say
+  #     - action: tts.amazon_polly_say
   #       data:
   #         entity_id: media_player.nest_mini
   #         message: |-
@@ -204,7 +204,7 @@ script:
   #             </prosody>
   #           </speak>
 
-  #     - service: tts.google_cloud_say
+  #     - action: tts.google_cloud_say
   #       data:
   #         entity_id: media_player.nest_mini
   #         message: |-

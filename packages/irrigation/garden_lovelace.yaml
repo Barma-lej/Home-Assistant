@@ -84,14 +84,14 @@ script:
     alias: Irrigation - Tabs umschalten
     icon: mdi:tab
     sequence:
-      - service: input_boolean.turn_off
+      - action: input_boolean.turn_off
         data:
           entity_id: >
             {% for item in states['input_boolean'] if item.object_id.startswith('irrigation_view_') and
                                                       item.entity_id != entity_id -%}
               {% if not loop.first %},{% endif %}{{ item.entity_id }}
             {%- endfor %}
-      - service: input_boolean.turn_on
+      - action: input_boolean.turn_on
         data:
           entity_id: "{{ entity_id }}"
 # homeassistant:

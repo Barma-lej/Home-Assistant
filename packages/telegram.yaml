@@ -42,22 +42,22 @@ automation:
   # Manage queries of telegram
   - id: telegram_control
     alias: "Telegram - Control"
-    trigger:
-      - platform: event
+    triggers:
+      - trigger: event
         event_type: telegram_callback
         event_data: {}
-      - platform: event
+      - trigger: event
         event_type: telegram_command
         event_data: {}
 
-    action:
+    actions:
       - choose:
           # Start
           - conditions:
               - condition: template
                 value_template: "{{ trigger.event.data.command == '/start' }}"
             sequence:
-              - service: telegram_bot.send_message
+              - action: telegram_bot.send_message
                 data:
                   target: "{{ trigger.event.data.chat_id }}"
                   message: "Tastatur aktiviert"
@@ -67,7 +67,7 @@ automation:
                     # - "/rollade_1, /rollade_2, /rollade_3, /rollade_4"
                     - "/alarm, /tor, /start, /help"
 
-              - service: script.telegram_callback
+              - action: script.telegram_callback
                 data:
                   target: "{{ trigger.event.data.chat_id }}"
                   message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
@@ -80,7 +80,7 @@ automation:
               - condition: template
                 value_template: "{{ trigger.event.data.command == '/help' }}"
             sequence:
-              - service: script.telegram_callback
+              - action: script.telegram_callback
                 data:
                   target: "{{ trigger.event.data.chat_id }}"
                   message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
@@ -114,7 +114,7 @@ script:
     icon: mdi:send
     mode: parallel
     sequence:
-      - service: telegram_bot.send_message
+      - action: telegram_bot.send_message
         data:
           target: "{{ target }}"
           message: "{{ message }}"
@@ -142,7 +142,7 @@ script:
       - condition: template
         value_template: "{{ (message_id is defined) and (message_id != 1000) }}"
 
-      - service: telegram_bot.delete_message
+      - action: telegram_bot.delete_message
         data:
           message_id: "{{ message_id }}"
           chat_id: "{{ target }}"

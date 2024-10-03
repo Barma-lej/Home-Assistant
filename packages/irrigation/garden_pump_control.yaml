@@ -5,13 +5,13 @@ automation:
     alias: Irrigation - Failsafe Pump Control Switch
     description: "Отключение насоса, при отключении автоматизации полива"
 
-    trigger:
-      - platform: state
+    triggers:
+      - trigger: state
         entity_id: input_boolean.irrigation_master_control_switch
         to: "off"
 
-    action:
-      - service: switch.turn_off
+    actions:
+      - action: switch.turn_off
         entity_id: switch.irrigation_pump
 
   # Включение насоса, если открылся один из клапанов
@@ -19,20 +19,20 @@ automation:
     alias: Irrigation - Pump ON
     description: "Включение насоса, если открылся один из клапанов"
 
-    trigger:
-      - platform: state
+    triggers:
+      - trigger: state
         entity_id: switch.irrigation_valves
         # entity_id: group.irrigation_switches
         to: "on"
         for: "00:00:01"
 
-    condition:
+    conditions:
       - condition: state
         entity_id: switch.irrigation_pump
         state: "off"
 
-    action:
-      - service: switch.turn_on
+    actions:
+      - action: switch.turn_on
         entity_id: switch.irrigation_pump
 
   # Выключение насоса, если закрыты все клапаны с задержкой для смены зоны полива
@@ -40,18 +40,18 @@ automation:
     alias: Irrigation - Pump OFF
     description: "Выключение насоса, если закрыты все клапаны с задержкой для смены зоны полива"
 
-    trigger:
-      - platform: state
+    triggers:
+      - trigger: state
         entity_id: switch.irrigation_valves
         # entity_id: group.irrigation_switches
         to: "off"
         for: "00:00:04"
 
-      - platform: time_pattern
+      - trigger: time_pattern
         # This will match every 15 minutes
         minutes: "/15"
 
-    condition:
+    conditions:
       - condition: and
         conditions:
           - condition: state
@@ -62,8 +62,8 @@ automation:
             entity_id: switch.irrigation_zone3_valve
             state: "off"
 
-    action:
-      - service: switch.turn_off
+    actions:
+      - action: switch.turn_off
         entity_id: switch.irrigation_pump
 
   # Включение насоса для подкачки
@@ -71,19 +71,19 @@ automation:
     alias: Irrigation - Regular pumping
     description: "Регулярная подкачка воды"
 
-    trigger:
-      - platform: time_pattern
+    triggers:
+      - trigger: time_pattern
         hours: "/4"
         minutes: "2"
 
-    condition:
+    conditions:
       - condition: state
         entity_id: switch.irrigation_pump
         state: "off"
 
-    action:
-      - service: switch.turn_on
+    actions:
+      - action: switch.turn_on
         entity_id: switch.irrigation_pump
       - delay: 15
-      - service: switch.turn_off
+      - action: switch.turn_off
         entity_id: switch.irrigation_pump

@@ -27,80 +27,80 @@ input_boolean:
 automation:
   - id: torteiloffnung_on
     alias: Garage - Torteiloffnung ON
-    trigger:
-      - platform: state
+    triggers:
+      - trigger: state
         entity_id: switch.torteil
         to: "on"
 
-    condition:
+    conditions:
       - condition: state
         entity_id: input_boolean.torteil
         state: "off"
 
-    action:
+    actions:
       - delay:
           seconds: 2
       - alias: ""
-        service: input_boolean.turn_on
+        action: input_boolean.turn_on
         data:
           entity_id: input_boolean.torteil
 
   #- id: 'torteil_off'
   #  alias: Torteiloffnung OFF
   #  description: ''
-  #  trigger:
+  #  triggers:
   #  - entity_id: binary_sensor.tor_geoffnet
-  #    platform: state
+  #    trigger: state
   #    to: 'on'
-  #  condition:
+  #  conditions:
   #  - condition: state
   #    entity_id: input_boolean.torteil
   #    state: 'on'
-  #  action:
+  #  actions:
   #  - alias: ''
-  #    service: homeassistant.turn_off
+  #    action: homeassistant.turn_off
   #    data:
   #      entity_id: input_boolean.torteil
 
   - id: telegram_tor
     alias: "Telegram - Tor"
     mode: restart
-    trigger:
-      - platform: event
+    triggers:
+      - trigger: event
         event_type: telegram_command
         event_data:
           command: "/tor"
-      - platform: event
+      - trigger: event
         event_type: telegram_command
         event_data:
           command: "/torteil"
 
-      - platform: event
+      - trigger: event
         event_type: telegram_callback
         event_data:
           command: "/tor"
-      - platform: event
+      - trigger: event
         event_type: telegram_callback
         event_data:
           command: "/torteil"
 
-    action:
+    actions:
       - choose:
           - conditions:
               - condition: template
                 value_template: "{{ trigger.event.data.command == '/tor' }}"
             sequence:
-              - service: switch.toggle
+              - action: switch.toggle
                 data:
                   entity_id: switch.tor
 
               - wait_for_trigger:
-                  - platform: state
+                  - trigger: state
                     entity_id: cover.tor
                 timeout: "00:00:05"
                 continue_on_timeout: true
 
-              - service: script.telegram_callback
+              - action: script.telegram_callback
                 data:
                   target: "{{ trigger.event.data.chat_id }}"
                   message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
@@ -110,17 +110,17 @@ automation:
               - condition: template
                 value_template: "{{ trigger.event.data.command == '/torteil' }}"
             sequence:
-              - service: switch.toggle
+              - action: switch.toggle
                 data:
                   entity_id: switch.torteil
 
               - wait_for_trigger:
-                  - platform: state
+                  - trigger: state
                     entity_id: cover.tor
                 timeout: "00:00:05"
                 continue_on_timeout: true
 
-              - service: script.telegram_callback
+              - action: script.telegram_callback
                 data:
                   target: "{{ trigger.event.data.chat_id }}"
                   message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"

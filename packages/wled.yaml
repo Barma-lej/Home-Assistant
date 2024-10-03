@@ -19,7 +19,7 @@ input_number:
     max: 3600
     step: 10
 
-#     service: light.turn_on
+#     action: light.turn_on
 # target:
 #   entity_id: light.wled
 # data:
@@ -29,28 +29,28 @@ input_number:
 automation:
   - id: wled_integration_manage
     alias: "WLED - Integration manage"
-    trigger:
-      - platform: state
+    triggers:
+      - trigger: state
         entity_id: light.sonoffpow_03
-      - platform: time_pattern
+      - trigger: time_pattern
         minutes: "/15"
-    condition: "{{ is_state('light.sonoffpow_03', 'on') or is_state('light.sonoffpow_03', 'off') }}"
-    action:
-      - service: "{{ iif(is_state('light.sonoffpow_03', 'on'), 'homeassistant.enable_config_entry', 'homeassistant.disable_config_entry') }}"
+    conditions: "{{ is_state('light.sonoffpow_03', 'on') or is_state('light.sonoffpow_03', 'off') }}"
+    actions:
+      - action: "{{ iif(is_state('light.sonoffpow_03', 'on'), 'homeassistant.enable_config_entry', 'homeassistant.disable_config_entry') }}"
         data:
           config_entry_id: 17c5043bacbffb9c30be8a0fab31ff2f
 
   - id: wled_loop_run
     alias: "WLED - Start Effektschleife"
     mode: single
-    trigger:
-      - platform: state
+    triggers:
+      - trigger: state
         entity_id:
           - input_select.wled_effects_loop
         to: Nacheinander
-      - platform: state
+      - trigger: state
         entity_id:
           - input_select.wled_effects_loop
         to: Zufällig
-    action:
-      - service: script.wled_loop
+    actions:
+      - action: script.wled_loop

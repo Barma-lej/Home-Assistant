@@ -40,8 +40,8 @@ automation:
   - id: set_rolladen_last_action
     alias: Rolladen - Set last action
     mode: parallel
-    trigger:
-      - platform: state
+    triggers:
+      - trigger: state
         entity_id:
           - cover.rolladen
           - cover.shellyswitch25_10d315
@@ -49,14 +49,14 @@ automation:
           - cover.shellyswitch25_f37a8c
           - cover.shellyswitch25_f37b28
 
-    condition:
+    conditions:
       - condition: or
         conditions:
           - "{{ trigger.from_state.state == 'opening' }}"
           - "{{ trigger.from_state.state == 'closing' }}"
 
-    action:
-      - service: input_text.set_value
+    actions:
+      - action: input_text.set_value
         target:
           entity_id: input_text.{{ trigger.to_state.object_id }}_last_action
         data:
@@ -74,7 +74,7 @@ script:
     alias: Cover - One button control
     mode: parallel
     sequence:
-      - service: >
+      - action: >
           {% if is_state("cover." ~ entity_id, "opening") or
                 is_state("cover." ~ entity_id, "closing") %}
             cover.stop_cover
@@ -101,7 +101,7 @@ script:
     alias: Cover - Two buttons control
     mode: parallel
     sequence:
-      - service: >
+      - action: >
           {% if is_state("cover." ~ entity_id, "opening") or
                 is_state("cover." ~ entity_id, "closing") %}
             cover.stop_cover

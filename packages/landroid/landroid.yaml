@@ -12,22 +12,22 @@ automation:
   - id: mower_notify_status
     alias: Mower status notification
     initial_state: false
-    trigger:
-      - platform: state
+    triggers:
+      - trigger: state
         # entity_id: vacuum.mower
         entity_id: lawn_mower.mower
 
-    condition:
+    conditions:
       - condition: template
         value_template: "{{ trigger.to_state.state != trigger.from_state.state }}"
 
-    action:
-      - service: notify.telegram_schick_home
+    actions:
+      - action: notify.telegram_schick_home
         data:
           title: 🏎️ Lanroid M500
           message: "*{{ trigger.to_state.state }}* <- {{ trigger.from_state.state }}"
 
-    #  - service: persistent_notification.create
+    #  - action: persistent_notification.create
     #    data:
     #      title: 🏎️ Lanroid M500
     #      message: "{{ trigger.from_state.state }} -> {{ trigger.to_state.state }} - {{ states('sensor.date_time') }}"
@@ -35,20 +35,20 @@ automation:
   - id: mower_notify_error
     alias: Mower error notification
     initial_state: true
-    trigger:
-      #   - platform: state
+    triggers:
+      #   - trigger: state
       #     entity_id: vacuum.mower
       #     attribute: error
-      - platform: template
+      - trigger: template
         value_template: "{{ states('sensor.mower_error') }}"
         # value_template: "{{ state_attr('vacuum.mower','error')['id'] }}"
 
-    condition:
+    conditions:
       - condition: template
         value_template: "{{ trigger.to_state.state != trigger.from_state.state }}"
 
-    action:
-      - service: notify.telegram_schick_home
+    actions:
+      - action: notify.telegram_schick_home
         data:
           title: 🏎️ Lanroid M500
           message: >-
@@ -57,7 +57,7 @@ automation:
           # *{{ trigger.to_state.state }}: {{ state_attr('vacuum.mower','error')['description'] }}*
           # <- {{ trigger.from_state.state }}: {{ state_attr('vacuum.mower','error')['description'] }}
 
-    #  - service: persistent_notification.create
+    #  - action: persistent_notification.create
     #    data:
     #      title: 🏎️ Lanroid M500
     #      message: "{{ trigger.from_state.state }} -> {{ trigger.to_state.state }} - {{ states('sensor.date_time') }}"
