@@ -416,7 +416,6 @@
     path: mdegat01/update_notifications.yaml
     input:
       update_entities:
-      - update.duck_dns_update
       - update.einfahrt_update
       - update.esphome_update
       - update.fritz_box_7490_fritz_os
