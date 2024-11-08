@@ -49,6 +49,7 @@ google_sevice_account.json
 home-assistant_v2.db
 home-assistant.log
 customize.yaml
+go2rtc.yaml
 google_calendars.yaml
 groups.yaml
 ip_bans.yaml
