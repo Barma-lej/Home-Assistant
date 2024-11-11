@@ -30,6 +30,22 @@ automation:
           - input_select.irrigation_cycle1_watering_days
           - input_select.irrigation_cycle2_watering_days
 
+      - trigger: time
+        at: "00:00:00"
+
+    conditions:
+      - condition: state
+        entity_id: input_boolean.irrigation_master_control_switch
+        state: "on"
+      - condition: or
+        conditions:
+          - condition: state
+            entity_id: input_boolean.irrigation_cycle1_enable
+            state: "on"
+          - condition: state
+            entity_id: input_boolean.irrigation_cycle2_enable
+            state: "on"
+
     actions:
       - action: input_datetime.set_datetime
         data:
