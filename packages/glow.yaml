@@ -1,7 +1,6 @@
-# Sonoff POW R2
-# Tasmota integration
+# Glow
 
-# Sensor ############################################################
+# Sensor ####################
 utility_meter:
   #  haus_energy_d:
   #    source: sensor.haus_energy_total
@@ -21,31 +20,25 @@ utility_meter:
     unique_id: haus_energy_t
     source: sensor.haus_total_energy
 
-# Customize #########################################################
+# Customize #################
 homeassistant:
   customize:
-    # Sensor ##########
     sensor.haus_power_consumption:
       friendly_name: Leistung (Haus)
       icon: mdi:lightning-bolt
       device_class: power
-
     sensor.haus_total_energy:
       friendly_name: Verbrauch seit Einschaltung (Haus)
       # icon: mdi:counter
-
     sensor.haus_daily_energy:
       friendly_name: Verbrauch Täglich (Haus)
       icon: mdi:counter
-
     sensor.haus_energy_m:
       friendly_name: Verbrauch Monatlich (Haus)
       # icon: mdi:counter
-
     sensor.haus_energy_y:
       friendly_name: Verbrauch Jahrlich (Haus)
       # icon: mdi:counter
-
     sensor.haus_energy_t:
       friendly_name: Verbrauch (Haus)
       # icon: mdi:counter
