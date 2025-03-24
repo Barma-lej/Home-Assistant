@@ -2,10 +2,10 @@
 # Tasmota integration
 # Irrigation
 
-# Template sensor ###################################################
+# Template sensor ###########
 template:
   - sensor:
-      # States ################
+      # States
       - name: Irrigation WiFi
         unique_id: irrigation_wifi
         state: "{{ states('sensor.sonoff4ch1_rssi') }}"
@@ -18,7 +18,21 @@ template:
           {%- else -%}mdi:wifi-strength-outline
           {%- endif %}
 
+# Customize #################
 homeassistant:
   customize:
     sensor.irrigation_wifi:
       friendly_name: Irrigation - WLAN Stärke
+
+    switch.irrigation_zone1_valve:
+      friendly_name: Irrigation - Hinten Ventil
+      icon: mdi:sprinkler-variant
+    switch.irrigation_zone2_valve:
+      friendly_name: Irrigation - Vorne Ventil
+      icon: mdi:sprinkler-variant
+    switch.irrigation_zone3_valve:
+      friendly_name: Irrigation - Hahn
+      icon: mdi:faucet
+    switch.irrigation_zone4_valve:
+      friendly_name: Irrigation - Pumpe
+      icon: mdi:engine

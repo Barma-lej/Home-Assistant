@@ -1,7 +1,7 @@
 # Sonoff POW R2
 # Tasmota Integration
 
-# Sensor ############################################################
+# Sensor ####################
 utility_meter:
   #  sonoffpow_04_energy_d:
   #    source: sensor.sonoffpow_04_energy_total
@@ -17,7 +17,7 @@ utility_meter:
     source: sensor.sonoffpow_04_energy_total
     cycle: yearly
 
-# Automation ########################################################
+# Automation ################
 automation:
   - id: telegram_sonoffpow_04
     alias: "Telegram - Sonoffpow_04"
@@ -50,31 +50,26 @@ automation:
           message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
           message: "💡 {{ state_attr('light.sonoffpow_04', 'friendly_name') }} - {{ states('light.sonoffpow_04') }}"
 
-# Customize #########################################################
+# Customize #################
 homeassistant:
   customize:
-    # Sensor ##########
+    light.sonoffpow_04:
+      friendly_name: Ambiente Küche
+      icon: hass:television-ambient-light
+
     sensor.sonoffpow_04_energy_total:
       friendly_name: Verbrauch (Ambiente Küche)
       icon: mdi:lightning-bolt
-
     sensor.sonoffpow_04_energy_power:
       friendly_name: Leistung (Ambiente Küche)
       icon: hass:gauge
       device_class: power
-
     sensor.sonoffpow_04_energy_today:
       friendly_name: Verbrauch Heute (Ambiente Küche)
       icon: mdi:lightning-bolt
-
-    #    sensor.sonoffpow_04_energy_d:
-    #      friendly_name: Verbrauch Heute (Ambiente Küche)
-    #      icon: mdi:lightning-bolt
-
     sensor.sonoffpow_04_energy_m:
       friendly_name: Verbrauch im Monat (Ambiente Küche)
       icon: mdi:lightning-bolt
-
     sensor.sonoffpow_04_energy_y:
       friendly_name: Verbrauch im Jahr (Ambiente Küche)
       icon: mdi:lightning-bolt

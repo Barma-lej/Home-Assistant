@@ -1,7 +1,7 @@
 # Sonoff POW R2
 # Tasmota integration
 
-# Sensor ############################################################
+# Sensor ####################
 utility_meter:
   #  sonoffpow_03_energy_d:
   #    source: sensor.sonoffpow_03_energy_total
@@ -17,7 +17,7 @@ utility_meter:
     source: sensor.sonoffpow_03_energy_total
     cycle: yearly
 
-# Automation ########################################################
+# Automation ################
 automation:
   - id: telegram_sonoffpow_03
     alias: "Telegram - Sonoffpow_03"
@@ -52,31 +52,26 @@ automation:
 
 #  Service ist {{ trigger.event }}"
 
-# Customize #########################################################
+# Customize #################
 homeassistant:
   customize:
-    # Sensor ##########
+    light.sonoffpow_03:
+      friendly_name: Terrassenlicht
+      icon: mdi:led-strip-variant
+
     sensor.sonoffpow_03_energy_total:
       friendly_name: Verbrauch (Terrassenlicht)
       icon: mdi:lightning-bolt
-
     sensor.sonoffpow_03_energy_power:
       friendly_name: Leistung (Terrassenlicht)
       icon: hass:gauge
       device_class: power
-
     sensor.sonoffpow_03_energy_today:
       friendly_name: Verbrauch Heute (Terrassenlicht)
       icon: mdi:lightning-bolt
-
-    #    sensor.sonoffpow_03_energy_d:
-    #      friendly_name: Verbrauch Heute (Terrassenlicht)
-    #      icon: mdi:lightning-bolt
-
     sensor.sonoffpow_03_energy_m:
       friendly_name: Verbrauch im Monat (Terrassenlicht)
       icon: mdi:lightning-bolt
-
     sensor.sonoffpow_03_energy_y:
       friendly_name: Verbrauch im Jahr (Terrassenlicht)
       icon: mdi:lightning-bolt

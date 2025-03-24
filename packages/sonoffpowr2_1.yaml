@@ -1,7 +1,7 @@
 # Sonoff POW R2
 # Tasmota integration
 
-# Sensor ############################################################
+# Sensor ####################
 utility_meter:
   #  sonoffpow_01_energy_d:
   #    source: sensor.sonoffpow_01_energy_total
@@ -17,7 +17,7 @@ utility_meter:
     source: sensor.sonoffpow_01_energy_total
     cycle: yearly
 
-# Automation ########################################################
+# Automation ################
 automation:
   - id: telegram_sonoffpow_01
     alias: "Telegram - Sonoffpow_01"
@@ -52,34 +52,28 @@ automation:
 
 # Service ist {{ trigger.event }}"
 
-# Customize #########################################################
+# Customize #################
 homeassistant:
   customize:
-    # Sensor ##########
+    light.sonoffpow_01:
+      friendly_name: Wandlicht
+      icon: hass:wall-sconce-flat
+
     sensor.sonoffpow_01_energy_totalstarttime:
       friendly_name: Seit (Wandlicht)
-
     sensor.sonoffpow_01_energy_power:
       friendly_name: Leistung (Wandlicht)
       icon: hass:gauge
       device_class: power
-
     sensor.sonoffpow_01_energy_total:
       friendly_name: Verbrauch (Wandlicht)
       # icon: mdi:chart-histogram
-
     sensor.sonoffpow_01_energy_today:
       friendly_name: Verbrauch Täglich (Wandlicht)
       # icon: mdi:
-
-    #    sensor.sonoffpow_01_energy_d:
-    #      friendly_name: Verbrauch Heute (Wandlicht)
-    #      icon: mdi:lightning-bolt
-
     sensor.sonoffpow_01_energy_m:
       friendly_name: Verbrauch Monatlich (Wandlicht)
       # icon: mdi:lightning-bolt
-
     sensor.sonoffpow_01_energy_y:
       friendly_name: Verbrauch Jahrlich (Wandlicht)
       # icon: mdi:lightning-bolt

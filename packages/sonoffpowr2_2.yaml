@@ -1,7 +1,7 @@
 # Sonoff POW R2
 # Tasmota Integration
 
-# Sensor ############################################################
+# Sensor ####################
 utility_meter:
   #  sonoffpow_02_energy_d:
   #    source: sensor.sonoffpow_02_energy_total
@@ -17,7 +17,7 @@ utility_meter:
     source: sensor.sonoffpow_02_energy_total
     cycle: yearly
 
-# Automation ########################################################
+# Automation ################
 # automation:
 #   - id: telegram_sonoffpow_02
 #     alias: "Telegram - Sonoffpow_02"
@@ -50,36 +50,29 @@ utility_meter:
 #           message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
 #           message: "💡 {{ state_attr('light.sonoffpow_02', 'friendly_name') }} - {{ states('light.sonoffpow_02') }}"
 
-# Customize #########################################################
+# Customize #################
 homeassistant:
   customize:
-    # Switch ##########
     switch.sonoffpow_02:
       friendly_name: Irrigation
       icon: mdi:power
 
-    # Sensor ##########
     sensor.sonoffpow_02_energy_totalstarttime:
       friendly_name: Seit (Irrigation)
-
     sensor.sonoffpow_02_energy_power:
       friendly_name: Leistung (Irrigation)
       # icon: mdi:gauge
       icon: mdi:lightning-bolt
       device_class: power
-
     sensor.sonoffpow_02_energy_total:
       friendly_name: Verbrauch (Irrigation)
       icon: mdi:counter
-
     sensor.sonoffpow_02_energy_today:
       friendly_name: Verbrauch Täglich (Irrigation)
       icon: mdi:counter
-
     sensor.sonoffpow_02_energy_m:
       friendly_name: Verbrauch Monatlich (Irrigation)
       # icon: mdi:lightning-bolt
-
     sensor.sonoffpow_02_energy_y:
       friendly_name: Verbrauch Jahrlich (Irrigation)
       # icon: mdi:lightning-bolt
