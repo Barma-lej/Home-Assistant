@@ -166,6 +166,16 @@ entity_config:
     room: Garten
     expose: true
 
+  cover.seitenmarkise:
+    name: Seitenmarkise
+    aliases:
+      - seitenmarkise
+      - сторона
+      - бок
+      - боковушка
+    room: Garten
+    expose: true
+
   # sensor.gartorpos:
   #   name: Tor Status
   #   room: Garage
