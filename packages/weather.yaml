@@ -1,0 +1,32 @@
+template:
+  - trigger:
+      - trigger: time_pattern
+        hours: /1
+    action:
+      - action: weather.get_forecasts
+        data:
+          type: hourly
+        target:
+          entity_id: weather.openweathermap
+        response_variable: hourly
+    sensor:
+      - name: Wettervorhersage der nächsten Stunde
+        unique_id: temperature_forecast_next_hour
+        state: "{{ hourly['weather.openweathermap'].forecast[0].temperature }}"
+        device_class: temperature
+        unit_of_measurement: °C
+        attributes:
+          # datetime: "{{ hourly['weather.openweathermap'].forecast[0].datetime }}"
+          condition: "{{ hourly['weather.openweathermap'].forecast[0].condition }}"
+          # templow: "{{ hourly['weather.openweathermap'].forecast[0].templow }}"
+          # pressure: "{{ hourly['weather.openweathermap'].forecast[0].pressure }}"
+          cloud_coverage: "{{ hourly['weather.openweathermap'].forecast[0].cloud_coverage }}"
+          # wind_speed: "{{ hourly['weather.openweathermap'].forecast[0].wind_speed }}"
+          # wind_bearing: "{{ hourly['weather.openweathermap'].forecast[0].wind_bearing }}"
+          # uv_index: "{{ hourly['weather.openweathermap'].forecast[0].uv_index }}"
+          # precipitation_probability: "{{ hourly['weather.openweathermap'].forecast[0].precipitation_probability }}"
+          precipitation: "{{ hourly['weather.openweathermap'].forecast[0].precipitation }}"
+          # dew_point: "{{ hourly['weather.openweathermap'].forecast[0].dew_point }}"
+          # wind_gust_speed: "{{ hourly['weather.openweathermap'].forecast[0].wind_gust_speed }}"
+          # humidity: "{{ hourly['weather.openweathermap'].forecast[0].humidity }}"
+          other: "{{ hourly['weather.openweathermap'].forecast[0] }}"

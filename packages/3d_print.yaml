@@ -1,15 +1,17 @@
 # Thumbnail from filename
 template:
   - trigger:
-      - platform: state
+      - trigger: state
         entity_id: sensor.ender_3_s1_pro_filename
     sensor:
       - name: "Ender 3 S1 Pro Thumbnail"
+        unique_id: ender_3_s1_pro_thumbnail
         state: >-
           {% if states('sensor.ender_3_s1_pro_filename') -%}
             {{ states('sensor.ender_3_s1_pro_filename') | replace('.gcode','.png') }}
-          {%- else -%}
-            {{ states('sensor.ender_3_s1_pro_thumbnail') }}
           {%- endif %}
         attributes:
           url: http://192.168.2.18/server/files/gcodes/.thumbs/{{ states('sensor.ender_3_s1_pro_thumbnail') }}
+
+          # {%- else -%}
+          #   {{ states('sensor.ender_3_s1_pro_thumbnail') }}

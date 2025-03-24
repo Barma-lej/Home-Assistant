@@ -1,7 +1,7 @@
 yandex_station:
   media_players:
-    - entity_id: media_player.chromecast
-      name: Chromecast
+    # - entity_id: media_player.chromecast
+    #   name: Chromecast
     - entity_id: media_player.chromecast_ultra
       name: Chromecast Ultra
     - entity_id: media_player.nest_mini
@@ -16,8 +16,8 @@ yandex_station:
       name: Erdgeschoss
     - entity_id: media_player.home_group
       name: Home Group
-    - entity_id: media_player.sony_kd_55x8505b
-      name: Sony KD 55X8505B
+    # - entity_id: media_player.sony_kd_55x8505b
+    #   name: Sony KD 55X8505B
     - entity_id: media_player.soundbar
       name: Soundbar
       media_content_type: url
