@@ -225,15 +225,15 @@
   alias: Garage - Coming home
   description: Open tor if Tiguan is coming to home
   triggers:
-  - trigger: device
-    device_id: 52dde1dbd0bd045e5b6181020e86c549
+  - device_id: d65b64c785a29ffed795c6d22780bb9f
     domain: device_tracker
-    entity_id: device_tracker.sm_g996b
+    entity_id: e26c53c9fa2534a4da69f77b06f7414f
     type: enters
+    trigger: device
     zone: zone.home
   conditions:
   - condition: state
-    entity_id: sensor.sm_g996b_bluetooth_connection
+    entity_id: sensor.as25_bluetooth_connection
     attribute: connected_paired_devices
     state: B4:EC:02:94:8A:CF (VW BT 1505)
     enabled: false
@@ -243,10 +243,10 @@
   - condition: or
     conditions:
     - condition: template
-      value_template: '{{ "68:4E:05:63:56:10 (VOLKSWAGEN-21ED)" in state_attr("sensor.sm_g996b_bluetooth_connection",
+      value_template: '{{ "68:4E:05:63:56:10 (VOLKSWAGEN-21ED)" in state_attr("sensor.as25_bluetooth_connection",
         "connected_paired_devices") }}'
     - condition: template
-      value_template: '{{ "B4:EC:02:94:8A:CF (VW BT 1505)" in state_attr("sensor.sm_g996b_bluetooth_connection",
+      value_template: '{{ "B4:EC:02:94:8A:CF (VW BT 1505)" in state_attr("sensor.as25_bluetooth_connection",
         "connected_paired_devices") }}'
   actions:
   - data: {}
@@ -261,31 +261,31 @@
         priority: high
         media_stream: alarm_stream_max
         tts_text: Die Garage öffnet
-    action: notify.mobile_app_sm_g996b
+    action: notify.mobile_app_as25
   mode: single
 - id: '1668017327174'
   alias: Garage - Leaving home
   description: Close tor if Tiguan is leaving home
   triggers:
-  - trigger: device
-    device_id: 52dde1dbd0bd045e5b6181020e86c549
+  - device_id: d65b64c785a29ffed795c6d22780bb9f
     domain: device_tracker
-    entity_id: device_tracker.sm_g996b
+    entity_id: e26c53c9fa2534a4da69f77b06f7414f
     type: leaves
+    trigger: device
     zone: zone.home
   conditions:
   - condition: state
-    entity_id: sensor.sm_g996b_bluetooth_connection
+    entity_id: sensor.as25_bluetooth_connection
     attribute: connected_paired_devices
     state: B4:EC:02:94:8A:CF (VW BT 1505)
     enabled: false
   - condition: or
     conditions:
     - condition: template
-      value_template: '{{ "68:4E:05:63:56:10 (VOLKSWAGEN-21ED)" in state_attr("sensor.sm_g996b_bluetooth_connection",
+      value_template: '{{ "68:4E:05:63:56:10 (VOLKSWAGEN-21ED)" in state_attr("sensor.as25_bluetooth_connection",
         "connected_paired_devices") }}'
     - condition: template
-      value_template: '{{ "B4:EC:02:94:8A:CF (VW BT 1505)" in state_attr("sensor.sm_g996b_bluetooth_connection",
+      value_template: '{{ "B4:EC:02:94:8A:CF (VW BT 1505)" in state_attr("sensor.as25_bluetooth_connection",
         "connected_paired_devices") }}'
   - condition: numeric_state
     entity_id: sensor.torposition
@@ -303,7 +303,7 @@
         priority: high
         media_stream: alarm_stream_max
         tts_text: Die Garage schlisst
-    action: notify.mobile_app_sm_g996b
+    action: notify.mobile_app_as25
   - wait_for_trigger:
     - trigger: numeric_state
       entity_id: sensor.torposition
@@ -326,7 +326,7 @@
         priority: high
         media_stream: alarm_stream_max
         tts_text: Die Garage ist geschlossen
-    action: notify.mobile_app_sm_g996b
+    action: notify.mobile_app_as25
   mode: single
 - id: 3d_prtint_is_done
   alias: 3D - Druck ist fertig
@@ -342,6 +342,19 @@
     to: complete
   conditions: []
   actions:
+  - action: camera.snapshot
+    metadata: {}
+    data:
+      filename: /config/www/screenshots/3dprinter.jpg
+    target:
+      entity_id: camera.ender_3_s1_pro_sony
+  - action: notify.telegram_schick_home
+    data:
+      message: "\U0001F3ED 3D Druck ist fertig"
+      data:
+        photo:
+        - file: /config/www/screenshots/3dprinter.jpg
+          caption: "\U0001F3ED 3D Druck ist fertig"
   - action: notify.telegram_schick_home
     data:
       message: "\U0001F3ED 3D Druck ist fertig"
@@ -349,6 +362,7 @@
         photo:
         - url: '{{ state_attr(''sensor.ender_3_s1_pro_thumbnail'',''url'') }}'
           caption: "\U0001F3ED 3D Druck ist fertig"
+    enabled: false
   - wait_for_trigger:
     - trigger: numeric_state
       entity_id: sensor.ender_3_s1_pro_extruder_temperature
@@ -358,6 +372,7 @@
       minutes: 10
       seconds: 0
       milliseconds: 0
+    enabled: true
   - if:
     - condition: template
       value_template: '{{ not is_state(''sensor.ender_3_s1_pro_current_print_state'',''printing'')
@@ -371,6 +386,7 @@
     - action: notify.telegram_schick_home
       data:
         message: "\U0001F3ED 3D Drucker ist ausgeschaltet"
+    enabled: true
   mode: single
 - id: '1674336725023'
   alias: Erinnerung - Mühlabfuhr
@@ -378,14 +394,13 @@
   use_blueprint:
     path: westenberg/garbage-reminder.yaml
     input:
-      garbage_sensor_1: sensor.bioabfall
+      garbage_sensor_1: sensor.restabfall
       garbage_sensor_2: sensor.leichtverpackungen
       garbage_sensor_3: sensor.papier
-      garbage_sensor_4: sensor.restabfall
       notifier: notify.telegram_schick_home
       day_offset: '1'
       reminder_time: '18:20:00'
-      reminder_message: 'Folgender Müll wird morgen abgeholt:'
+      reminder_message: 'Folgender Müll wird morgen abgeholt: '
       reminder_title: "\U0001F5D1️ Müllabfuhr Erinnerung"
 - id: '1694760290268'
   alias: HASS - CleanUp stale devices
@@ -424,13 +439,12 @@
       - update.garagegate_firmware
       - update.home_assistant_core_update
       - update.home_assistant_supervisor_update
-      - update.home_assistant_glow_firmware
       - update.markise_firmware
       - update.mosquitto_broker_update
       - update.nginx_home_assistant_ssl_proxy_update
-      - update.pi_hole_dostupno_veb_obnovlenie
-      - update.pi_hole_dostupno_obnovlenie_iadra
-      - update.pi_hole_dostupno_obnovlenie_ftl
+      - update.pi_hole_v6_integration_update
+      - update.pi_hole_core_update_available
+      - update.pi_hole_ftl_update_available
       - update.samba_share_update
       - update.sqlite_web_update
       - update.studio_code_server_update
@@ -443,11 +457,50 @@
       - update.fritz_box_7590_ax_fritz_os
       - update.music_assistant_server_update
       - update.shelly1pmminig3_34b7da8db254_firmware_update
-      mobile_app_device: 52dde1dbd0bd045e5b6181020e86c549
+      - update.aha_region_update
+      - update.bar_card_update
+      - update.card_tools_update
+      - update.comfortable_environment_card_update
+      - update.firmware_update
+      - update.fold_entity_row_update
+      - update.go2rtc_update
+      - update.hacs_update
+      - update.landroid_card_update
+      - update.landroid_cloud_update
+      - update.let_s_encrypt_update
+      - update.local_tuya_update
+      - update.media_browser_for_yandex_station_update
+      - update.mini_media_player_update
+      - update.mini_graph_card_update
+      - update.moonraker_update
+      - update.mushroom_themes_update
+      - update.passive_ble_monitor_integration_update
+      - update.polr_ytube_media_card_update
+      - update.restriction_card_update
+      - update.samsung_soundbar_update
+      - update.slider_button_card_update
+      - update.slider_entity_row_update
+      - update.spook_your_homie_update
+      - update.thermal_comfort_icons_update
+      - update.thermal_comfort_update
+      - update.vacuum_card_update
+      - update.weather_chart_card_update
+      - update.webrtc_camera_update
+      - update.xiaomi_mi_smart_pedestal_fan_integration_update
+      - update.xiaomi_smartmi_fan_card_update
+      - update.xiaomi_vacuum_map_card_update
+      - update.yandex_smart_home_update
+      - update.yandex_station_intents_update
+      - update.yandex_station_update
+      - update.ytube_music_player_update
+      - update.pi_hole_web_update_available
+      - update.maxi_media_player_update
+      - update.samsungtv_smart_update
+      mobile_app_device: d65b64c785a29ffed795c6d22780bb9f
       reminder_hours: '6'
       run_config_check: true
       send_to_ha: true
-      mobile_app_device_2: 52dde1dbd0bd045e5b6181020e86c549
+      mobile_app_device_2: d65b64c785a29ffed795c6d22780bb9f
 - id: camera_manage_status_led
   alias: Camera - Manage status LED
   triggers:
@@ -513,10 +566,11 @@
       domain: switch
       enabled: false
     - condition: state
-      entity_id: media_player.tv_gq75qn92catxzg
+      entity_id: media_player.gq75qn92catxzg
       state: 'off'
   actions:
   - alias: Выбор условий для выключения и включения TV Board
+    enabled: false
     choose:
     - conditions:
       - condition: template
@@ -536,6 +590,15 @@
         target:
           entity_id: switch.tuyaplug2
         data: {}
+  - if:
+    - condition: template
+      value_template: '{{ is_state(''switch.tuyaplug2'', ''on'') and (is_state(''group.family'',
+        ''not_home'') or now().hour < 12 or now().hour > 22) }}'
+    then:
+    - action: switch.turn_off
+      target:
+        entity_id: switch.tuyaplug2
+      data: {}
   mode: single
 - id: rolladen_close_if_its_hot
   alias: Rolladen - schliessen wehn es heiss ist
@@ -621,67 +684,6 @@
     min_elevation: 10
     max_changed: 240
   mode: single
-- id: rolladen_close_if_its_hot1
-  alias: Rolladen - schliessen wehn es heiss ist1
-  description: Rolladen - schliessen wehn es heiss ist
-  triggers:
-  - trigger: numeric_state
-    entity_id:
-    - sun.sun
-    attribute: azimuth
-    above: 150
-    for:
-      minutes: 1
-    variables:
-      entity: cover.shellyswitch25_f37a8c
-      above_position: 40
-      to_position: 29
-  - trigger: numeric_state
-    entity_id: sun.sun
-    attribute: azimuth
-    above: 180
-    for:
-      minutes: 1
-    variables:
-      entity: cover.shellyswitch25_f37b28
-      above_position: 40
-      to_position: 29
-  - trigger: numeric_state
-    entity_id: sun.sun
-    attribute: azimuth
-    above: 220
-    for:
-      minutes: 1
-    variables:
-      entity: cover.shellyswitch25_10eaa4
-      above_position: 40
-      to_position: 29
-  - trigger: numeric_state
-    entity_id: sun.sun
-    attribute: azimuth
-    above: 260
-    for:
-      minutes: 1
-    variables:
-      entity: cover.shellyswitch25_10d315
-      above_position: 75
-      to_position: 60
-  conditions:
-  - condition: template
-    value_template: '{{ (states(''sensor.rasen_temperature'') | float ) > temperature
-      and (state_attr(''weather.openweathermap'', ''cloud_coverage'') | int ) < cloud_coverage
-      and state_attr(entity, ''current_position'') > above_position }}'
-  actions:
-  - action: cover.set_cover_position
-    metadata: {}
-    target:
-      entity_id: '{{ entity }}'
-    data:
-      position: '{{ to_position }}'
-  trigger_variables:
-    temperature: 22
-    cloud_coverage: 40
-  mode: single
 - id: markise_control
   alias: Markise Verwaltung
   description: Markiese öffnen, wenn es heiß ist oder schließen wenn sie nicht brauchst
@@ -751,7 +753,7 @@
         action: cover.set_cover_position
   mode: single
 - id: vacuum_when_nobody_home
-  alias: Staubsauger - Niemand zu Hause ist
+  alias: Robi - Niemand zu Hause ist
   description: Wenn Niemand Zuhause ist, dann staubsaugen.
   triggers:
   - trigger: state
@@ -793,4 +795,253 @@
     metadata: {}
     data:
       addon: core_letsencrypt
+  mode: single
+- id: weihnachten_licht_an
+  alias: Weihnachten - Licht An
+  description: Weihnachten licht an am Abend
+  triggers:
+  - trigger: sun
+    event: sunset
+    offset: -00:15:00
+  conditions:
+  - condition: state
+    entity_id: group.family_wlan
+    alias: Is anybody home
+    state: home
+  actions:
+  - action: switch.turn_on
+    data:
+      entity_id: switch.weihnachten
+  mode: single
+- id: weihnachten_licht_an_anatolij
+  alias: Weihnachten - Licht An Anatolij
+  description: Weihnachten licht an am Morgens für Anatolij
+  mode: single
+  triggers:
+  - trigger: time
+    at: 08:20:00
+  conditions:
+  - condition: and
+    conditions:
+    - condition: sun
+      before: sunrise
+      after_offset: 00:15:00
+    - condition: time
+      weekday:
+      - mon
+      - tue
+      - wed
+      - thu
+      - fri
+  actions:
+  - action: switch.turn_on
+    data:
+      entity_id: switch.weihnachten
+- id: weihnachten_licht_an_wenn_jemand_kommt
+  alias: Weihnachten - Licht An wenn jemand kommt
+  description: Weihnachten licht an wenn jemand kommt
+  triggers:
+  - trigger: state
+    entity_id:
+    - group.family_wlan
+    - group.family
+    from: not_home
+    to: home
+    for:
+      hours: 0
+      minutes: 3
+      seconds: 0
+  conditions:
+  - condition: template
+    value_template: '{{ state_attr(''sun.sun'', ''elevation'') < 4 }}'
+  actions:
+  - action: switch.turn_on
+    data:
+      entity_id: switch.weihnachten
+  mode: single
+- id: weihnachten_licht_aus
+  alias: Weihnachten - Licht Aus
+  description: Weihnachten licht aus
+  triggers:
+  - trigger: time
+    at:
+    - 00:00:00
+    - 09:30:00
+  - trigger: sun
+    event: sunrise
+    offset: 00:15:00
+  - trigger: state
+    entity_id:
+    - group.family_wlan
+    - group.family
+    from: home
+    to: not_home
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+  conditions: []
+  actions:
+  - action: switch.turn_off
+    data:
+      entity_id: switch.weihnachten
+  mode: single
+- id: robi_yandex_home
+  alias: Robi - Yandex Haus
+  description: ''
+  triggers:
+  - trigger: event
+    event_type: yandex_intent
+    event_data:
+      text: Уберись дома
+  actions:
+  - action: script.robi_home
+  mode: single
+- id: robi_yandex_kitchen
+  alias: Robi - Yandex Küche
+  description: ''
+  triggers:
+  - trigger: event
+    event_type: yandex_intent
+    event_data:
+      text: Убери кухню
+  actions:
+  - action: script.robi_kitchen
+  mode: single
+- id: robi_yandex_living_room
+  alias: Robi - Yandex Wohnzimmer
+  description: ''
+  triggers:
+  - trigger: event
+    event_type: yandex_intent
+    event_data:
+      text: Убери зал
+  actions:
+  - action: script.robi_living_room
+  mode: single
+- id: robi_yandex_stube
+  alias: Robi - Yandex Stube
+  description: ''
+  triggers:
+  - trigger: event
+    event_type: yandex_intent
+    event_data:
+      text: Убери штубэ
+  actions:
+  - action: script.robi_stube
+  mode: single
+- id: robi_yandex_bedroom
+  alias: Robi - Yandex Schlafzimmer
+  description: ''
+  triggers:
+  - trigger: event
+    event_type: yandex_intent
+    event_data:
+      text: Убери спальню
+  actions:
+  - action: script.robi_bedroom
+  mode: single
+- id: robi_yandex_flur
+  alias: Robi - Yandex Flur
+  description: ''
+  triggers:
+  - trigger: event
+    event_type: yandex_intent
+    event_data:
+      text: Убери коридор
+  actions:
+  - action: script.robi_flur
+  mode: single
+- id: robi_yandex_hwr
+  alias: Robi - Yandex HWR
+  description: ''
+  triggers:
+  - trigger: event
+    event_type: yandex_intent
+    event_data:
+      text: Убери кладовку
+  actions:
+  - action: script.robi_hwr
+    data: {}
+  mode: single
+- id: robi_yandex_wc
+  alias: Robi - Yandex WC
+  description: ''
+  triggers:
+  - trigger: event
+    event_type: yandex_intent
+    event_data:
+      text: Убери туалет
+  actions:
+  - action: script.robi_wc
+  mode: single
+- id: seitenmarkise_control
+  alias: Seitenmarkise Verwaltung
+  description: SetemMarkiese schliessen, wenn es heiß ist oder schließen wenn sie
+    nicht brauchst oder es regnet
+  triggers:
+  - trigger: numeric_state
+    entity_id:
+    - sun.sun
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+    attribute: azimuth
+    above: 180
+    id: azimuth
+  - trigger: numeric_state
+    entity_id:
+    - sun.sun
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+    attribute: elevation
+    below: 9
+    id: elevation
+  - trigger: state
+    entity_id:
+    - binary_sensor.mower_rainsensor_triggered
+    to: 'on'
+    id: regen
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: and
+        conditions:
+        - condition: trigger
+          id:
+          - azimuth
+        - condition: template
+          value_template: '{{ not is_state(''binary_sensor.mower_rainsensor_triggered'',
+            ''on'') }}'
+          alias: Нет дождя
+        - condition: numeric_state
+          entity_id: sensor.ble_temperature_temperatur_gt
+          above: 22
+        - condition: numeric_state
+          entity_id: weather.openweathermap
+          below: 40
+          attribute: cloud_coverage
+      sequence:
+      - target:
+          device_id:
+          - f15eb933b0a5284d735a9358ce7d1986
+        data:
+          position: 100
+        action: cover.set_cover_position
+    - conditions:
+      - condition: trigger
+        id:
+        - elevation
+        - regen
+      sequence:
+      - target:
+          device_id:
+          - f15eb933b0a5284d735a9358ce7d1986
+        data:
+          position: 0
+        action: cover.set_cover_position
   mode: single
