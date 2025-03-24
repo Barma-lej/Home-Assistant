@@ -36,7 +36,7 @@ media_source:
 mobile_app:
 my: # This integration handles redirects from the My Home Assistant service.
 notify:
-sun: # Track the sun
+# sun: # Track the sun - UI configured
 system_health: # System Health integration data can be viewed in Developer Tools on the “Info” tab.
 websocket_api:
 
