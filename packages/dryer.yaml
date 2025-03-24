@@ -1,19 +1,21 @@
 # Garage
 # Smartthings integration
 
-# Sensor ##############################
+# Sensor
 sensor:
   - platform: history_stats
+    unique_id: trockner_betriebszeit_heute
     name: Trockner Betriebszeit Heute
-    entity_id: sensor.trockner_dryer_machine_state
+    entity_id: sensor.trockner_machine_state
     state: "run"
     type: time
     start: "{{ now().replace(hour=0, minute=0, second=0) }}"
     end: "{{ now() }}"
 
   - platform: history_stats
+    unique_id: trockner_betriebszeit_monat
     name: Trockner Betriebszeit Monat
-    entity_id: sensor.trockner_dryer_machine_state
+    entity_id: sensor.trockner_machine_state
     state: "run"
     type: time
     end: "{{ now() }}"
@@ -21,8 +23,9 @@ sensor:
       days: 30
 
   - platform: history_stats
+    unique_id: trockner_betriebszeit_jahr
     name: Trockner Betriebszeit Jahr
-    entity_id: sensor.trockner_dryer_machine_state
+    entity_id: sensor.trockner_machine_state
     state: "run"
     type: time
     end: "{{ now() }}"
@@ -30,8 +33,9 @@ sensor:
       days: 365
 
   - platform: history_stats
+    unique_id: trockner_betriebszeit
     name: Trockner Betriebszeit
-    entity_id: sensor.trockner_dryer_machine_state
+    entity_id: sensor.trockner_machine_state
     state: "run"
     type: time
     start: "{{ 0 }}"
