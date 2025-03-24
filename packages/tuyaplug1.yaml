@@ -2,7 +2,7 @@
 # https://github.com/rospogrigio/localtuya/issues/1148
 #
 
-# Sensors #######################################
+# Sensors ###################
 sensor:
   - platform: integration
     unique_id: tuyaplug1_energy
@@ -28,10 +28,9 @@ utility_meter:
     name: Tuyaplug1 Energy Yearly
     cycle: yearly
 
-# Customize #####################################
+# Customize #################
 homeassistant:
   customize:
-    # Switch ##########
     switch.tuyaplug1:
       friendly_name: 3D Drucker
       icon: mdi:printer-3d
@@ -42,27 +41,21 @@ homeassistant:
       friendly_name: Überladung (3D Drucker)
       icon: mdi:battery-alert-variant
 
-    # Sensor ##########
     sensor.tuyaplug1_current:
       friendly_name: Stromstärke (3D Drucker)
       # icon: mdi:current-ac
-
     sensor.tuyaplug1_power:
       friendly_name: Leistung (3D Drucker)
       # icon: mdi:lightning-bolt
-
     sensor.tuyaplug1_energy:
       friendly_name: Verbrauch (3D Drucker)
       # icon: mdi:counter
-
     sensor.tuyaplug1_energy_daily:
       friendly_name: Verbrauch Täglich (3D Drucker)
       # icon: mdi:counter
-
     sensor.tuyaplug1_energy_monthly:
       friendly_name: Verbrauch Monatlich (3D Drucker)
       # icon: mdi:counter
-
     sensor.tuyaplug1_energy_yearly:
       friendly_name: Verbrauch Jahrlich (3D Drucker)
       # icon: mdi:counter

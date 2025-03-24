@@ -2,17 +2,17 @@
 # Tasmota
 # https://planetcalc.ru/5992/ - Approximation of a function of one variable
 
-# Customize ###########################
+# Customize #################
 homeassistant:
   customize:
     light.sonoffbnsz01:
       friendly_name: Garage LED
       icon: mdi:wall-sconce-flat-outline
 
-# Templates ###########################
+# Templates #################
 template:
   - trigger:
-      - platform: state
+      - trigger: state
         entity_id: light.sonoffbnsz01
     sensor:
       - name: "SonoffBNSZ01 Power"

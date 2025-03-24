@@ -2,7 +2,7 @@
 # https://github.com/rospogrigio/localtuya/issues/1148
 #
 
-# Sensors #######################################
+# Sensors ###################
 sensor:
   - platform: integration
     unique_id: tuyaplug2_energy
@@ -28,7 +28,7 @@ utility_meter:
     name: Tuyaplug2 Energy Yearly
     cycle: yearly
 
-# Automations ###################################
+# Automations ###############
 # automation:
 #   # TV Board on  -> TV off -> Niemand Zuhause -> TV Board off
 #   #                           Jemand Zuhause  -> Zeit ist zwischen 23:00 and 11:00 -> TV Board off
@@ -74,10 +74,9 @@ utility_meter:
 #                 target:
 #                   entity_id: switch.tuyaplug2
 
-# Customize #####################################
+# Customize #################
 homeassistant:
   customize:
-    # Switch ##########
     switch.tuyaplug2:
       friendly_name: TV Board
       icon: mdi:television
@@ -88,27 +87,21 @@ homeassistant:
       friendly_name: Überladung (TV Board)
       icon: mdi:battery-alert-variant
 
-    # Sensor ##########
     sensor.tuyaplug2_current:
       friendly_name: Stromstärke (TV Board)
       # icon: mdi:current-ac
-
     sensor.tuyaplug2_power:
       friendly_name: Leistung (TV Board)
       # icon: mdi:lightning-bolt
-
     sensor.tuyaplug2_energy:
       friendly_name: Verbrauch (TV Board)
       # icon: mdi:counter
-
     sensor.tuyaplug2_energy_daily:
       friendly_name: Verbrauch Täglich (TV Board)
       # icon: mdi:counter
-
     sensor.tuyaplug2_energy_monthly:
       friendly_name: Verbrauch Monatlich (TV Board)
       # icon: mdi:counter
-
     sensor.tuyaplug2_energy_yearly:
       friendly_name: Verbrauch Jahrlich (TV Board)
       # icon: mdi:counter
