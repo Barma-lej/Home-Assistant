@@ -33,33 +33,33 @@ group:
   #     - switch.irrigation_zone2_valve
   #     # - switch.irrigation_zone3_valve
 
-  # irrigation_automations:
-  #   name: "Irrigation - Automatisierungen"
-  #   entities:
-  #     # Irrigation
-  #     - automation.irrigation_set_next_run_time_when_schedule_enabled_or_time_changed
-  #     - automation.irrigation_run_cycle_1
-  #     - automation.irrigation_run_cycle_2
-  #     - automation.irrigation_run_a_cycle_manually
-  #     - automation.irrigation_cancel_a_manual_cycle
-  #     # - automation.irrigation_cancel_if_it_rains
+  irrigation_automations:
+    name: "Irrigation - Automatisierungen"
+    entities:
+      # Irrigation
+      - automation.irrigation_set_next_run_time_when_schedule_enabled_or_time_changed
+      - automation.irrigation_run_cycle_1
+      - automation.irrigation_run_cycle_2
+      - automation.irrigation_run_a_cycle_manually
+      - automation.irrigation_cancel_a_manual_cycle
+      # - automation.irrigation_cancel_if_it_rains
 
-  #     # Master Control
-  #     - automation.irrigation_master_control_switch
+      # Master Control
+      - automation.irrigation_master_control_switch
 
-  #     # Pump control
-  #     - automation.irrigation_failsafe_pump_control_switch
-  #     - automation.irrigation_pump_on
-  #     - automation.irrigation_pump_off
+      # Pump control
+      - automation.irrigation_failsafe_pump_control_switch
+      - automation.irrigation_pump_on
+      - automation.irrigation_pump_off
 
-  #     # Statistic
-  #     # - automation.irrigation_set_start_end_time
-  #     # - automation.irrigation_daily_to_total
+      # Statistic
+      # - automation.irrigation_set_start_end_time
+      # - automation.irrigation_daily_to_total
 
-  #     # Failsafe
-  #     - automation.irrigation_failsafe_master_control_switch
-  #     - automation.irrigation_failsafe_valve_1_on
-  #     - automation.irrigation_failsafe_valve_2_on
+      # Failsafe
+      - automation.irrigation_failsafe_master_control_switch
+      - automation.irrigation_failsafe_valve_1_on
+      - automation.irrigation_failsafe_valve_2_on
 
 # Input_Booleans ####################################################
 input_boolean:
