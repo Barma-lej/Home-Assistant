@@ -469,7 +469,6 @@
       - update.landroid_cloud_update
       - update.let_s_encrypt_update
       - update.local_tuya_update
-      - update.media_browser_for_yandex_station_update
       - update.mini_media_player_update
       - update.mini_graph_card_update
       - update.moonraker_update
@@ -496,6 +495,10 @@
       - update.pi_hole_web_update_available
       - update.maxi_media_player_update
       - update.samsungtv_smart_update
+      - update.card_mod_update
+      - update.pi_hole_docker_update_available
+      - update.seitenmarkise_74aab6_firmware
+      - update.tagblack1_firmware
       mobile_app_device: d65b64c785a29ffed795c6d22780bb9f
       reminder_hours: '6'
       run_config_check: true
@@ -926,9 +929,10 @@
   - trigger: event
     event_type: yandex_intent
     event_data:
-      text: Убери штубэ
+      text: Убери гостиную
   actions:
   - action: script.robi_stube
+    data: {}
   mode: single
 - id: robi_yandex_bedroom
   alias: Robi - Yandex Schlafzimmer
