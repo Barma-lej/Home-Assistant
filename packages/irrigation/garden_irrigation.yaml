@@ -536,7 +536,7 @@ script:
             {% if zone in [1, 2] %}
               {% set tasmota = 'sonoff4ch' %}
             {% endif %}
-            {{ tasmota }}/cmnd/pulsetime{{ zone | string}}
+            cmnd/{{ tasmota }}/pulsetime{{ zone | string}}
           payload: >
             {% set duration = states('input_number.irrigation_cycle' ~ cycle ~ '_zone' ~ zone ~ '_duration') | float(0) %}
             {% set payload = 100 + (duration * 60) + 30 %}
@@ -544,7 +544,7 @@ script:
       # Set pump
       - action: mqtt.publish
         data:
-          topic: sonoff4ch/cmnd/pulsetime4
+          topic: cmnd/sonoff4ch/pulsetime4
           payload: >
             {% set duration = states('input_number.irrigation_cycle' ~ cycle ~ '_zone' ~ zone ~ '_duration') | float(0) %}
             {% set payload = 100 + (duration * 60) + 30 %}
