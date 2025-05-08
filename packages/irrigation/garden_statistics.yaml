@@ -68,12 +68,8 @@ template:
         unique_id: irrigation_last_irrigated_time
         state: >-
           {%- set date = as_timestamp(now()) -%}
-          {%- set weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"] -%}
           {%- set weekdays_short = ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."] -%}
-          {%- set months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "Nowember", "Dezember"] -%}
-          {%- set months_short = ["Jan", "Feb", "Mrz", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Now", "Dez"] -%}
           {%- set w = date | timestamp_custom("%w") | int(0) -%}
-          {%- set m = date | timestamp_custom("%m") | int(0) -%}
           {{ weekdays_short[w] }} {{ date | timestamp_custom('%d.%m.%Y %H:%M:%S', true) }}
         icon: mdi:clock-end
         attributes:
@@ -139,52 +135,6 @@ template:
           cost: >-
             {{ (states('sensor.irrigation_water_consumption_pump') | float(0)
             * states('input_number.water_price') | float(0)) | round(2) }}
-
-      # - name: Irrigation - Watering duration
-      #   unique_id: irrigation_watering_duration
-      #   state: >-
-      #     {% set t = states('sensor.irrigation_watering_duration_pump_yearly') | float(0) * 60 -%}
-      #     {%- if t > 1440 -%}
-      #       {{ '%0d Tg. %0.02d:%0.02d:%0.02d' | format(t // 1440, t % 1440 // 60, t % 60, t % 1 * 60) }}
-      #     {%- else -%}
-      #       {{ '%0.02d:%0.02d:%02d' | format(((t % 1440) // 60), t % 60, t % 1 * 60) }}
-      #     {%- endif %}
-      #   icon: mdi:clock
-      #   attributes:
-      #     pump_daily: >-
-      #       {% set t = states('sensor.irrigation_watering_duration_pump_daily') | float(0) *60 %}
-      #       {{ '%0.02d:%0.02d:%0.02d' | format(t // 60, t % 60, t % 1 * 60) }}
-      #     pump_yearly: "{{ states('sensor.irrigation_watering_duration') }}"
-      #     zone1_daily: >-
-      #       {% set t = states('sensor.irrigation_watering_duration_zone1_daily') | float(0) *60 %}
-      #       {{ '%0.02d:%0.02d:%0.02d' | format(t // 60, t % 60, t % 1 * 60) }}
-      #     zone1_yearly: >-
-      #       {% set t = states('sensor.irrigation_watering_duration_zone1_yearly') | float(0) * 60 -%}
-      #       {%- if t > 1440 -%}
-      #         {{ '%0d Tg. %0.02d:%0.02d:%0.02d' | format(t // 1440, t % 1440 // 60, t % 60, t % 1 * 60) }}
-      #       {%- else -%}
-      #         {{ '%0.02d:%0.02d:%02d' | format(((t % 1440) // 60), t % 60, t % 1 * 60) }}
-      #       {%- endif %}
-      #     zone2_daily: >-
-      #       {% set t = states('sensor.irrigation_watering_duration_zone2_daily') | float(0) *60 %}
-      #       {{ '%0.02d:%0.02d:%0.02d' | format(t // 60, t % 60, t % 1 * 60) }}
-      #     zone2_yearly: >-
-      #       {% set t = states('sensor.irrigation_watering_duration_zone2_yearly') | float(0) * 60 -%}
-      #       {%- if t > 1440 -%}
-      #         {{ '%0d Tg. %0.02d:%0.02d:%0.02d' | format(t // 1440, t % 1440 // 60, t % 60, t % 1 * 60) }}
-      #       {%- else -%}
-      #         {{ '%0.02d:%0.02d:%02d' | format(((t % 1440) // 60), t % 60, t % 1 * 60) }}
-      #       {%- endif %}
-      #     zone3_daily: >-
-      #       {% set t = states('sensor.irrigation_watering_duration_zone3_daily') | float(0) *60 %}
-      #       {{ '%0.02d:%0.02d:%0.02d' | format(t // 60, t % 60, t % 1 * 60) }}
-      #     zone3_yearly: >-
-      #       {% set t = states('sensor.irrigation_watering_duration_zone3_yearly') | float(0) * 60 -%}
-      #       {%- if t > 1440 -%}
-      #         {{ '%0d Tg. %0.02d:%0.02d:%0.02d' | format(t // 1440, t % 1440 // 60, t % 60, t % 1 * 60) }}
-      #       {%- else -%}
-      #         {{ '%0.02d:%0.02d:%02d' | format(((t % 1440) // 60), t % 60, t % 1 * 60) }}
-      #       {%- endif %}
 
 sensor:
   # Watering durations
@@ -276,10 +226,6 @@ automation:
         variables:
           action: "Start"
 
-    # conditions:
-    # - condition: template
-    #   value_template: "{{ trigger.to_state.state != trigger.from_state.state }}"
-
     actions:
       - action: notify.telegram_schick_home
         data:
@@ -289,24 +235,6 @@ automation:
 # Customize #########################################################
 homeassistant:
   customize:
-    sensor.irrigation_ontime_zone1_daily:
-      friendly_name: "Bewässerung Hinten (Heute)"
-    sensor.irrigation_ontime_zone2_daily:
-      friendly_name: "Bewässerung Vorne (Heute)"
-    sensor.irrigation_ontime_zone3_daily:
-      friendly_name: "Hahnoffnung (Heute)"
-    sensor.irrigation_ontime_pump_daily:
-      friendly_name: "Pumpennutzung (Heute)"
-
-    sensor.irrigation_ontime_zone1:
-      friendly_name: "Bewässerung Hinten"
-    sensor.irrigation_ontime_zone2:
-      friendly_name: "Bewässerung Vorne"
-    sensor.irrigation_ontime_zone3:
-      friendly_name: "Hahnoffnung"
-    sensor.irrigation_ontime_pump:
-      friendly_name: "Pumpennutzung"
-
     # Switches ##############
     # Master control switch
     switch.irrigation_watering:
@@ -366,41 +294,3 @@ homeassistant:
       friendly_name: "Irrigation - Dauer Hahn Jährlich"
     sensor.irrigation_watering_duration_pump_yearly:
       friendly_name: "Irrigation - Dauer Pumpe Jährlich"
-
-      # Recorder ##########################################################
-# recorder:
-#  exclude:
-#  entities:
-#  - sensor.irrigation_hs_zone1_daily
-#  - sensor.irrigation_hs_zone2_daily
-#  - sensor.irrigation_hs_zone3_daily
-#  - sensor.irrigation_hs_pump_daily
-#  - input_number.irrigation_ontime_zone1
-#  - input_number.irrigation_ontime_zone2
-#  - input_number.irrigation_ontime_zone3
-#  - input_number.irrigation_ontime_pump
-#  - automation.irrigation_set_start_time
-#  - automation.irrigation_daily_to_total
-#  - automation.irrigation_update_the_last_time_a_cycle_ended
-#  - automation.irrigation_notify
-
-## Logbook ###########################################################
-# logbook:
-#  exclude:
-#  entities:
-#  - group.irrigation_status_zone1
-#  - group.irrigation_status_zone2
-#  - group.irrigation_status_zone3
-#  - sensor.irrigation_hs_zone1_daily
-#  - sensor.irrigation_hs_zone2_daily
-#  - sensor.irrigation_hs_zone3_daily
-#  - sensor.irrigation_hs_pump_daily
-#  - input_number.irrigation_ontime_zone1
-#  - input_number.irrigation_ontime_zone2
-#  - input_number.irrigation_ontime_zone3
-#  - input_number.irrigation_ontime_pump
-#  - automation.irrigation_set_start_time
-#  - automation.irrigation_daily_to_total
-#  - automation.irrigation_update_the_last_time_a_cycle_ended
-#  - automation.irrigation_notify
-

@@ -14,57 +14,51 @@ automation:
       - action: switch.turn_off
         entity_id: switch.irrigation_pump
 
-  # Включение насоса, если открылся один из клапанов
-  - id: irrigation_pump_on
-    alias: Irrigation - Pump ON
-    description: "Включение насоса, если открылся один из клапанов"
-
+  # Smart pump control
+  - id: irrigation_smart_pump
+    alias: Irrigation - Smart Pump Control
     triggers:
       - trigger: state
         entity_id: switch.irrigation_valves
-        # entity_id: group.irrigation_switches
         to: "on"
         for: "00:00:01"
-
-    conditions:
-      - condition: state
-        entity_id: switch.irrigation_pump
-        state: "off"
-
-    actions:
-      - action: switch.turn_on
-        entity_id: switch.irrigation_pump
-
-  # Выключение насоса, если закрыты все клапаны с задержкой для смены зоны полива
-  - id: irrigation_pump_off
-    alias: Irrigation - Pump OFF
-    description: "Выключение насоса, если закрыты все клапаны с задержкой для смены зоны полива"
-
-    triggers:
+        id: valve_on
       - trigger: state
         entity_id: switch.irrigation_valves
-        # entity_id: group.irrigation_switches
         to: "off"
         for: "00:00:04"
-
+        id: valve_off
       - trigger: time_pattern
-        # This will match every 15 minutes
         minutes: "/15"
-
-    conditions:
-      - condition: and
-        conditions:
-          - condition: state
-            entity_id: switch.irrigation_valves
-            # entity_id: group.irrigation_switches
-            state: "off"
-          - condition: state
-            entity_id: switch.irrigation_zone3_valve
-            state: "off"
+        id: every15min
 
     actions:
-      - action: switch.turn_off
-        entity_id: switch.irrigation_pump
+      - choose:
+          - conditions:
+              - condition: trigger
+                id: valve_on
+              - condition: state
+                entity_id: switch.irrigation_pump
+                state: "off"
+            sequence:
+              - action: switch.turn_on
+                target:
+                  entity_id: switch.irrigation_pump
+          - conditions:
+              - condition: trigger
+                id:
+                  - valve_off
+                  - every15min
+              - condition: state
+                entity_id: switch.irrigation_valves
+                state: "off"
+              - condition: state
+                entity_id: switch.irrigation_zone3_valve
+                state: "off"
+            sequence:
+              - action: switch.turn_off
+                target:
+                  entity_id: switch.irrigation_pump
 
   # Включение насоса для подкачки
   - id: irrigation_regular_pumping

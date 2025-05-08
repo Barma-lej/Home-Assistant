@@ -47,8 +47,7 @@ group:
 
       # Pump control
       - automation.irrigation_failsafe_pump_control_switch
-      - automation.irrigation_pump_on
-      - automation.irrigation_pump_off
+      - automation.irrigation_smart_pump_control
 
       # Statistic
       # - automation.irrigation_set_start_end_time
