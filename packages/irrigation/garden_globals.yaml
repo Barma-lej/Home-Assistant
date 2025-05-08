@@ -38,10 +38,8 @@ group:
     entities:
       # Irrigation
       - automation.irrigation_set_next_run_time_when_schedule_enabled_or_time_changed
-      - automation.irrigation_run_cycle_1
-      - automation.irrigation_run_cycle_2
-      - automation.irrigation_run_a_cycle_manually
-      - automation.irrigation_cancel_a_manual_cycle
+      - automation.irrigation_run_cycles
+      - automation.irrigation_manual_cycle_control
       # - automation.irrigation_cancel_if_it_rains
 
       # Master Control
