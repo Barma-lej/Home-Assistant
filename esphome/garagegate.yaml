@@ -7,7 +7,7 @@ substitutions:
   device_name: garagegate
   room: Garage
   friendly_name: Tor
-  project_version: "2024.11.0"
+  project_version: "2025.05.0"
   device_description: "Garagentorsteuerung mit der Positionskontrolle von Garagentoren"
 
   # Webserver credentials
@@ -214,16 +214,20 @@ script:
       start_pos: float
     then:
       - switch.turn_on: relay
-      - delay: 2.5s
+      - delay: 2.5s # Даем время воротам начать движение и датчику обновиться
       - if:
           condition:
-            - lambda: 'return id(gate).current_operation < start_pos;'
+            # - lambda: 'return id(gate).current_operation < start_pos;' # start_pos - это id(gate).position перед первым импульсом
+            # Проверяем, что ворота действительно начали двигаться вверх (позиция увеличилась)
+            # или, если они уже были почти открыты, то достигли конечной точки.
+            # start_pos - это id(gate).position перед первым импульсом реле.
+            - lambda: 'return id(gate).position < start_pos + 0.02 && id(gate).position < 0.98;' # Если позиция не увеличилась значительно и ворота не открыты
           then:
-            - logger.log: "Gate direction is incorrect: Reversing"
+            - logger.log: "Gate direction for OPEN seems incorrect or stalled: Retrying/Reversing"
             - delay: 1s
-            - switch.turn_on: relay
+            - switch.turn_on: relay # Остановить текущее движение
             - delay: 1s
-            - switch.turn_on: relay
+            - switch.turn_on: relay # Начать движение в (предположительно) правильном направлении
 
   - id: gate_close
     mode: restart
@@ -234,13 +238,17 @@ script:
       - delay: 2.5s
       - if:
           condition:
-            - lambda: 'return id(gate).current_operation > start_pos;'
+            # - lambda: 'return id(gate).current_operation > start_pos;'
+            # Проверяем, что ворота действительно начали двигаться вниз (позиция уменьшилась)
+            # или, если они уже были почти закрыты, то достигли конечной точки.
+            # start_pos - это id(gate).position перед первым импульсом реле.
+            - lambda: 'return id(gate).position > start_pos - 0.02 && id(gate).position > 0.02;' # Если позиция не уменьшилась значительно и ворота не закрыты
           then:
-            - logger.log: "Gate direction is incorrect: Reversing"
+            - logger.log: "Gate direction for CLOSE seems incorrect or stalled: Retrying/Reversing"
             - delay: 1s
-            - switch.turn_on: relay
+            - switch.turn_on: relay # Остановить текущее движение
             - delay: 1s
-            - switch.turn_on: relay
+            - switch.turn_on: relay # Начать движение в (предположительно) правильном направлении
 
   - id: gate_stop
     mode: single
@@ -261,37 +269,71 @@ script:
           condition:
             - lambda: return pos == 1.0;
           then:
-            - lambda: id(gate_open)->execute(id(gate).position);
-            - script.wait: gate_open
-            - wait_until:
-                - lambda: return id(gate).position == 1.0 ;
+            - logger.log: "Gate position: Moving to FULLY OPEN"
+            - lambda: id(gate_open)->execute(id(gate).position); # Просто запускаем, не ждем завершения скрипта
+            # - script.execute: gate_open # Просто запускаем, не ждем завершения скрипта
+            # - script.wait: gate_open
+            - wait_until: # Ждем, пока позиция не станет 1.0 или сработает верхний концевик
+                # - lambda: return id(gate).position == 1.0 ;
+                condition:
+                  or:
+                    - lambda: return id(gate).position >= 0.99;
+                    - binary_sensor.is_on: end_stop_top
+                timeout: 40s # Пример тайм-аута, настройте под свои ворота
+            - if: # Если вышли по таймауту, а не по достижению позиции
+                condition:
+                  lambda: return !(id(gate).position >= 0.99 || id(end_stop_top).state);
+                then:
+                  - logger.log: "Gate position: Timeout reaching FULLY OPEN. Stopping."
+                  - script.execute: gate_stop
           else:
             - if:
                 condition:
                   - lambda: return pos == 0.0;
                 then:
+                  - logger.log: "Gate position: Moving to FULLY CLOSED"
                   - lambda: id(gate_close)->execute(id(gate).position);
-                  - script.wait: gate_close
-                  - wait_until:
-                    - lambda: return id(gate).position == 0.0 ;
+                  # - script.execute: gate_close # Просто запускаем
+                  # - script.wait: gate_close
+                  - wait_until: # Ждем, пока позиция не станет 0.0 или сработает нижний концевик
+                      # - lambda: return id(gate).position == 0.0 ;
+                      condition:
+                        or:
+                          - lambda: return id(gate).position <= 0.01; # Небольшой допуск
+                          - binary_sensor.is_on: end_stop_bottom
+                      timeout: 40s # Пример тайм-аута
+                  - if: # Если вышли по таймауту
+                      condition:
+                        lambda: return !(id(gate).position <= 0.01 || id(end_stop_bottom).state);
+                      then:
+                        - logger.log: "Gate position: Timeout reaching FULLY CLOSED. Stopping."
+                        - script.execute: gate_stop
 
                 else:
                   - if:
                       condition:
                         - lambda: return pos > id(gate).position + 0.01;
                       then:
+                        - logger.log: "Gate position: Moving UP to partial position"
                         - lambda: id(gate_open)->execute(id(gate).position);
+                        # - script.execute: gate_open
                         - wait_until:
-                          - lambda: return id(gate).position > pos;
+                            condition:
+                              lambda: return id(gate).position > pos;
+                            timeout: 40s
                         - script.execute: gate_stop
                       else:
                         - if:
                             condition:
                               - lambda: return pos < id(gate).position - 0.01;
                             then:
+                              - logger.log: "Gate position: Moving DOWN to partial position"
                               - lambda: id(gate_close)->execute(id(gate).position);
+                              # - script.execute: gate_close
                               - wait_until:
-                                - lambda: return id(gate).position < pos;
+                                  condition:
+                                    lambda: return id(gate).position < pos;
+                                  timeout: 40s
                               - script.execute: gate_stop
 
 status_led:
