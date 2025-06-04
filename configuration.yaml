@@ -88,6 +88,7 @@ recorder:
   # db_url: !secret mariadb_url
   purge_keep_days: 90
   commit_interval: 20
+  auto_repack: true
   exclude:
     domains:
       - calendar
