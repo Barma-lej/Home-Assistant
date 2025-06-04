@@ -1,0 +1,399 @@
+# Input_Booleans
+input_boolean:
+  # w10_irrigation_master_control_switch:
+  #   name: W10 Bewässerung - Bewässerungsautomat
+  #   icon: mdi:sprinkler-variant
+
+  w10_irrigation_cycle1_enable:
+    name: W10 Bewässerung - Zeitplan Morgens
+    icon: mdi:weather-sunset-up
+  w10_irrigation_cycle2_enable:
+    name: W10 Bewässerung - Zeitplan Abends
+    icon: mdi:weather-sunset-up
+
+  # w10_irrigation_cycle1_enable_saved_state:
+  #   name: W10 Bewässerung - Speichern der Status des 1 Zyklus
+  #   icon: mdi:content-save
+  # w10_irrigation_cycle2_enable_saved_state:
+  #   name: W10 Bewässerung - Speichern der Status des 2 Zyklus
+  #   icon: mdi:content-save
+
+  w10_irrigation_use_sensor_data:
+    name: W10 Bewässerung - Sensordaten verwenden
+    icon: mdi:thermometer-lines
+
+  w10_irrigation_manual_run:
+    name: W10 Bewässerung - Manuell starten
+    icon: mdi:sprinkler-variant
+
+  w10_irrigation_running:
+    name: W10 Bewässerung - Läuft aktuell
+    icon: mdi:run
+
+  # w10_irrigation_cycle1_running:
+  #   name: W10 Bewässerung - Zyklus 1 läuft
+  #   icon: mdi:run
+  # w10_irrigation_cycle2_running:
+  #   name: W10 Bewässerung - Zyklus 2 läuft
+  #   icon: mdi:run
+
+# Input_Texts
+input_text:
+  w10_irrigation_status:
+    name: W10 Bewässerung - Status
+    icon: mdi:information-outline
+
+# Input_Datetimes
+input_datetime:
+  w10_irrigation_cycle1_run_time:
+    name: W10 Bewässerung - Geplanter Start am Morgen
+    has_date: false
+    has_time: true
+    icon: mdi:clock-out
+
+  w10_irrigation_cycle2_run_time:
+    name: W10 Bewässerung - Geplanter Start am Abend
+    has_date: false
+    has_time: true
+    icon: mdi:clock-out
+
+# Input_Numbers
+input_number:
+  w10_irrigation_manual_duration:
+    name: W10 Bewässerung - Dauer Manuell
+    min: 0
+    max: 90
+    step: 1
+    icon: mdi:camera-timer
+    unit_of_measurement: min
+
+  w10_irrigation_cycle1_duration:
+    name: W10 Bewässerung - Dauer am Morgen
+    min: 0
+    max: 90
+    step: 1
+    icon: mdi:camera-timer
+    unit_of_measurement: min
+
+  w10_irrigation_cycle2_duration:
+    name: W10 Bewässerung - Dauer am Abend
+    min: 0
+    max: 90
+    step: 1
+    icon: mdi:camera-timer
+    unit_of_measurement: min
+
+  # The temperature above which the irrigation will started
+  w10_irrigation_temperature_threshold:
+    name: W10 Bewässerung - Temperatur >=
+    min: 10
+    max: 30
+    icon: mdi:thermometer
+    unit_of_measurement: "°C"
+  # w10_irrigation_cycle2_temperature_threshold:
+  #   name: W10 Bewässerung - Abendtemp. >=
+  #   min: 10
+  #   max: 30
+  #   icon: mdi:thermometer
+  #   unit_of_measurement: "°C"
+
+  # The moisture below which the irrigation will started
+  w10_irrigation_moisture_threshold:
+    name: W10 Bewässerung - Bodenfeuchte
+    min: 5
+    max: 45
+    icon: mdi:water-percent
+    unit_of_measurement: "%"
+
+# Timers
+timer:
+  w10_irrigation_zone_duration:
+    name: W10 Bewässerung - Verbleibende Zeit
+
+    # Automations
+automation:
+  - id: w10_irrigation_manual_control
+    alias: W10 Bewässerung - Manuelle Steuerung
+    mode: parallel
+    triggers:
+      - trigger: state
+        entity_id:
+          - input_boolean.w10_irrigation_manual_run
+    actions:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.w10_irrigation_manual_run
+                state: "on"
+            sequence:
+              # - action: script.turn_on
+              #   target:
+              #     entity_id: script.w10_irrigation_run
+              #   data:
+              #     cycle: "manual"
+              - action: script.w10_irrigation_run
+                data:
+                  cycle: "manual"
+          - conditions:
+              - condition: template
+                value_template: "{{ trigger.to_state.state == 'off' }}"
+            sequence:
+              - action: script.turn_on
+                target:
+                  entity_id: script.w10_irrigation_stop
+              # - action: script.w10_irrigation_stop
+
+  - id: w10_irrigation_scheduled_run
+    alias: W10 Bewässerung - Geplanter Start
+    mode: single
+    triggers:
+      - trigger: time
+        at: input_datetime.w10_irrigation_cycle1_run_time
+        variables:
+          cycle: "cycle1"
+          enable_boolean: "input_boolean.w10_irrigation_cycle1_enable"
+      - trigger: time
+        at: input_datetime.w10_irrigation_cycle2_run_time
+        variables:
+          cycle: "cycle2"
+          enable_boolean: "input_boolean.w10_irrigation_cycle2_enable"
+    conditions:
+      - condition: template # Check if the specific cycle is enabled
+        alias: Wenn Zyklus aktiviert ist
+        value_template: |
+          {{ is_state(enable_boolean, 'on') }}
+      - condition: state # Not already running
+        entity_id: input_boolean.w10_irrigation_running
+        state: "off"
+      - condition: state # Manual run not active
+        entity_id: input_boolean.w10_irrigation_manual_run
+        state: "off"
+      - condition: template # Check duration > 0 for the triggered cycle
+        value_template: "{{ states('input_number.w10_irrigation_' ~ cycle ~ '_duration') | int(0) > 0 }}"
+      - condition: template
+        value_template: "{{ states('switch.sonoffs20_2') != 'unavailable' }}"
+        alias: "Wenn Schalter erreichbar ist"
+      - condition: template
+        alias: "Sensorbedingungen (Temp, Feuchtigkeit, Regen)"
+        value_template: |
+          {% if is_state('input_boolean.w10_irrigation_use_sensor_data', 'on') -%}
+            {{ states('sensor.rasen_temperature') | float(0) >= states('input_number.w10_irrigation_temperature_threshold') | float(0) and
+              states('sensor.rasen_moisture') | float(0) <= states('input_number.w10_irrigation_moisture_threshold') | float(0) and
+              is_state('binary_sensor.mower_rainsensor_triggered','off') }}
+          {%- else -%}
+            True
+          {%- endif %}
+    actions:
+      - action: script.w10_irrigation_run
+        data:
+          cycle: "{{ cycle }}"
+
+  - id: w10_irrigation_cancel_if_it_rains
+    alias: W10 Bewässerung - Abbrechen bei Regen
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.mower_rainsensor_triggered
+        to: "on"
+        id: rain_instant
+      - trigger: state
+        entity_id: binary_sensor.mower_rainsensor_triggered
+        to: "on"
+        for:
+          minutes: 1
+        id: rain_sustained
+    condition:
+      - condition: state
+        entity_id: input_boolean.w10_irrigation_running
+        state: "on"
+    actions:
+      - action: script.w10_irrigation_stop
+      - action: notify.telegram_schick_home # Ensure this notification service exists
+        data:
+          title: "⛈️ W10 Bewässerung abgebrochen"
+          message: >
+            {% if trigger.id == 'rain_instant' %}
+            Regen erkannt - W10 Bewässerung sofort abgebrochen.
+            {% else %}
+            Anhaltender Regen - W10 Bewässerung eingestellt.
+            {% endif %}
+
+# Scripts
+script:
+  w10_irrigation_run:
+    alias: W10 Bewässerung - Start
+    # unique_id: w10_irrigation_run_script
+    mode: single
+    fields:
+      cycle:
+        description: "The irrigation cycle to run (cycle1, cycle2, or manual)"
+        example: "manual"
+    sequence:
+      - variables:
+          duration_entity: "input_number.w10_irrigation_{{ cycle }}_duration"
+          duration_minutes: "{{ states(duration_entity) | int(0) }}"
+          is_manual_run: "{{ cycle == 'manual' }}"
+      - condition: template
+        value_template: "{{ duration_minutes > 0 }}"
+        alias: "Nur starten, wenn Dauer > 0"
+      - condition: state # Ensure no other W10 irrigation is running
+        entity_id: input_boolean.w10_irrigation_running
+        state: "off"
+        alias: "Nur starten, wenn keine andere W10 Bewässerung läuft"
+      - action: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.w10_irrigation_running
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.w10_irrigation_status
+        data:
+          value: >
+            {% if cycle == 'cycle1' %}Morgenzyklus ({{ duration_minutes }} min)
+            {% elif cycle == 'cycle2' %}Abendzyklus ({{ duration_minutes }} min)
+            {% else %}Manuell ({{ duration_minutes }} min)
+            {% endif %}
+      - action: mqtt.publish
+        data:
+          topic: cmnd/sonoffs20-2/PulseTime
+          payload: "{{ 100 + (duration_minutes * 60) }}"
+      - action: switch.turn_on
+        target:
+          entity_id: switch.sonoffs20_2
+      - action: timer.start
+        target:
+          entity_id: timer.w10_irrigation_zone_duration
+        data:
+          duration: "{{ duration_minutes * 60 }}"
+
+      - wait_template: >
+          {{ is_state('timer.w10_irrigation_zone_duration' , 'idle') }}
+        continue_on_timeout: false
+      - action: input_boolean.turn_off # Cleanup after timer is idle
+        target:
+          entity_id: input_boolean.w10_irrigation_running
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.w10_irrigation_status
+        data:
+          value: "Gestoppt"
+      - if: "{{ is_manual_run and is_state('input_boolean.w10_irrigation_manual_run', 'on') }}"
+        then:
+          - action: input_boolean.turn_off
+            target:
+              entity_id: input_boolean.w10_irrigation_manual_run
+
+  w10_irrigation_stop:
+    alias: W10 Bewässerung - Stop
+    # unique_id: w10_irrigation_stop_script
+    mode: single
+    sequence:
+      - action: switch.turn_off
+        target:
+          entity_id: switch.sonoffs20_2
+
+      - action: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.w10_irrigation_manual_run
+
+      - action: input_boolean.turn_off # Ensure running flag is off
+        target:
+          entity_id: input_boolean.w10_irrigation_running
+      - action: timer.cancel # Use cancel to stop the timer immediately
+        target:
+          entity_id: timer.w10_irrigation_zone_duration
+
+      - action: input_text.set_value # Update status
+        target:
+          entity_id: input_text.w10_irrigation_status
+        data:
+          value: "Gestoppt"
+      - action: script.turn_off
+        target:
+          entity_id: script.w10_irrigation_run
+
+          # description: ""
+# mode: single
+# triggers:
+#   - trigger: time
+#     at: input_datetime.w10_irrigation_cycle1_run_time
+#     id: morning
+#   - trigger: time
+#     at: input_datetime.w10_irrigation_cycle2_run_time
+#     id: evening
+#   - trigger: time
+#     at: >-
+#       {{ (today_at(states('input_datetime.w10_irrigation_cycle1_run_time')) +
+#       (timedelta(minutes=states('input_number.w10_irrigation_cycle1_duration') |
+#       int(0)))).strftime('%H:%M:%S') }}
+#     id: morning_stop
+#   - trigger: time
+#     at: >-
+#       {{ (today_at(states('input_datetime.w10_irrigation_cycle2_run_time')) +
+#       (timedelta(minutes=states('input_number.w10_irrigation_cycle2_duration') |
+#       int(0)))).strftime('%H:%M:%S') }}
+#     id: evening_stop
+# conditions:
+#   - condition: or
+#     alias: Если влажность низкая
+#     conditions:
+#       - condition: and
+#         conditions:
+#           - condition: state
+#             entity_id: input_boolean.w10_irrigation_use_sensor_data
+#             state: "on"
+#           - condition: numeric_state
+#             entity_id: input_number.w10_irrigation_moisture_threshold
+#             above: sensor.rasen_moisture
+#             value_template: "{{ float(state.state) + 1 }}"
+#       - condition: state
+#         entity_id: input_boolean.w10_irrigation_use_sensor_data
+#         state: "off"
+#   - condition: state
+#     entity_id: input_boolean.w10_irrigation_manual_run
+#     state: "off"
+# actions:
+#   - choose:
+#       - conditions:
+#           - condition: trigger
+#             id:
+#               - morning
+#           - alias: Если температура позволяет
+#             condition: or
+#             conditions:
+#               - condition: and
+#                 conditions:
+#                   - condition: state
+#                     entity_id: input_boolean.w10_irrigation_use_sensor_data
+#                     state: "on"
+#                   - condition: numeric_state
+#                     entity_id: sensor.rasen_temperature
+#                     value_template: "{{ float(state.state) + 1 }}"
+#               - condition: state
+#                 entity_id: input_boolean.w10_irrigation_use_sensor_data
+#                 state: "off"
+#           - condition: numeric_state
+#             entity_id: input_number.w10_irrigation_cycle1_duration
+#             above: 0
+#         sequence:
+#           - action: switch.turn_on
+#             metadata: {}
+#             data: {}
+#             target:
+#               entity_id: switch.sonoffs20_2
+#           - action: mqtt.publish
+#             data:
+#               topic: cmnd/sonoffs20-2/PulseTime
+#               payload: >
+#                 {% set duration = states('w10_irrigation_cycle1_duration') |
+#                 float(0) %} {% set payload = 100 + (duration * 60) + 30 %} {{
+#                 payload | int(0) }}
+#           - action: timer.start
+#             metadata: {}
+#             target:
+#               entity_id: timer.w10_irrigation_zone_duration
+#             data:
+#               duration: >-
+#                 {{ states('input_number.w10_irrigation_cycle1_duration') |
+#                 int(0) * 60 }}
+#       - conditions: []
+#         sequence: []
