@@ -1,15 +1,15 @@
 # Telegram Bot configuration
-telegram_bot:
-  - platform: polling
-    # - platform: broadcast
-    api_key: !secret telegram_api_key
-    allowed_chat_ids:
-      - !secret telegram_channel
-      - !secret telegram_bot_familie
-      - !secret telegram_bot_anatolij
-      - !secret telegram_bot_natalja
-      - !secret telegram_bot_kristina
-      - !secret telegram_bot_veronika
+# telegram_bot:
+#   - platform: polling
+#     # - platform: broadcast
+#     api_key: !secret telegram_api_key
+#     allowed_chat_ids:
+#       - !secret telegram_channel
+#       - !secret telegram_bot_familie
+#       - !secret telegram_bot_anatolij
+#       - !secret telegram_bot_natalja
+#       - !secret telegram_bot_kristina
+#       - !secret telegram_bot_veronika
 
 # Notify ############################################################
 notify:
