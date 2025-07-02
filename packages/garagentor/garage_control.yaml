@@ -1,7 +1,7 @@
 # Garage
 # Control
 
-# Recorder ##########################################################
+# Recorder
 recorder:
   exclude:
     entities:
@@ -9,7 +9,7 @@ recorder:
       - sensor.tor_uptime
       - input_boolean.torteil
 
-# Logbook ###########################################################
+# Logbook
 logbook:
   exclude:
     entities:
@@ -17,13 +17,25 @@ logbook:
       - sensor.tor_uptime
       - input_boolean.torteil
 
-# Input ############################################################
+# Input
 input_boolean:
   torteil:
     name: "Tor Teiloffnung"
     icon: mdi:garage-alert
 
-# Automations #######################################################
+# Template Sensors
+template:
+  - binary_sensor:
+      - name: "Garage Open Too Long"
+        unique_id: garage_open_too_long # Unique ID for Home Assistant
+        state: >
+          {{ states('cover.tor') == 'open' and 
+            state_attr('cover.tor', 'current_position') | int(0) > 13 }}
+        delay_on:
+          minutes: 30 # Turns on after the condition is true for 30 minutes
+        # Turns off as soon as the condition is false
+
+# Automations
 automation:
   - id: torteiloffnung_on
     alias: Garage - Torteiloffnung ON
@@ -126,10 +138,192 @@ automation:
                   message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
                   message: "{{ state_attr('switch.torteil', 'friendly_name') }} - {{ state_attr('cover.tor', 'current_position') }}%"
 
-# Customize #########################################################
+  - id: garage_auto_close
+    alias: "Garage - Autoschließen"
+    description: "Гараж - Автоматическое закрытие (открыт >13% более 30 мин, темно, свет выкл)"
+    mode: single # Предотвращает одновременный запуск нескольких экземпляров
+
+    # Triggers when any of the key conditions might lead to an auto-close scenario
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.garage_open_too_long # Helper sensor turns on
+        to: "on"
+      - trigger: state
+        entity_id: sun.sun
+        to: "below_horizon" # It becomes dark
+      - trigger: state
+        entity_id: binary_sensor.all_lights_off
+        to: "on" # All relevant lights turn off
+      - trigger: homeassistant
+        event: start # Check conditions when Home Assistant starts
+
+    condition:
+      # All these conditions must be true for the actions to run
+      - condition: state
+        entity_id: sun.sun
+        state: "below_horizon" # Условие "темно"
+      - condition: state
+        entity_id: binary_sensor.all_lights_off # Условие "везде выключен свет"
+        state: "on" # 'on' означает, что все светильники выключены
+      - condition: state
+        entity_id: binary_sensor.garage_open_too_long # Garage has been open >13% for over 30 mins
+        state: "on"
+
+    actions:
+      - variables:
+          initial_pos: "{{ state_attr('cover.tor', 'current_position') | int }}"
+
+      - action: notify.telegram_schick_home
+        data:
+          title: "🚗Гараж"
+          message: "Гараж открыт уже 30 минут, сейчас темно и свет везде выключен. Планирую закрыть через 1 минуту. Свет будет мигать. Если ворота сдвинутся более чем на 10%, закрытие отменится."
+
+      # Минутное ожидание с миганием света и проверкой отмены
+      - alias: "Минутное ожидание с миганием и проверкой отмены"
+        repeat:
+          count: 12 # 12 циклов * 5 секунд = 60 секунд
+          sequence:
+            # Проверка отмены перед каждым миганием
+            - choose:
+                - conditions:
+                    - condition: template
+                      value_template: >
+                        {% set current_pos = state_attr('cover.tor', 'current_position') | int(0) %}
+                        {{ (current_pos - initial_pos) | abs > 10 }}
+                  sequence:
+                    - action: notify.telegram_schick_home
+                      data:
+                        title: "🚗Гараж"
+                        message: "Автоматическое закрытие гаража отменено, так как положение ворот изменилось более чем на 10%."
+                    - stop: "Закрытие отменено из-за изменения положения ворот"
+            # Мигание светом
+            - action: light.turn_on
+              target:
+                entity_id: light.sonoffbnsz01
+              data: {} # Добавлено для явности, если light.turn_on требует
+            - delay:
+                seconds: 2.5 # Свет включен
+            - action: light.turn_off
+              target:
+                entity_id: light.sonoffbnsz01
+              data: {} # Добавлено для явности
+            - delay:
+                seconds: 2.5 # Свет выключен (общий цикл 5 секунд)
+
+      # Финальная проверка перед закрытием (на случай, если состояние изменилось или отмена сработала в последний момент)
+      - condition: template
+        value_template: >
+          {% set current_pos = state_attr('cover.tor', 'current_position') | int(0) %}
+          {{ (current_pos - initial_pos) | abs <= 10 }}
+      - condition: template # Убедимся, что ворота все еще открыты и соответствуют условию
+        value_template: "{{ states('cover.tor') == 'open' and state_attr('cover.tor', 'current_position') | int(0) > 13 }}"
+
+      - action: notify.telegram_schick_home
+        data:
+          title: "🚗Гараж"
+          message: "Начинаю процедуру автоматического закрытия гаража..."
+
+      # Попытка 1
+      - alias: "Закрытие гаража - Попытка 1"
+        action: switch.toggle
+        target:
+          entity_id: switch.tor
+      - delay:
+          seconds: 3 # Дать время на реакцию и обновление состояния
+
+      - choose:
+          # Успех: ворота закрываются или уже закрыты
+          - conditions:
+              - "{{ states('cover.tor') == 'closing' or states('cover.tor') == 'closed' }}"
+            sequence:
+              - action: notify.telegram_schick_home
+                data:
+                  title: "🚗Гараж"
+                  message: "Ворота закрываются/закрыты после 1-й команды."
+          # Неудача: ворота открываются или все еще открыты (остановлены)
+          - conditions:
+              - "{{ states('cover.tor') == 'opening' or states('cover.tor') == 'open' }}"
+            sequence:
+              - action: notify.telegram_schick_home
+                data:
+                  title: "🚗Гараж"
+                  message: "После 1-й команды, ворота {{ states('cover.tor') }}. Отправляю 2-ю команду..."
+              # Попытка 2:
+              # Если было 'opening', это будет 'stop'.
+              # Если было 'open' (stopped), это должно быть 'close'.
+              - alias: "Закрытие гаража - Попытка 2"
+                action: switch.toggle
+                target:
+                  entity_id: switch.tor
+              - delay:
+                  seconds: 3
+
+              - choose:
+                  # Успех со 2-й попытки
+                  - conditions:
+                      - "{{ states('cover.tor') == 'closing' or states('cover.tor') == 'closed' }}"
+                    sequence:
+                      - action: notify.telegram_schick_home
+                        data:
+                          title: "🚗Гараж"
+                          message: "Ворота закрываются/закрыты после 2-й команды."
+                  # Неудача: ворота все еще открываются, или открыты (остановлены) после 2-й попытки
+                  - conditions:
+                      - "{{ states('cover.tor') == 'opening' or states('cover.tor') == 'open' }}"
+                    sequence:
+                      - action: notify.telegram_schick_home
+                        data:
+                          title: "🚗Гараж"
+                          message: "После 2-й команды, ворота {{ states('cover.tor') }}. Отправляю 3-ю команду..."
+                      # Попытка 3:
+                      # Если последовательность была: open -> stop -> (эта команда должна быть close)
+                      - alias: "Закрытие гаража - Попытка 3"
+                        action: switch.toggle
+                        target:
+                          entity_id: switch.tor
+                      - delay:
+                          seconds: 3 # Дать время на реакцию
+                      - action: notify.telegram_schick_home
+                        data:
+                          title: "🚗Гараж"
+                          message: "3-я команда отправлена. Текущее состояние: {{ states('cover.tor') }}. Ожидаю полного закрытия."
+                default: # Неожиданное состояние после 2-й попытки
+                  - action: notify.telegram_schick_home
+                    data:
+                      title: "🚗Гараж - Ошибка"
+                      message: "Неожиданное состояние ворот {{ states('cover.tor') }} после 2-й попытки закрытия."
+        default: # Неожиданное состояние после 1-й попытки
+          - action: notify.telegram_schick_home
+            data:
+              title: "🚗Гараж - Ошибка"
+              message: "Неожиданное состояние ворот {{ states('cover.tor') }} после 1-й попытки закрытия."
+
+      # Ожидание закрытия ворот (мониторим cover.tor)
+      - wait_for_trigger:
+          - trigger: state
+            entity_id: cover.tor
+            to: "closed"
+        timeout:
+          minutes: 2 # Таймаут ожидания закрытия (настройте под свои ворота)
+        continue_on_timeout: true # Продолжить выполнение, даже если таймаут
+
+      # Уведомление о результате
+      - variables:
+          garage_closed_successfully: "{{ wait.trigger is not none and states('cover.tor') == 'closed' }}"
+      - action: notify.telegram_schick_home
+        data:
+          title: "🚗Гараж"
+          message: >
+            {% if garage_closed_successfully %}
+              Гараж успешно закрыт автоматически.
+            {% else %}
+              Гараж не закрылся (состояние: {{ states('cover.tor') }}, позиция: {{ state_attr('cover.tor', 'current_position') }}%) в течение 2 минут после команды автоматического закрытия.
+            {% endif %}
+
+# Customize
 homeassistant:
   customize:
-    # Sensor ##########
+    # Sensors
     sensor.tor_wifi_signal:
       unit_of_measurement: "dBm"
     cover.tor:
