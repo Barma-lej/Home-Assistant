@@ -38,16 +38,19 @@ group:
     entities:
       # Irrigation
       - automation.irrigation_set_next_run_time_when_schedule_enabled_or_time_changed
-      - automation.irrigation_run_cycles
-      - automation.irrigation_manual_cycle_control
-      # - automation.irrigation_cancel_if_it_rains
+      # - automation.irrigation_run_cycles
+      # - automation.irrigation_manual_cycle_control
+      - automation.irrigation_manuell_starten
+      - automation.irrigation_abbrechen_manueller_zyklus
+      - automation.irrigation_cancel_if_it_rains
 
       # Master Control
       - automation.irrigation_master_control_switch
 
       # Pump control
       - automation.irrigation_failsafe_pump_control_switch
-      - automation.irrigation_smart_pump_control
+      - automation.irrigation_pump_on
+      - automation.irrigation_pump_off
 
       # Statistic
       # - automation.irrigation_set_start_end_time
@@ -57,6 +60,9 @@ group:
       - automation.irrigation_failsafe_master_control_switch
       - automation.irrigation_failsafe_valve_1_on
       - automation.irrigation_failsafe_valve_2_on
+
+      - automation.irrigation_start_abendzyklus
+      - automation.irrigation_start_morgenzyklus
 
 # Input_Booleans ####################################################
 input_boolean:

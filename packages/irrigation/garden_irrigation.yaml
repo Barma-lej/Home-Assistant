@@ -7,25 +7,12 @@
 #    sensor.zone5_valve:
 #      unit_of_measurement: '%'
 
-# Define common conditions as anchors
-common_conditions: &cycle_conditions
-  - condition: state
-    entity_id: input_boolean.irrigation_master_control_switch
-    state: "on"
-  - condition: or
-    conditions:
-      - condition: state
-        entity_id: input_boolean.irrigation_cycle1_enable
-        state: "on"
-      - condition: state
-        entity_id: input_boolean.irrigation_cycle2_enable
-        state: "on"
-
 # Automations ###############
 automation:
   # Set next run time when schedule enabled or time changed
   - id: irrigation_set_next_run_time_when_schedule_enabled_or_time_changed
     alias: Irrigation - Zeitplan bei der Zeitänderung oder Automat Aktivierung
+    # initial_state: on
     triggers:
       - trigger: state
         entity_id:
@@ -40,104 +27,242 @@ automation:
         entity_id:
           - input_select.irrigation_cycle1_watering_days
           - input_select.irrigation_cycle2_watering_days
-    conditions: *cycle_conditions
+
+    conditions:
+      - condition: state
+        entity_id: input_boolean.irrigation_master_control_switch
+        state: "on"
+      - condition: or
+        conditions:
+          - condition: state
+            entity_id: input_boolean.irrigation_cycle1_enable
+            state: "on"
+          - condition: state
+            entity_id: input_boolean.irrigation_cycle2_enable
+            state: "on"
+
     actions:
       - variables:
-          cycle: "{{ '1' if 'cycle1' in trigger.entity_id else '2' }}"
+          cycle_num: "{{ '1' if 'cycle1' in trigger.entity_id else '2' }}"
       - action: input_datetime.set_datetime
-        target:
-          entity_id: input_datetime.irrigation_cycle{{ cycle }}_next_run_time
         data:
+          entity_id: "input_datetime.irrigation_cycle{{ cycle_num }}_next_run_time"
           date: >
-            {% set schedule_time = states('input_select.irrigation_cycle' ~ cycle ~ '_schedule_time') %}
-            {{ now().strftime('%Y-%m-%d') if now().strftime('%H:%M') < schedule_time 
-              else (now() + timedelta(days=1)).strftime('%Y-%m-%d') }}
-          time: "{{ states('input_select.irrigation_cycle' ~ cycle ~ '_schedule_time') }}"
+            {% set schedule_time_str = states('input_select.irrigation_cycle' ~ cycle_num ~ '_schedule_time') %}
+            {% if now().strftime('%H:%M') < schedule_time_str %}
+              {{ now().strftime('%Y-%m-%d') }}
+            {% else %}
+              {{ (now() + timedelta(days=1)).strftime('%Y-%m-%d') }}
+            {% endif %}
+          time: >
+            {{ states('input_select.irrigation_cycle' ~ cycle_num ~ '_schedule_time') }}
 
-  # Run irrigation cycles at scheduled times
-  - id: irrigation_run_cycles
-    alias: Irrigation - Automatische Zyklen
-    mode: parallel
+  # Run irrigation cycles at the right time and on the right days
+  # Cycle 1 #############################
+  - id: irrigation_run_cycle_1
+    alias: Irrigation - Start Morgenzyklus
     triggers:
       - trigger: time
         at: input_datetime.irrigation_cycle1_next_run_time
-        variables:
-          cycle: "1"
-      - trigger: time
-        at: input_datetime.irrigation_cycle2_next_run_time
-        variables:
-          cycle: "2"
+
     conditions:
-      - condition: template
-        value_template: >
-          {{ is_state('input_boolean.irrigation_cycle' ~ cycle ~ '_enable','on') }}
+      - condition: state
+        entity_id: input_boolean.irrigation_cycle1_enable
+        state: "on"
+
     actions:
       - action: script.irrigation_check_a_sensor_data
         data:
-          cycle: "{{ cycle }}"
+          cycle: "1"
+
       - action: script.irrigation_update_next_runtime
         data:
-          cycle: "{{ cycle }}"
+          cycle: "1"
 
-  # Run/Cancel Manual Cycles
-  - id: irrigation_manual_cycle_control
-    alias: Irrigation - Manuelle Steuerung
+  # Cycle 2 #############################
+  - id: irrigation_run_cycle_2
+    alias: Irrigation - Start Abendzyklus
+    triggers:
+      - trigger: time
+        at: input_datetime.irrigation_cycle2_next_run_time
+
+    conditions:
+      - condition: state
+        entity_id: input_boolean.irrigation_cycle2_enable
+        state: "on"
+
+    actions:
+      - action: script.irrigation_check_a_sensor_data
+        data:
+          cycle: "2"
+
+      - action: script.irrigation_update_next_runtime
+        data:
+          cycle: "2"
+
+  # Run A Cycle Manually ############################################
+  - id: irrigation_run_a_cycle_manually
+    alias: Irrigation - Manuell starten
+    # initial_state: on
     triggers:
       - trigger: state
         entity_id:
           - input_boolean.irrigation_cycle1_manual_run
           - input_boolean.irrigation_cycle2_manual_run
-    actions:
-      - variables:
-          cycle: "{{ trigger.entity_id.split('_')[2][-1] }}"
-          is_start: "{{ trigger.to_state.state == 'on' }}"
-      - choose:
-          # Manual Start
-          - conditions: "{{ is_start }}"
-            sequence:
-              - condition: template
-                value_template: >
-                  {{ is_state('input_boolean.irrigation_cycle' ~ ( '2' if cycle == '1' else '1' ) ~ '_running', 'off') }}
-              - action: script.irrigation_prepare_manual_cycle
-                data:
-                  cycle: "{{ cycle }}"
-              - wait_template: "{{ is_state('script.irrigation_run_a_cycle', 'off') }}"
-              - action: script.irrigation_restore_state
-                data:
-                  cycle: "{{ cycle }}"
-          # Manual Cancel
-          - conditions: "{{ not is_start }}"
-            sequence:
-              - action: script.irrigation_cancel_cycle
-                data:
-                  cycle: "{{ cycle }}"
+        from: "off"
+        to: "on"
 
-  # Cancel if rain detected
+    conditions:
+      # Don't run if the other cycle is already running
+      - condition: template
+        value_template: >
+          {% if trigger.entity_id == 'input_boolean.irrigation_cycle1_manual_run' %}
+            {{ states('input_boolean.irrigation_cycle2_running') == 'off' }}
+          {% else %}
+            {{ states('input_boolean.irrigation_cycle1_running') == 'off' }}
+          {% endif %}
+
+    actions:
+      # Update progress in ui
+      - action: input_text.set_value
+        data:
+          entity_id: input_text.irrigation_current_zone
+          value: "Initialisierung..."
+
+      # Make sure nothing in the system is running
+      # Turn off valves
+      - action: switch.turn_off
+        data:
+          entity_id: switch.irrigation_valves
+
+      # - action: homeassistant.turn_off
+      #   data:
+      #     entity_id: group.irrigation_switches
+
+      # Turn off scripts if they were somehow running
+      - action: script.turn_off
+        target:
+          entity_id:
+            - script.irrigation_run_a_cycle
+            - script.irrigation_irrigate_a_zone
+
+      # Save the current state of both irrigation_cycle_enable booleans
+      - action: "input_boolean.turn_{{ 'on' if is_state('input_boolean.irrigation_cycle1_enable', 'on') else 'off' }}"
+        target:
+          entity_id: input_boolean.irrigation_cycle1_enable_saved_state
+
+      - action: "input_boolean.turn_{{ 'on' if is_state('input_boolean.irrigation_cycle2_enable', 'on') else 'off' }}"
+        target:
+          entity_id: input_boolean.irrigation_cycle2_enable_saved_state
+
+      # Disable both programmes
+      - action: input_boolean.turn_off
+        target:
+          entity_id:
+            - input_boolean.irrigation_cycle1_enable
+            - input_boolean.irrigation_cycle2_enable
+
+      # Run a cycle
+      - action: script.irrigation_run_a_cycle
+        data:
+          cycle: >
+            {% if trigger.entity_id == 'input_boolean.irrigation_cycle1_manual_run' %}
+              1
+            {% else %}
+              2
+            {% endif %}
+
+      # Wait until script is finished
+      - wait_template: "{{ is_state('script.irrigation_run_a_cycle', 'off') }}"
+
+      # Turn off both manual run booleans (in case one was turned on while the other was already running)
+      - action: input_boolean.turn_off
+        target:
+          entity_id:
+            - input_boolean.irrigation_cycle1_manual_run
+            - input_boolean.irrigation_cycle2_manual_run
+
+      # Restore the previous state of both irrigation_cycle_enable booleans
+      - action: "input_boolean.turn_{{ 'on' if is_state('input_boolean.irrigation_cycle1_enable_saved_state', 'on') else 'off' }}"
+        target:
+          entity_id: input_boolean.irrigation_cycle1_enable
+
+      - action: "input_boolean.turn_{{ 'on' if is_state('input_boolean.irrigation_cycle2_enable_saved_state', 'on') else 'off' }}"
+        target:
+          entity_id: input_boolean.irrigation_cycle2_enable
+
+  # Cancel A Manual Cycle #############################################
+  - id: irrigation_cancel_a_manual_cycle
+    alias: Irrigation - Abbrechen manueller Zyklus
+    # initial_state: on
+    triggers:
+      - trigger: state
+        entity_id:
+          - input_boolean.irrigation_cycle1_manual_run
+          - input_boolean.irrigation_cycle2_manual_run
+        from: "on"
+        to: "off"
+
+    actions:
+      # Turn off valves #####################
+      - action: switch.turn_off
+        data:
+          entity_id: switch.irrigation_valves
+
+      # - action: homeassistant.turn_off
+      #   data:
+      #     entity_id: group.irrigation_switches
+
+      # Turn off scripts ####################
+      - action: script.turn_off
+        target:
+          entity_id:
+            - script.irrigation_run_a_cycle
+            - script.irrigation_irrigate_a_zone
+
+      # Cancel the timer ####################
+      - action: timer.cancel
+        data:
+          entity_id: timer.irrigation_zone_duration
+
+      # Update progress in ui ###############
+      - action: homeassistant.turn_off
+        target:
+          entity_id: "input_boolean.irrigation_cycle{{ '1' if trigger.entity_id == 'input_boolean.irrigation_cycle1_manual_run' else '2' }}_running"
+        # data: # Kept for reference, target is preferred for service calls
+        #   entity_id: >
+        #     {% if trigger.entity_id == 'input_boolean.irrigation_cycle1_manual_run' %} input_boolean.irrigation_cycle1_running {% else %} input_boolean.irrigation_cycle2_running {% endif %}
+
+      - action: input_text.set_value
+        data:
+          entity_id: input_text.irrigation_current_zone
+          value: "-"
+
+  # Cancel an irrigation if it rains ####
   - id: irrigation_cancel_if_it_rains
     alias: Irrigation - Abbrechen wenn es regnet
     mode: single
+
     triggers:
       - trigger: state
+        # entity_id: sensor.landroid_mower_error
+        # attribute: error_id
+        # to: "5"
+        # entity_id: vacuum.mower
+        # attribute: rain_sensor.triggered
+        # to: "true"
+
         entity_id: binary_sensor.mower_rainsensor_triggered
         to: "on"
-        id: instant
+
       - trigger: template
+        # value_template: "{{ state_attr('vacuum.mower', 'rain_sensor').triggered == True }}"
         value_template: "{{ is_state('binary_sensor.mower_rainsensor_triggered','on') }}"
         for: "00:01:00"
-        id: delayed
+
     actions:
       - action: timer.cancel
-        target:
-          entity_id: timer.irrigation_zone_duration
-      - action: notify.telegram_schick_home
-        data:
-          title: ⛈️ Bewässerung abgebrochen
-          message: >
-            {% if trigger.id == 'instant' %}
-            Regen erkannt - sofortiger Abbruch
-            {% else %}
-            Anhaltender Regen - Bewässerung eingestellt
-            {% endif %}
+        entity_id: timer.irrigation_zone_duration
 
 # Scripts ###################
 script:
@@ -165,74 +290,11 @@ script:
             or (is_state('input_boolean.irrigation_cycle' ~ cycle ~ '_use_sensor_data', 'on')
               and is_state('binary_sensor.mower_rainsensor_triggered','off')) }}
 
+      # and not state_attr('vacuum.mower', 'rain_sensor').triggered == True) }}
+      # and not is_state_attr('sensor.landroid_mower_error', 'error_id', 5)) }}
       - action: script.irrigation_run_a_cycle
         data:
           cycle: "{{ cycle }}"
-
-  # Helper scripts for manual cycle control
-  irrigation_prepare_manual_cycle:
-    alias: Irrigation - Manuelle Bewässerung vorbereiten
-    sequence:
-      - action: input_text.set_value
-        data:
-          entity_id: input_text.irrigation_current_zone
-          value: "Initialisierung..."
-      - action: switch.turn_off
-        target:
-          entity_id: switch.irrigation_valves
-      - action: script.turn_off
-        target:
-          entity_id:
-            - script.irrigation_run_a_cycle
-            - script.irrigation_irrigate_a_zone
-      - action: input_boolean.turn_off
-        target:
-          entity_id:
-            - input_boolean.irrigation_cycle1_enable
-            - input_boolean.irrigation_cycle2_enable
-      - action: script.irrigation_run_a_cycle
-        data:
-          cycle: "{{ cycle }}"
-
-  irrigation_restore_state:
-    alias: Irrigation - Status wiederherstellen
-    sequence:
-      - action: input_boolean.turn_off
-        target:
-          entity_id:
-            - input_boolean.irrigation_cycle1_manual_run
-            - input_boolean.irrigation_cycle2_manual_run
-      - action: input_boolean.turn_on
-        target:
-          entity_id: >
-            {% set states = ['irrigation_cycle1_enable_saved_state',
-                            'irrigation_cycle2_enable_saved_state'] %}
-            {% for state in states if is_state('input_boolean.' ~ state, 'on') %}
-              input_boolean.{{ state.replace('_saved_state','') }}
-            {% endfor %}
-
-  irrigation_cancel_cycle:
-    alias: Irrigation - Zyklus abbrechen
-    sequence:
-      - parallel:
-          - action: switch.turn_off
-            target:
-              entity_id: switch.irrigation_valves
-          - action: script.turn_off
-            target:
-              entity_id:
-                - script.irrigation_run_a_cycle
-                - script.irrigation_irrigate_a_zone
-          - action: timer.cancel
-            target:
-              entity_id: timer.irrigation_zone_duration
-      - action: homeassistant.turn_off
-        target:
-          entity_id: input_boolean.irrigation_cycle{{ cycle }}_running
-      - action: input_text.set_value
-        data:
-          entity_id: input_text.irrigation_current_zone
-          value: "-"
 
   #######################################
   # Script to run a cycle

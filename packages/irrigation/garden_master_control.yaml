@@ -40,8 +40,9 @@ automation:
 
         data:
           entity_id: >
-            {% for item in states['automation'] if item.name.startswith('Irrigation - ') and
-                                                  item.name.find('Master Control Switch') == -1 -%}
+            {% for item in states['automation'] if item.name.startswith('Irrigation - ')
+              and item.name.find('Master Control Switch') == -1
+              and item.name.find('Regular pumping') == -1 -%}
               {% if not loop.first %},{% endif %}{{ item.entity_id }}
             {%- endfor %}
 
