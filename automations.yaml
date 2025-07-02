@@ -417,7 +417,7 @@
     data: {}
     target:
       entity_id:
-      - button.fritz_box_7490_cleanup
+      - button.fritz_box_5590_fiber_cleanup
       - button.fritz_box_7590_ax_cleanup
   - action: ble_monitor.cleanup_entries
     data: {}
@@ -433,7 +433,7 @@
       update_entities:
       - update.einfahrt_update
       - update.esphome_update
-      - update.fritz_box_7490_fritz_os
+      - update.fritz_box_5590_fiber_fritz_os
       - update.ftp_update
       - update.garage_update
       - update.garagegate_firmware
@@ -498,7 +498,6 @@
       - update.card_mod_update
       - update.pi_hole_docker_update_available
       - update.seitenmarkise_74aab6_firmware
-      - update.tagblack1_firmware
       mobile_app_device: d65b64c785a29ffed795c6d22780bb9f
       reminder_hours: '6'
       run_config_check: true
@@ -562,12 +561,6 @@
       entity_id: media_player.sony_kd_55x8505b
       state: 'off'
       enabled: false
-    - condition: device
-      type: is_off
-      device_id: b27f8710204ef17c5ceec7d600094266
-      entity_id: 392d29df68afcbb2f120844915de46d5
-      domain: switch
-      enabled: false
     - condition: state
       entity_id: media_player.gq75qn92catxzg
       state: 'off'
@@ -604,156 +597,136 @@
       data: {}
   mode: single
 - id: rolladen_close_if_its_hot
-  alias: Rolladen - schliessen wehn es heiss ist
-  description: Rolladen - schliessen wehn es heiss ist
+  alias: Rolladen - Automatisch schließen bei Hitze und Sonne
+  description: Schließt bestimmte Rolläden, wenn es heiß ist und die Sonne entsprechend
+    steht, um die Räume kühl zu halten. Berücksichtigt individuelle Azimut-Schwellenwerte
+    pro Rolladen.
   triggers:
-  - trigger: numeric_state
-    entity_id: sun.sun
-    attribute: azimuth
-    above: 150
-    for:
-      minutes: 1
-  - trigger: numeric_state
-    entity_id: sun.sun
-    attribute: azimuth
-    above: 180
-    for:
-      minutes: 1
-  - trigger: numeric_state
-    entity_id: sun.sun
-    attribute: azimuth
-    above: 220
-    for:
-      minutes: 1
-  - trigger: numeric_state
-    entity_id:
-    - sun.sun
-    attribute: azimuth
-    above: 240
-    for:
-      minutes: 1
-  - trigger: numeric_state
-    entity_id:
-    - weather.openweathermap
-    attribute: cloud_coverage
-    for:
-      minutes: 1
-    below: 40
+  - minutes: /5
+    trigger: time_pattern
   conditions:
   - condition: template
-    value_template: '{{ ( min_azimuth < state_attr(''sun.sun'',''azimuth'') | float(0)
-      < max_azimuth and state_attr(''sun.sun'',''elevation'') | float(0) > min_elevation
-      ) and ( states(''sensor.rasen_temperature'') | float(0) > temperature or states(''sensor.ble_temperature_temperatur_gt'')
-      | float(0) > temperature_indoor )  and state_attr(''weather.openweathermap'',
-      ''cloud_coverage'') | int(100) < cloud_coverage }}'
+    value_template: "{% set sun_azimuth = state_attr('sun.sun', 'azimuth') | float(0)
+      %} {% set sun_elevation = state_attr('sun.sun', 'elevation') | float(-91) %}
+      {# По умолчанию ниже любого типичного SUN_ELEVATION_MIN_ACTIVE #} {% set current_clouds
+      = state_attr('weather.openweathermap', 'cloud_coverage') | int(CLOUD_COVERAGE_MAX)
+      %} {# По умолчанию, чтобы условие current_clouds < CLOUD_COVERAGE_MAX стало
+      ложным #} {% set ground_temp = states('sensor.rasen_temperature') | float(GROUND_TEMP_THRESHOLD
+      - 1) %} {# По умолчанию, чтобы условие ground_temp > GROUND_TEMP_THRESHOLD стало
+      ложным #} {% set terrasse_temp = states('sensor.ble_temperature_temperatur_gt')
+      | float(TERRASSE_TEMP_THRESHOLD - 1) %} {# По умолчанию, чтобы условие terrasse_temp
+      > TERRASSE_TEMP_THRESHOLD стало ложным #}\n{{ SUN_AZIMUTH_MIN_ACTIVE < sun_azimuth
+      < SUN_AZIMUTH_MAX_ACTIVE\n  and sun_elevation > SUN_ELEVATION_MIN_ACTIVE\n  and
+      (ground_temp > GROUND_TEMP_THRESHOLD or terrasse_temp > TERRASSE_TEMP_THRESHOLD)\n
+      \ and current_clouds < CLOUD_COVERAGE_MAX\n}}\n"
   actions:
   - repeat:
-      for_each:
-      - entity: cover.shellyswitch25_f37a8c
-        azimuth: 150
-        above_position: 40
-        to_position: 0
-      - entity: cover.shellyswitch25_f37b28
-        azimuth: 180
-        above_position: 40
-        to_position: 0
-      - entity: cover.shellyswitch25_10eaa4
-        azimuth: 220
-        above_position: 40
-        to_position: 0
-      - entity: cover.shellyswitch25_10d315
-        azimuth: 240
-        above_position: 75
-        to_position: 60
+      for_each: '{{ COVERS_TO_MANAGE }}'
       sequence:
-      - if:
-        - condition: template
-          value_template: '{{ repeat.item.azimuth <= state_attr(''sun.sun'', ''azimuth'')
-            and state_attr(repeat.item.entity, ''current_position'') > repeat.item.above_position
-            and (( as_timestamp(now()) - as_timestamp(states[repeat.item.entity].last_changed,
-            0) ) / 60 ) > max_changed }}'
-        then:
-        - target:
-            entity_id: '{{ repeat.item.entity }}'
-          data:
-            position: '{{ repeat.item.to_position }}'
-          action: cover.set_cover_position
-  trigger_variables:
-    temperature: 22
-    temperature_indoor: 22
-    cloud_coverage: 40
-    min_azimuth: 150
-    max_azimuth: 300
-    min_elevation: 10
-    max_changed: 240
-  mode: single
+      - variables:
+          cover_entity_id: '{{ repeat.item.entity }}'
+          current_sun_azimuth: '{{ state_attr(''sun.sun'', ''azimuth'') | float(0)
+            }}'
+          cover_current_pos: '{{ state_attr(cover_entity_id, ''current_position'')
+            | int(-1) }}'
+          cover_last_changed_timestamp: '{{ as_timestamp(states[cover_entity_id].last_changed,
+            0) }}'
+      - condition: template
+        value_template: "{# Проверяем, прошел ли азимут солнца триггерный азимут для
+          этого роллета. Не двигать, если уже в целевой позиции #} {{ current_sun_azimuth
+          >= repeat.item.azimuth_close_trigger and\n  cover_current_pos > repeat.item.current_pos_above
+          and\n  cover_current_pos != repeat.item.target_pos and\n  ((as_timestamp(now())
+          - cover_last_changed_timestamp) / 60) > COOLDOWN_MINUTES\n}}\n"
+      - target:
+          entity_id: '{{ cover_entity_id }}'
+        data:
+          position: '{{ repeat.item.target_pos }}'
+        action: cover.set_cover_position
+  variables:
+    GROUND_TEMP_THRESHOLD: 22
+    TERRASSE_TEMP_THRESHOLD: 22
+    CLOUD_COVERAGE_MAX: 40
+    SUN_AZIMUTH_MIN_ACTIVE: 150
+    SUN_AZIMUTH_MAX_ACTIVE: 300
+    SUN_ELEVATION_MIN_ACTIVE: 10
+    COOLDOWN_MINUTES: 240
+    COVERS_TO_MANAGE:
+    - entity: cover.shellyswitch25_f37a8c
+      azimuth_close_trigger: 150
+      current_pos_above: 40
+      target_pos: 0
+    - entity: cover.shellyswitch25_f37b28
+      azimuth_close_trigger: 180
+      current_pos_above: 40
+      target_pos: 0
+    - entity: cover.shellyswitch25_10eaa4
+      azimuth_close_trigger: 220
+      current_pos_above: 40
+      target_pos: 0
+    - entity: cover.shellyswitch25_10d315
+      azimuth_close_trigger: 240
+      current_pos_above: 75
+      target_pos: 60
 - id: markise_control
   alias: Markise Verwaltung
-  description: Markiese öffnen, wenn es heiß ist oder schließen wenn sie nicht brauchst
-    oder es regnet
+  description: Markise automatisch steuern basierend auf Sonne, Temperatur, Wolken
+    und Regen.
   triggers:
-  - trigger: numeric_state
-    entity_id:
-    - sun.sun
-    for:
-      hours: 0
-      minutes: 1
-      seconds: 0
-    attribute: azimuth
-    above: 200
-    id: azimuth
-  - trigger: numeric_state
-    entity_id:
-    - sun.sun
-    for:
-      hours: 0
-      minutes: 1
-      seconds: 0
-    attribute: elevation
-    below: 9
-    id: elevation
-  - trigger: state
-    entity_id:
-    - binary_sensor.mower_rainsensor_triggered
-    to: 'on'
-    id: regen
-  conditions: []
+  - trigger: time_pattern
+    minutes: /5
+  - trigger: template
+    value_template: '{{ is_state(RAIN_SENSOR, ''on'') or (state_attr(''sun.sun'',
+      ''elevation'') | float(999) < SUN_ELEVATION_THRESHOLD_CLOSE) }}'
   actions:
   - choose:
     - conditions:
-      - condition: and
-        conditions:
-        - condition: trigger
-          id:
-          - azimuth
-        - condition: template
-          value_template: '{{ not is_state(''binary_sensor.mower_rainsensor_triggered'',
-            ''on'') }}'
-          alias: Нет дождя
-        - condition: numeric_state
-          entity_id: sensor.ble_temperature_temperatur_gt
-          above: 22
-        - condition: numeric_state
-          entity_id: weather.openweathermap
-          below: 40
-          attribute: cloud_coverage
+      - condition: template
+        value_template: "{% set sun_azimuth = state_attr('sun.sun', 'azimuth') | float(0)
+          %} {% set sun_elevation = state_attr('sun.sun', 'elevation') | float(0)
+          %} {% set current_temp = states(TEMP_SENSOR) | float(-100) %} {% set cloud_coverage
+          = state_attr(WEATHER_SENSOR, 'cloud_coverage') | float(101) %} {% set current_pos
+          = state_attr(COVER_ENTITY_ID, 'current_position') | int(-1) %} {% set cover_last_changed_timestamp
+          = as_timestamp(states[COVER_ENTITY_ID].last_changed, 0) %}\n{{ sun_azimuth
+          > SUN_AZIMUTH_MIN_OPEN and\n  sun_elevation >= SUN_ELEVATION_MIN_OPEN and\n
+          \ current_temp > TEMP_THRESHOLD_OPEN and\n  cloud_coverage < CLOUD_COVERAGE_THRESHOLD_OPEN
+          and\n  is_state(RAIN_SENSOR, 'off') and\n  current_pos != POSITION_SUN_PROTECTION
+          and\n  ((as_timestamp(now()) - cover_last_changed_timestamp) / 60) > COOLDOWN_MINUTES\n}}\n"
+        alias: Если солнце мешает, жарко, нет облаков и дождя
       sequence:
-      - target:
-          device_id: f601cdeb470db8fab8cf47dd38761e97
+      - delay: 3
+      - action: cover.set_cover_position
         data:
-          position: 100
-        action: cover.set_cover_position
+          position: '{{ POSITION_SUN_PROTECTION }}'
+        target:
+          entity_id: '{{ COVER_ENTITY_ID }}'
     - conditions:
-      - condition: trigger
-        id:
-        - elevation
-        - regen
+      - condition: template
+        value_template: "{% set sun_elevation = state_attr('sun.sun', 'elevation')
+          | float(999) %} {% set current_pos = state_attr(COVER_ENTITY_ID, 'current_position')
+          | int(-1) %}\n{{ (is_state(RAIN_SENSOR, 'on') or\n  sun_elevation < SUN_ELEVATION_THRESHOLD_CLOSE)
+          and\n  current_pos != POSITION_RETRACTED\n}}\n"
+      alias: Если солнце уже не мешает или дождь
       sequence:
-      - target:
-          device_id: f601cdeb470db8fab8cf47dd38761e97
+      - delay: 3
+      - action: cover.set_cover_position
         data:
-          position: 0
-        action: cover.set_cover_position
+          position: '{{ POSITION_RETRACTED }}'
+        target:
+          entity_id: '{{ COVER_ENTITY_ID }}'
+  trigger_variables:
+    SUN_ELEVATION_THRESHOLD_CLOSE: 11
+    RAIN_SENSOR: binary_sensor.mower_rainsensor_triggered
+  variables:
+    COVER_ENTITY_ID: cover.markise
+    TEMP_SENSOR: sensor.ble_temperature_temperatur_gt
+    WEATHER_SENSOR: weather.openweathermap
+    TEMP_THRESHOLD_OPEN: 22
+    CLOUD_COVERAGE_THRESHOLD_OPEN: 40
+    SUN_AZIMUTH_MIN_OPEN: 180
+    SUN_ELEVATION_MIN_OPEN: 15
+    POSITION_SUN_PROTECTION: 100
+    POSITION_RETRACTED: 0
+    COOLDOWN_MINUTES: 60
   mode: single
 - id: vacuum_when_nobody_home
   alias: Robi - Niemand zu Hause ist
@@ -981,71 +954,111 @@
   mode: single
 - id: seitenmarkise_control
   alias: Seitenmarkise Verwaltung
-  description: SetemMarkiese schliessen, wenn es heiß ist oder schließen wenn sie
-    nicht brauchst oder es regnet
+  description: Seitenmarkise automatisch steuern basierend auf Sonne, Temperatur,
+    Wolken und Regen.
   triggers:
-  - trigger: numeric_state
-    entity_id:
-    - sun.sun
-    for:
-      hours: 0
-      minutes: 1
-      seconds: 0
-    attribute: azimuth
-    above: 180
-    id: azimuth
-  - trigger: numeric_state
-    entity_id:
-    - sun.sun
-    for:
-      hours: 0
-      minutes: 1
-      seconds: 0
-    attribute: elevation
-    below: 9
-    id: elevation
+  - trigger: time_pattern
+    minutes: /5
+  - trigger: template
+    value_template: '{{ is_state(RAIN_SENSOR, ''on'') or (state_attr(''sun.sun'',
+      ''elevation'') | float(999) < SUN_ELEVATION_THRESHOLD_RETRACT) }}'
+  actions:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: "{% set sun_azimuth = state_attr('sun.sun', 'azimuth') | float(0)
+          %} {% set sun_elevation = state_attr('sun.sun', 'elevation') | float(0)
+          %} {% set current_temp = states(TEMP_SENSOR) | float(-100) %} {% set cloud_coverage
+          = state_attr(WEATHER_SENSOR, 'cloud_coverage') | float(101) %} {% set current_pos
+          = state_attr(COVER_ENTITY_ID, 'current_position') | int(-1) %} {% set cover_last_changed_timestamp
+          = as_timestamp(states[COVER_ENTITY_ID].last_changed, 0) %}\n{{ sun_azimuth
+          > SUN_AZIMUTH_MIN_DEPLOY and\n  sun_elevation >= SUN_ELEVATION_MIN_DEPLOY
+          and\n  current_temp > TEMP_THRESHOLD_DEPLOY and\n  cloud_coverage < CLOUD_COVERAGE_THRESHOLD_DEPLOY
+          and\n  is_state(RAIN_SENSOR, 'off') and\n  current_pos != POSITION_SUN_PROTECTION
+          and\n  ((as_timestamp(now()) - cover_last_changed_timestamp) / 60) > COOLDOWN_MINUTES\n}}\n"
+        alias: Если солнце мешает, жарко, нет облаков и дождя
+      sequence:
+      - action: cover.set_cover_position
+        data:
+          position: '{{ POSITION_SUN_PROTECTION }}'
+        target:
+          entity_id: '{{ COVER_ENTITY_ID }}'
+    - conditions:
+      - condition: template
+        value_template: "{% set sun_elevation = state_attr('sun.sun', 'elevation')
+          | float(999) %} {% set current_pos = state_attr(COVER_ENTITY_ID, 'current_position')
+          | int(-1) %}\n{{ (is_state(RAIN_SENSOR, 'on') or\n  sun_elevation < SUN_ELEVATION_THRESHOLD_RETRACT)
+          and\n  current_pos != POSITION_RETRACTED\n}}\n"
+      alias: Если солнце уже не мешает или дождь
+      sequence:
+      - action: cover.set_cover_position
+        data:
+          position: '{{ POSITION_RETRACTED }}'
+        target:
+          entity_id: '{{ COVER_ENTITY_ID }}'
+  trigger_variables:
+    SUN_ELEVATION_THRESHOLD_RETRACT: 11
+    RAIN_SENSOR: binary_sensor.mower_rainsensor_triggered
+  variables:
+    COVER_ENTITY_ID: cover.seitenmarkise
+    TEMP_SENSOR: sensor.ble_temperature_temperatur_gt
+    WEATHER_SENSOR: weather.openweathermap
+    TEMP_THRESHOLD_DEPLOY: 22
+    CLOUD_COVERAGE_THRESHOLD_DEPLOY: 40
+    SUN_AZIMUTH_MIN_DEPLOY: 180
+    SUN_ELEVATION_MIN_DEPLOY: 12
+    POSITION_SUN_PROTECTION: 15
+    POSITION_RETRACTED: 100
+    COOLDOWN_MINUTES: 60
+  mode: single
+- id: '1746608947446'
+  alias: debug
+  description: ''
+  triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.mower_rainsensor_triggered
+    - switch.sonoffs20_2
     to: 'on'
-    id: regen
+    id: cycle1
+  - trigger: state
+    entity_id:
+    - switch.sonoffs20_2
+    to: 'off'
+    id: cycle2
+  conditions: []
+  actions:
+  - action: notify.telegram_bot_anatolij
+    metadata: {}
+    data:
+      message: '{{ trigger.id[-1] }}'
+  mode: single
+- id: garage_smartthing_sync
+  alias: Garage - Smarttagsverwaltung
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - switch.st_virtual_switch1
+    - switch.st_virtual_switch2
   conditions: []
   actions:
   - choose:
     - conditions:
-      - condition: and
-        conditions:
-        - condition: trigger
-          id:
-          - azimuth
-        - condition: template
-          value_template: '{{ not is_state(''binary_sensor.mower_rainsensor_triggered'',
-            ''on'') }}'
-          alias: Нет дождя
-        - condition: numeric_state
-          entity_id: sensor.ble_temperature_temperatur_gt
-          above: 22
-        - condition: numeric_state
-          entity_id: weather.openweathermap
-          below: 40
-          attribute: cloud_coverage
+      - condition: template
+        value_template: '{{ trigger.entity_id == ''switch.st_virtual_switch1'' }}'
       sequence:
-      - target:
-          device_id:
-          - f15eb933b0a5284d735a9358ce7d1986
-        data:
-          position: 100
-        action: cover.set_cover_position
+      - action: switch.toggle
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.tor
     - conditions:
-      - condition: trigger
-        id:
-        - elevation
-        - regen
+      - condition: template
+        value_template: '{{ trigger.entity_id == ''switch.st_virtual_switch2'' }}'
       sequence:
-      - target:
-          device_id:
-          - f15eb933b0a5284d735a9358ce7d1986
-        data:
-          position: 0
-        action: cover.set_cover_position
+      - action: switch.toggle
+        metadata: {}
+        data: {}
+        target:
+          entity_id: switch.torteil
   mode: single
