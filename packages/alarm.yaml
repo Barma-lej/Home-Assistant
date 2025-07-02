@@ -156,7 +156,7 @@ script:
           entity_id: media_player.home_group
         data:
           media_content_type: music
-          media_content_id: "media-source://media_source/local/sounds/polizeisirene-martinshorn-KCD04046.mp3"
+          media_content_id: "media-source://media_source/nuc/sounds/polizeisirene-martinshorn-KCD04046.mp3"
           extra:
             thumb: "/local/images/alarm_red.png"
             title: Alarm

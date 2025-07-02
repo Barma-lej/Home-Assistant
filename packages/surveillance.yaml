@@ -23,7 +23,7 @@ scene:
       switch.terrasse_record_audio: "on"
       switch.alfa03: "on"
 
-# Automations #######################################################
+# Automations
 automation:
   # Отправка файлов в Telegram
   - id: camera_upload_to_telegram
@@ -65,14 +65,14 @@ automation:
                     video:
                       - file: "{{ trigger.event.data.path }}"
                         caption: >-
-                          {% if 'cam1' in trigger.event.data.folder %}
+                          {% if 'terrasse' in trigger.event.data.folder %}
                             🏃 *Terrasse* Bewegung
-                          {% elif 'cam2' in trigger.event.data.folder %}
+                          {% elif 'garage' in trigger.event.data.folder %}
                             🚗 *Garage* Bewegung
-                          {% elif 'cam3' in trigger.event.data.folder %}
+                          {% elif 'einfahrt' in trigger.event.data.folder %}
                             🏠 *Einfahrt* Bewegung
                           {% else %}
-                            🏃 *Bewegung erkannt!*
+                            🏃 *{{ trigger.event.data.folder | title }} Bewegung!*
                           {% endif -%}
                         timeout: 1000
               - action: shell_command.cam_remove_file
@@ -92,14 +92,14 @@ automation:
                     photo:
                       - file: "{{ trigger.event.data.path }}"
                         caption: >-
-                          {% if 'cam1' in trigger.event.data.folder %}
+                          {% if 'terrasse' in trigger.event.data.folder %}
                             🏃 *Terrasse* Bewegung
-                          {% elif 'cam2' in trigger.event.data.folder %}
+                          {% elif 'garage' in trigger.event.data.folder %}
                             🚗 *Garage* Bewegung
-                          {% elif 'cam3' in trigger.event.data.folder %}
+                          {% elif 'einfahrt' in trigger.event.data.folder %}
                             🏠 *Einfahrt* Bewegung
                           {% else %}
-                            🏃 *Bewegung erkannt!*
+                            🏃 *{{ trigger.event.data.folder | title }} Bewegung!*
                           {% endif -%}
 
   - id: camera_surveillance_management
@@ -151,7 +151,7 @@ automation:
       - action: button.press
         entity_id: button.innen_ptz_stop
 
-# Script ############################################################
+# Script
 script:
   camera_ptz:
     alias: Camera - PTZ Control

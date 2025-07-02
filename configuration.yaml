@@ -3,7 +3,7 @@ homeassistant:
   # latitude: !secret ha_latitude
   # longitude: !secret ha_longitude
   # elevation: !secret ha_elevation
-  # #  time_zone: !secret ha_time_zone
+  # time_zone: !secret ha_time_zone
   # unit_system: metric
   # external_url: !secret ha_external_url
   # internal_url: !secret ha_internal_url
@@ -13,7 +13,8 @@ homeassistant:
   #   - /mnt/sdb1/cams
 
   media_dirs:
-    local: /media
+    # local: /media
+    nuc: /share/nuc/media
 
 zone:
   - name: Home
@@ -36,15 +37,8 @@ media_source:
 mobile_app:
 my: # This integration handles redirects from the My Home Assistant service.
 notify:
-# sun: # Track the sun - UI configured
 system_health: # System Health integration data can be viewed in Developer Tools on the “Info” tab.
 websocket_api:
-
-# folder_watcher:
-#   - folder: /media/cams
-
-# Show links to resources in log and frontend
-# introduction:
 
 # Enables the frontend ################
 frontend:
