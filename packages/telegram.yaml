@@ -128,13 +128,13 @@ script:
             - "{% set r1 = state_attr('cover.shellyswitch25_f37a8c', 'current_position') | int %}
               {% set r2 = state_attr('cover.shellyswitch25_f37b28', 'current_position') | int %}
               {% set r3 = state_attr('cover.shellyswitch25_10eaa4', 'current_position') | int %}
-              {{ (r1 < 95) | iif((r1 < 20) | iif('🔒', '🟢'~r1~'%'), '🟢') }} Rollade 1:/rollade_1,
-              {{ (r2 < 95) | iif((r2 < 20) | iif('🔒', '🟢'~r2~'%'), '🟢') }} Rollade 2:/rollade_2,
-              {{ (r3 < 95) | iif((r3 < 20) | iif('🔒', '🟢'~r3~'%'), '🟢') }} Rollade 3:/rollade_3"
+              {{ (r1 < 95) | iif((r1 < 20) | iif('🔒', '🪟'~r1~'%'), '🪟') }} Rollade 1:/rollade_1,
+              {{ (r2 < 95) | iif((r2 < 20) | iif('🔒', '🪟'~r2~'%'), '🪟') }} Rollade 2:/rollade_2,
+              {{ (r3 < 95) | iif((r3 < 20) | iif('🔒', '🪟'~r3~'%'), '🪟') }} Rollade 3:/rollade_3"
             - "{% set r4 = state_attr('cover.shellyswitch25_10d315', 'current_position') | int %}
-              {{ (r4 < 95) | iif((r4 < 20) | iif('🔒', '🟢'~r4~'%'), '🟢') }} Terrasse:/rollade_4,
-              {{ ( states('sensor.torposition') | int > 0 ) | iif( '🟢' ~ states('sensor.torposition') ~ '%' , '🔒' ) }} Tor:/tor,
-              {{ ( states('sensor.torposition') | int > 0 ) | iif( '🟢' ~ states('sensor.torposition') ~ '%' , '🔒' ) }} Tortel:/torteil"
+              {{ (r4 < 95) | iif((r4 < 20) | iif('🔒', '🪟'~r4~'%'), '🪟') }} Terrasse:/rollade_4,
+              {{ ( states('sensor.torposition') | int > 0 ) | iif( '🚗' ~ states('sensor.torposition') | round(0) ~ '%' , '🔒' ) }} Tor:/tor,
+              {{ ( states('sensor.torposition') | int > 0 ) | iif( '🚗', '🔒' ) }} Tortel:/torteil"
             - "{{ (states('input_boolean.alarm_indoor') == 'on') | iif('🚨', '🔒') }} Alarm:/alarm,
               Home:/start,
               Hilfe:/help"
@@ -163,3 +163,24 @@ script:
 # start - Zeigt die Begrüßungsnachricht
 # help - Zeigt eine Nachricht mit Befehlen an
 
+# Emojis reference for easy maintenance:
+# 🟢 - Active/On/Open
+# 🔴 - Inactive/Off/Closed
+# 🔒 - Locked/Secured/Closed
+# 🔓 - Unlocked/Unsecured/Open
+# ❌ - Error/Unavailable
+# ⚪ - Unknown/Neutral
+# 💡 - Light
+# 🪟 - Window/Cover
+# 🚗 - Garage/Car
+# 🚨 - Alarm/Security
+# 📊 - Status/Statistics
+# 🔄 - Refresh/Update
+# 🔙 - Back/Return
+# ❓ - Help/Question
+# 🏠 - Home/Main
+# 🕐 - Time/Clock
+# ⬆️ - Up/Open
+# ⬇️ - Down/Close
+# ⏸️ - Stop/Pause
+# ⏹️ - Stop (alternative)
