@@ -9,8 +9,8 @@ homeassistant:
   # internal_url: !secret ha_internal_url
   packages: !include_dir_named packages
   customize: !include customize.yaml
-  # allowlist_external_dirs:
-  #   - /mnt/sdb1/cams
+  allowlist_external_dirs:
+    - /share/nuc/media/cams
 
   media_dirs:
     # local: /media
