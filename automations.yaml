@@ -495,8 +495,6 @@
       - update.pi_hole_web_update_available
       - update.maxi_media_player_update
       - update.samsungtv_smart_update
-      - update.card_mod_update
-      - update.pi_hole_docker_update_available
       - update.seitenmarkise_74aab6_firmware
       mobile_app_device: d65b64c785a29ffed795c6d22780bb9f
       reminder_hours: '6'
@@ -974,7 +972,7 @@
           = as_timestamp(states[COVER_ENTITY_ID].last_changed, 0) %}\n{{ sun_azimuth
           > SUN_AZIMUTH_MIN_DEPLOY and\n  sun_elevation >= SUN_ELEVATION_MIN_DEPLOY
           and\n  current_temp > TEMP_THRESHOLD_DEPLOY and\n  cloud_coverage < CLOUD_COVERAGE_THRESHOLD_DEPLOY
-          and\n  is_state(RAIN_SENSOR, 'off') and\n  current_pos != POSITION_SUN_PROTECTION
+          and\n  is_state(RAIN_SENSOR, 'off') and\n  current_pos > POSITION_SUN_PROTECTION
           and\n  ((as_timestamp(now()) - cover_last_changed_timestamp) / 60) > COOLDOWN_MINUTES\n}}\n"
         alias: Если солнце мешает, жарко, нет облаков и дождя
       sequence:
@@ -1009,7 +1007,7 @@
     SUN_ELEVATION_MIN_DEPLOY: 12
     POSITION_SUN_PROTECTION: 15
     POSITION_RETRACTED: 100
-    COOLDOWN_MINUTES: 60
+    COOLDOWN_MINUTES: 120
   mode: single
 - id: '1746608947446'
   alias: debug
