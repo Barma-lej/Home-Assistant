@@ -78,3 +78,36 @@ wled_loop:
           state: Nacheinander
   mode: single
   icon: mdi:sync
+mower_start:
+  sequence:
+  - if:
+    - condition: or
+      conditions:
+      - condition: device
+        device_id: b2433e6a3cf7900f69e6978e42cd0749
+        domain: landroid_cloud
+        entity_id: fcbb7a8aff31130444cd0ffe677aa1d9
+        type: is_mowing
+      - condition: device
+        device_id: b2433e6a3cf7900f69e6978e42cd0749
+        domain: landroid_cloud
+        entity_id: fcbb7a8aff31130444cd0ffe677aa1d9
+        type: is_edgecut
+      - condition: device
+        device_id: b2433e6a3cf7900f69e6978e42cd0749
+        domain: landroid_cloud
+        entity_id: fcbb7a8aff31130444cd0ffe677aa1d9
+        type: has_error
+    then:
+    - device_id: b2433e6a3cf7900f69e6978e42cd0749
+      domain: landroid_cloud
+      entity_id: fcbb7a8aff31130444cd0ffe677aa1d9
+      type: dock
+    else:
+    - device_id: b2433e6a3cf7900f69e6978e42cd0749
+      domain: landroid_cloud
+      entity_id: fcbb7a8aff31130444cd0ffe677aa1d9
+      type: mow
+  alias: Mower - Start
+  description: Поддержка газонокосилки для Yandex станции
+  icon: mdi:robot-mower-outline
