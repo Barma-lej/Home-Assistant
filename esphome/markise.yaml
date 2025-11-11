@@ -57,10 +57,6 @@ api:
   encryption:
     key: !secret markise_api
 
-ota:
-  platform: esphome
-  password: !secret ota_password
-
 safe_mode:
   num_attempts: 5
   reboot_timeout: 10min
@@ -72,6 +68,11 @@ web_server:
   auth:
     username: '${web_username}'
     password: '${web_password}'
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+  - platform: web_server
 
 # Use the blue LED in the device as a status LED, which will blink if there are warnings (slow) or errors (fast)
 status_led:

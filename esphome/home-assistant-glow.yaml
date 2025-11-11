@@ -76,6 +76,7 @@ ota:
     password: !secret ota_password
   - platform: http_request
     id: ota_http_request
+  - platform: web_server
 
 update:
   - platform: http_request
