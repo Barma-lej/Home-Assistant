@@ -69,7 +69,6 @@ input_select:
     name: "Lautsprecher:"
     options:
       - Nest Mini
-      - Sound Blaster
       - Home Mini Flur
       - Home Mini Kristina
       - Garten
@@ -104,9 +103,8 @@ automation:
         target:
           entity_id: >-
             {% set entities = {
-              'Garten':'media_player.googlehome9539',
+              'Garten':'media_player.garten',
               'Nest Mini':'media_player.nest_mini',
-              'Sound Blaster':'media_player.soundblaster',
               'Home Mini Flur':'media_player.flur',
               'Home Mini Kristina':'media_player.kristina',
               'Überall':'media_player.home_group',
@@ -130,9 +128,8 @@ automation:
       data:
         entity_id: >
           {% set entities = {
-            'Garten':'media_player.googlehome9539',
+            'Garten':'media_player.garten',
             'Nest Mini':'media_player.nest_mini',
-            'Sound Blaster':'media_player.soundblaster',
             'Home Mini Flur':'media_player.flur',
             'Home Mini Kristina':'media_player.kristina',
             'Überall':'media_player.home_group',
@@ -172,9 +169,8 @@ script:
         target:
           entity_id: >-
             {% set entities = {
-              'Garten':'media_player.googlehome9539',
+              'Garten':'media_player.garten',
               'Nest Mini':'media_player.nest_mini',
-              'Sound Blaster':'media_player.soundblaster',
               'Home Mini Flur':'media_player.flur',
               'Home Mini Kristina':'media_player.kristina',
               'Überall':'media_player.home_group',
@@ -240,9 +236,8 @@ script:
         target:
           entity_id: >-
             {% set entities = {
-              'Garten':'media_player.googlehome9539',
+              'Garten':'media_player.garten',
               'Nest Mini':'media_player.nest_mini',
-              'Sound Blaster':'media_player.soundblaster',
               'Home Mini Flur':'media_player.flur',
               'Home Mini Kristina':'media_player.kristina',
               'Überall':'media_player.home_group',
@@ -262,3 +257,6 @@ script:
 #     #   friendly_name: Play
 #     # script.radio_stop:
 #     #   friendly_name: Stop
+
+# 'Sound Blaster':'media_player.soundblaster',
+

@@ -48,7 +48,12 @@ automation:
       is_video: "{{ file_path.endswith('.mp4') and not file_path.endswith('e.mp4') }}"
       is_converted_video: "{{ file_path.endswith('e.mp4') }}"
       is_image: "{{ file_path.endswith('.jpg') }}"
-      common_prompt: "Очень кратко опиши, что ты видишь на этом изображении/видео. Твоё сообщение должно быть коротким максимум 60 символов, чтобы поместиться в уведомление на телефоне. Если это человек, постарайся определить пол. Если это видео опиши также направление движения объекта в соответствии с описанием кадра. Не описывай неподвижные объекты или здания."
+      common_prompt: >-
+        Очень кратко опиши, что ты видишь на этом изображении/видео. Твоё
+        сообщение должно быть коротким максимум 60 символов, чтобы поместиться
+        в уведомление на телефоне. Если это человек, постарайся определить пол.
+        Если это видео опиши также направление движения объекта в соответствии
+        с описанием кадра. Не описывай неподвижные объекты или здания.
       # Секретные значения
       einfahrt_uid: !secret einfahrt_uid
       terrasse_uid: !secret terrasse_uid
@@ -61,7 +66,7 @@ automation:
         {% if 'einfahrt' in folder_name %}
           {{ {'icon': '🏠', 'name': 'Einfahrt', 'uid': einfahrt_uid, 'prompt': einfahrt_prompt} }}
         {% elif 'terrasse' in folder_name %}
-          {{ {'icon': '🏡', 'name': 'Terrasse', 'uid': terrasse_uid, 'prompt': terrasse_prompt} }}
+          {{ {'icon': '🏡', 'name': 'Terrasse', 'uid': terrasse_uid} }}
         {% elif 'garage' in folder_name %}
           {{ {'icon': '🚗', 'name': 'Garage', 'uid': garage_uid} }}
         {% else %}
@@ -110,7 +115,7 @@ automation:
               - if:
                   - "{{ camera_info.prompt != null }}"
                 then:
-                  - action: google_generative_ai_conversation.generate_content
+                  - action: ai_task.generate_data
                     data:
                       prompt: "{{ camera_info.prompt }} {{ common_prompt }}"
                       filenames:
@@ -149,7 +154,7 @@ automation:
               - if:
                   - "{{ camera_info.prompt != null }}"
                 then:
-                  - action: google_generative_ai_conversation.generate_content
+                  - action: ai_task.generate_data
                     data:
                       prompt: "{{ camera_info.prompt }} {{ common_prompt }}"
                       filenames:
@@ -158,7 +163,7 @@ automation:
                   - action: notify.mobile_app_as25
                     data:
                       message: "{{ response.text }}"
-                      title: "{{ camera_info.name }} {{ folder_name }}"
+                      title: "{{ camera_info.name }}"
                       data:
                         image: "/media/nuc{{ file_path[16:] }}"
                         url: "/lovelace/cams"

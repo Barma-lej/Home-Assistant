@@ -67,23 +67,23 @@ automation:
         entity_id: switch.irrigation_pump
 
   # Включение насоса для подкачки
-  - id: irrigation_regular_pumping
-    alias: Irrigation - Regular pumping
-    description: "Регулярная подкачка воды"
+  # - id: irrigation_regular_pumping
+  #   alias: Irrigation - Regular pumping
+  #   description: "Регулярная подкачка воды"
 
-    triggers:
-      - trigger: time_pattern
-        hours: "/4"
-        minutes: "2"
+  #   triggers:
+  #     - trigger: time_pattern
+  #       hours: "/4"
+  #       minutes: "2"
 
-    conditions:
-      - condition: state
-        entity_id: switch.irrigation_pump
-        state: "off"
+  #   conditions:
+  #     - condition: state
+  #       entity_id: switch.irrigation_pump
+  #       state: "off"
 
-    actions:
-      - action: switch.turn_on
-        entity_id: switch.irrigation_pump
-      - delay: 15
-      - action: switch.turn_off
-        entity_id: switch.irrigation_pump
+  #   actions:
+  #     - action: switch.turn_on
+  #       entity_id: switch.irrigation_pump
+  #     - delay: 15
+  #     - action: switch.turn_off
+  #       entity_id: switch.irrigation_pump
