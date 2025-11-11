@@ -1,18 +1,21 @@
 # Templates #########################################################
 - platform: template
   sensors:
-    solar_angle:
-      friendly_name: "Sonnenwinkel"
-      unit_of_measurement: "°"
-      value_template: "{{ states.sun.sun.attributes.elevation }}"
-
-    sunrise:
-      friendly_name: "Sonnenaufgang"
-      value_template: "{{ states.sun.sun.attributes.next_rising }}"
-    # Text ##############################################################
+    # Text for Picture elements card
     only_text:
-      friendly_name: " "
-      value_template: ""
+      unique_id: only_text
+      friendly_name: "Only Text"
+      value_template: " "
+      icon_template: mdi:format-text
+
+#     solar_angle:
+#       friendly_name: "Sonnenwinkel"
+#       unit_of_measurement: "°"
+#       value_template: "{{ states.sun.sun.attributes.elevation }}"
+
+#     sunrise:
+#       friendly_name: "Sonnenaufgang"
+#       value_template: "{{ states.sun.sun.attributes.next_rising }}"
 
 # Date Time #########################################################
 - platform: time_date
