@@ -1,18 +1,20 @@
-switch:
-  - platform: template
-    switches:
-      alarm_play:
-        friendly_name: Sirene
-        value_template: "{{ is_state('input_boolean.alarm_indoor', 'on') }}"
+template:
+  - switch:
+      - default_entity_id: switch.alarm_play
+        name: Sirene
+        unique_id: alarm_play
+        state: "{{ is_state('input_boolean.alarm_indoor', 'on') }}"
         turn_on:
           - action: input_boolean.turn_on
             target:
-              entity_id: input_boolean.alarm_indoor
+              entity_id:
+                - input_boolean.alarm_indoor
         turn_off:
           - action: input_boolean.turn_off
             target:
-              entity_id: input_boolean.alarm_indoor
-        icon_template: >-
+              entity_id:
+                - input_boolean.alarm_indoor
+        icon: >-
           {% if is_state('input_boolean.alarm_indoor', 'on') %}
             mdi:alarm-light
           {% else %}

@@ -1,12 +1,5 @@
 # Xiaomi Roborock S50
 
-# Integration
-# vacuum:
-#   - platform: xiaomi_miio
-#     name: "Robi"
-#     host: !secret robi_ip
-#     token: !secret robi_token
-
 # Recorder
 recorder:
   exclude:
@@ -15,12 +8,8 @@ recorder:
       - input_select.robi_zone
       - input_boolean.robi_zone_settings
       - input_number.robi_passes
-      - input_number.robi_start_minutes_weekend
-      - input_number.robi_start_hour_weekend
-      - input_number.robi_start_minutes_weekdays
-      - input_number.robi_start_hour_weekdays
 
-# Logbook
+      # Logbook
 logbook:
   exclude:
     entities:
@@ -28,10 +17,6 @@ logbook:
       - input_select.robi_zone
       - input_boolean.robi_zone_settings
       - input_number.robi_passes
-      - input_number.robi_start_minutes_weekend
-      - input_number.robi_start_hour_weekend
-      - input_number.robi_start_minutes_weekdays
-      - input_number.robi_start_hour_weekdays
 
 homeassistant:
   customize:
@@ -67,7 +52,7 @@ homeassistant:
 #   content_type: image/png
 #   framerate: 1
 
-# Sensor
+# Template
 template:
   - sensor:
       # Accesories
@@ -120,29 +105,27 @@ template:
           {{ '{:02}:{:02}:{:02}'.format(hours, minutes, seconds) }}
         icon: mdi:clock-fast
 
-    # - platform: rest
-    #   resource: !secret robi_resource_map
-    #   name: Vacuum Map url
-    #   value_template: "http://{{states('sensor.robi_ip')}}{{value_json.mapsrc}}"
+  # - switch:
+  #     - name: Vacuum
+  #       unique_id: robi_switch
+  #       state: "{{ on if is_state('vacuum.robi', 'cleaning') else off }}"
+  #       turn_on:
+  #         - action: input_select.select_option
+  #           entity_id:
+  #             - input_select.robi_zone
+  #           data:
+  #             option: EG
+  #       turn_off:
+  #         - action: vacuum.return_to_base
+  #           data:
+  #             entity_id: vacuum.robi
+  #       default_entity_id: switch.vacuum
+  #       icon: mdi:robot-vacuum
 
-# Switch
-switch:
-  - platform: template
-    switches:
-      vacuum:
-        friendly_name: "Robi"
-        unique_id: robi_switch
-        value_template: "{% if is_state('vacuum.robi', 'cleaning') %}On{% else %}Off{% endif %}"
-        icon_template: mdi:robot-vacuum
-        turn_on:
-          action: input_select.select_option
-          entity_id: input_select.robi_zone
-          data:
-            option: "EG"
-        turn_off:
-          action: vacuum.return_to_base
-          data:
-            entity_id: vacuum.robi
+  # - platform: rest
+  #   resource: !secret robi_resource_map
+  #   name: Vacuum Map url
+  #   value_template: "http://{{states('sensor.robi_ip')}}{{value_json.mapsrc}}"
 
 # input Select
 input_select:
@@ -210,7 +193,7 @@ input_datetime:
     has_time: true
     icon: mdi:clock-start
 
-# Automation ########################################################
+# Automation
 automation:
   # If you want to set the vacuum to mop mode, just like the app, here is a script for that:
   #   robi_set_mop:

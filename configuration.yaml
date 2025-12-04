@@ -202,6 +202,7 @@ group: !include groups.yaml
 # panel_iframe: !include panel_iframe.yaml
 # scene: !include scenes.yaml
 script: !include scripts.yaml
+template: !include template.yaml
 sensor: !include sensors.yaml
 shell_command: !include shell_commands.yaml
 # zone: !include zones.yaml

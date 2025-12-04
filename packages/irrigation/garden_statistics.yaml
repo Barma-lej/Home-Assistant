@@ -1,21 +1,5 @@
-# Switches ##########################################################
+# Switches
 switch:
-  # Master control switch
-  - platform: template
-    switches:
-      irrigation_watering:
-        unique_id: irrigation_watering
-        value_template: "{{ states('sensor.sonoffpow_02_energy_power') | float(0) > 100 }}"
-        turn_on:
-          action: switch.turn_on
-          target:
-            entity_id: switch.sonoffpow_02
-        turn_off:
-          action: switch.turn_off
-          target:
-            entity_id: switch.sonoffpow_02
-        icon_template: "{{ 'mdi:water-pump' if is_state('switch.irrigation_watering', 'on') else 'mdi:water-pump-off' }}"
-
   # Groups
   - platform: group
     name: Irrigation - Switches Zone1
@@ -52,8 +36,28 @@ switch:
       - switch.irrigation_pump
       - switch.irrigation_watering
 
-# Sensors ###########################################################
+# Template
 template:
+  # Switches
+  - switch:
+      # Master control switch
+      - default_entity_id: switch.irrigation_watering
+        name: "Irrigation - Bewässerungschalter"
+        unique_id: irrigation_watering
+        state: "{{ states('sensor.sonoffpow_02_energy_power') | float(0) > 100 }}"
+        turn_on:
+          - action: switch.turn_on
+            target:
+              entity_id:
+                - switch.sonoffpow_02
+        turn_off:
+          - action: switch.turn_off
+            target:
+              entity_id:
+                - switch.sonoffpow_02
+        icon: "{{ 'mdi:water-pump' if is_state('switch.irrigation_watering', 'on') else 'mdi:water-pump-off' }}"
+
+  # Sensors
   - trigger:
       - trigger: state
         entity_id:
@@ -235,12 +239,6 @@ automation:
 # Customize #########################################################
 homeassistant:
   customize:
-    # Switches ##############
-    # Master control switch
-    switch.irrigation_watering:
-      friendly_name: "Irrigation - Bewässerungschalter"
-      icon: mdi:numeric-1-box-multiple
-
     # Groups of switches
     switch.irrigation_switches_zone1:
       friendly_name: "Irrigation - Hinterhofgruppe"

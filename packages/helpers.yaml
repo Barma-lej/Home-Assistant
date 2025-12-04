@@ -48,22 +48,18 @@ input_number:
     icon: mdi:waves
     unit_of_measurement: m³/h
 
-# Binary Sensor
-binary_sensor:
-  - platform: template
-    sensors:
-      all_lights_off:
-        friendly_name: "Все светильники выключены"
-        value_template: >
-          {{ states.light | selectattr('state', 'eq', 'on') | list | count == 0 }}
-        icon_template: >
+template:
+  - binary_sensor:
+      - default_entity_id: binary_sensor.all_lights_off
+        name: "Все светильники выключены"
+        state: "{{ states.light | selectattr('state', 'eq', 'on') | list | count == 0 }}"
+        icon: >
           {% if is_state('binary_sensor.all_lights_off', 'on') %}
             mdi:lightbulb-off-outline
           {% else %}
             mdi:lightbulb-on-outline
           {% endif %}
 
-# template:
 #   - sensor:
 #       # Подсчёт абонентской платы за электричество
 #       - name: "Placeholder energy subscription price"

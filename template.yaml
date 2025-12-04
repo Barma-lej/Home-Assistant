@@ -1,0 +1,15 @@
+sensor:
+  # Keep track how many days have past since a date
+  - name: "Only Text"
+    unique_id: only_text
+    state: ""
+    icon: mdi:format-text
+
+#     solar_angle:
+#       friendly_name: "Sonnenwinkel"
+#       unit_of_measurement: "°"
+#       value_template: "{{ states.sun.sun.attributes.elevation }}"
+
+#     sunrise:
+#       friendly_name: "Sonnenaufgang"
+#       value_template: "{{ states.sun.sun.attributes.next_rising }}"
