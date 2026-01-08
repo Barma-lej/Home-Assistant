@@ -5,17 +5,17 @@
 utility_meter:
   shelly_rollade_2_d:
     unique_id: shelly_rollade_2_d
-    source: sensor.shellyswitch25_f37b28_energy
+    source: sensor.rollade_2_energy
     cycle: daily
 
   shelly_rollade_2_m:
     unique_id: shelly_rollade_2_m
-    source: sensor.shellyswitch25_f37b28_energy
+    source: sensor.rollade_2_energy
     cycle: monthly
 
   shelly_rollade_2_y:
     unique_id: shelly_rollade_2_y
-    source: sensor.shellyswitch25_f37b28_energy
+    source: sensor.rollade_2_energy
     cycle: yearly
 
 # Automation ########################################################
@@ -37,11 +37,11 @@ automation:
     actions:
       - action: script.cover_one_button
         data:
-          entity_id: shellyswitch25_f37b28
+          entity_id: rollade_2
 
       - wait_for_trigger:
           - trigger: state
-            entity_id: cover.shellyswitch25_f37b28
+            entity_id: cover.rollade_2
         timeout: "00:00:02"
         continue_on_timeout: true
 
@@ -49,18 +49,18 @@ automation:
         data:
           target: "{{ trigger.event.data.chat_id }}"
           message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
-          message: "🏡 {{ state_attr('cover.shellyswitch25_f37b28', 'friendly_name') }} - {{ states('cover.shellyswitch25_f37b28') }}"
+          message: "🏡 {{ state_attr('cover.rollade_2', 'friendly_name') }} - {{ states('cover.rollade_2') }}"
 
 # Customize #########################################################
 homeassistant:
   customize:
-    cover.shellyswitch25_f37b28:
+    cover.rollade_2:
       friendly_name: Rollade 2
-    sensor.shellyswitch25_f37b28_power:
+    sensor.rollade_2_power:
       friendly_name: Leistung (Rollade 2)
       icon: mdi:gauge
-    sensor.shellyswitch25_f37b28_energy:
+    sensor.rollade_2_energy:
       friendly_name: Verbrauch (Rollade 2)
-    binary_sensor.shellyswitch25_f37b28_overheating:
+    binary_sensor.rollade_2_overheating:
       friendly_name: Überhitzen (Rollade 2)
       icon: mdi:thermometer-alert

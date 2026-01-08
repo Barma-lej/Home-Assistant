@@ -125,13 +125,13 @@ script:
             - "{{ (states('light.shellyswitch25_10a36d_channel_2') == 'on') | iif('🟢', '🔴') }} Essecke:/essecke,
               {{ (states('light.sonoffpow_02') == 'on') | iif('🟢', '🔴') }} Ambiwohnen:/ambiente_wohnen,
               {{ (states('light.sonoffpow_04') == 'on') | iif('🟢', '🔴') }} Ambiküche:/ambiente_kueche"
-            - "{% set r1 = state_attr('cover.shellyswitch25_f37a8c', 'current_position') | int %}
-              {% set r2 = state_attr('cover.shellyswitch25_f37b28', 'current_position') | int %}
-              {% set r3 = state_attr('cover.shellyswitch25_10eaa4', 'current_position') | int %}
+            - "{% set r1 = state_attr('cover.rollade_1', 'current_position') | int %}
+              {% set r2 = state_attr('cover.rollade_2', 'current_position') | int %}
+              {% set r3 = state_attr('cover.rollade_3', 'current_position') | int %}
               {{ (r1 < 95) | iif((r1 < 20) | iif('🔒', '🪟'~r1~'%'), '🪟') }} Rollade 1:/rollade_1,
               {{ (r2 < 95) | iif((r2 < 20) | iif('🔒', '🪟'~r2~'%'), '🪟') }} Rollade 2:/rollade_2,
               {{ (r3 < 95) | iif((r3 < 20) | iif('🔒', '🪟'~r3~'%'), '🪟') }} Rollade 3:/rollade_3"
-            - "{% set r4 = state_attr('cover.shellyswitch25_10d315', 'current_position') | int %}
+            - "{% set r4 = state_attr('cover.rollade_4', 'current_position') | int %}
               {{ (r4 < 95) | iif((r4 < 20) | iif('🔒', '🪟'~r4~'%'), '🪟') }} Terrasse:/rollade_4,
               {{ ( states('sensor.torposition') | int > 0 ) | iif( '🚗' ~ states('sensor.torposition') | round(0) ~ '%' , '🔒' ) }} Tor:/tor,
               {{ ( states('sensor.torposition') | int > 0 ) | iif( '🚗', '🔒' ) }} Tortel:/torteil"

@@ -5,17 +5,17 @@
 utility_meter:
   shelly_rollade_4_d:
     unique_id: shelly_rollade_4_d
-    source: sensor.shellyswitch25_10d315_energy
+    source: sensor.rollade_4_energy
     cycle: daily
 
   shelly_rollade_4_m:
     unique_id: shelly_rollade_4_m
-    source: sensor.shellyswitch25_10d315_energy
+    source: sensor.rollade_4_energy
     cycle: monthly
 
   shelly_rollade_4_y:
     unique_id: shelly_rollade_4_y
-    source: sensor.shellyswitch25_10d315_energy
+    source: sensor.rollade_4_energy
     cycle: yearly
 
 # Automation ########################################################
@@ -37,11 +37,11 @@ automation:
     actions:
       - action: script.cover_one_button
         data:
-          entity_id: shellyswitch25_10d315
+          entity_id: rollade_4
 
       - wait_for_trigger:
           - trigger: state
-            entity_id: cover.shellyswitch25_10d315
+            entity_id: cover.rollade_4
         timeout: "00:00:02"
         continue_on_timeout: true
 
@@ -49,18 +49,18 @@ automation:
         data:
           target: "{{ trigger.event.data.chat_id }}"
           message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
-          message: "🏡 {{ state_attr('cover.shellyswitch25_10d315', 'friendly_name') }} - {{ states('cover.shellyswitch25_10d315') }}"
+          message: "🏡 {{ state_attr('cover.rollade_4', 'friendly_name') }} - {{ states('cover.rollade_4') }}"
 
 # Customize #########################################################
 homeassistant:
   customize:
-    cover.shellyswitch25_10d315:
+    cover.rollade_4:
       friendly_name: Rollade Terrasse
-    sensor.shellyswitch25_10d315_power:
+    sensor.rollade_4_power:
       friendly_name: Leistung (Rollade Terrasse)
       icon: mdi:gauge
-    sensor.shellyswitch25_10d315_energy:
+    sensor.rollade_4_energy:
       friendly_name: Verbrauch (Rollade Terrasse)
-    binary_sensor.shellyswitch25_10d315_overheating:
+    binary_sensor.rollade_4_overheating:
       friendly_name: Überhitzen (Rollade Terrasse)
       icon: mdi:thermometer-alert
