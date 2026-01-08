@@ -1,6 +1,0 @@
-# Customize #################
-homeassistant:
-  customize:
-    switch.torteil:
-      friendly_name: Tor teilöffnen
-      icon: mdi:garage-open-variant
