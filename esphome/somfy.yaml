@@ -1,0 +1,372 @@
+substitutions:
+  # device_name: "Steba Humidifier"
+  name: "somfy"
+  friendly_name: "Somfy"
+  room: "Terrasse"
+  project_name: ""
+  project_version: "2026.01.0"
+  device_description: "Control Somfy covers with the ESP32-C6 Supermini"
+
+  c1_name: "Dach" # "Крыша"
+  c2_name: "Seite" # "Бок"
+  c3_name: "Links" # "Левая"
+  c4_name: "Rechts" # "Правая"
+  c5_name: "Terrasse" # "Терасса"
+
+  # Webserver credentials
+  web_username: !secret web_server_user
+  web_password: !secret web_server_password
+
+  # GPIO пины для управления (кнопки)
+  up_gpio: GPIO4
+  down_gpio: GPIO5
+  my_gpio: GPIO6
+  select_gpio: GPIO7
+
+  # GPIO пины для считывания состояния
+  l1_gpio: GPIO0 # cover 1
+  l2_gpio: GPIO1 # cover 2
+  l3_gpio: GPIO2 # cover 3
+  l4_gpio: GPIO3 # cover 4
+
+  # GPIO пины светодиодов
+  rgb_led_gpio: GPIO8
+  system_led_gpio: GPIO15
+
+globals:
+  - id: retry_count
+    type: int
+    restore_value: no
+    initial_value: '0'
+
+esphome:
+  name: "${name}"
+  friendly_name: "${friendly_name}"
+  comment: "${device_description}"
+
+esp32:
+  board: esp32-c6-devkitc-1
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret somfy
+
+ota:
+  - platform: esphome
+    id: my_ota
+    password: !secret ota_password # "0a2a51f485cc9ee08a96402b33b1470e"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "${name}"
+    password: !secret fallback_ap_password
+
+captive_portal:
+
+web_server:
+  id: esphome_web_server
+  version: 3
+  port: 80
+  auth:
+    username: "${web_username}"
+    password: "${web_password}"
+
+# Трекер для Bluetooth
+esp32_ble_tracker:
+  scan_parameters:
+    active: false
+
+# Включаем сам прокси
+bluetooth_proxy:
+  active: true
+
+# Бинарные сенсоры для считывания светодиодов
+binary_sensor:
+  - platform: gpio
+    id: led_1
+    pin: 
+      number: '${l1_gpio}'
+      mode: INPUT_PULLDOWN
+    filters:
+      - delayed_on: 10ms
+      - delayed_off: 10ms
+  - platform: gpio
+    id: led_2
+    pin: 
+      number: '${l2_gpio}'
+      mode: INPUT_PULLDOWN
+    filters:
+      - delayed_on: 10ms
+      - delayed_off: 10ms
+  - platform: gpio
+    id: led_3
+    pin: 
+      number: '${l3_gpio}'
+      mode: INPUT_PULLDOWN
+    filters:
+      - delayed_on: 10ms
+      - delayed_off: 10ms
+  - platform: gpio
+    id: led_4
+    pin: 
+      number: '${l4_gpio}'
+      mode: INPUT_PULLDOWN
+    filters:
+      - delayed_on: 10ms
+      - delayed_off: 10ms
+
+output:
+  - platform: gpio
+    pin: '${up_gpio}'
+    id: up_output
+  - platform: gpio
+    pin: '${down_gpio}'
+    id: down_output
+  - platform: gpio
+    pin: '${my_gpio}'
+    id: my_output
+  - platform: gpio
+    pin: '${select_gpio}'
+    id: select_output
+
+button:
+    # Restart the ESP
+  - platform: restart
+    name: "Restart"
+
+  - platform: output
+    name: "Hoch"
+    id: btn_up
+    output: up_output
+    internal: True
+    duration: 0.4s
+
+  - platform: output
+    name: "Runter"
+    id: btn_down
+    output: down_output
+    internal: True
+    duration: 0.4s
+
+  - platform: output
+    name: "My-Stop"
+    id: btn_stop
+    output: my_output
+    internal: True
+    duration: 0.4s
+
+  - platform: output
+    name: "Auswahl"
+    id: btn_select
+    output: select_output
+    internal: True
+    duration: 0.4s
+
+# Скрипт выбора канала
+script:
+  - id: execute_somfy_command
+    parameters:
+      target: int
+      action: int # 1: Up, 2: Down, 3: Stop
+    mode: restart
+    then:
+      - lambda: 'id(retry_count) = 0;'
+      - light.turn_on: system_led
+      
+      # --- ШАГ 1: ПОИСК КАНАЛА ---
+      - while:
+          condition:
+            lambda: |-
+              bool found = false;
+              if (target == 1) found = id(led_1).state;
+              else if (target == 2) found = id(led_2).state;
+              else if (target == 3) found = id(led_3).state;
+              else if (target == 4) found = id(led_4).state;
+              else if (target == 5) found = (id(led_1).state && id(led_2).state && id(led_3).state && id(led_4).state);
+              return (!found && id(retry_count) < 10);
+          then:
+            - button.press: btn_select
+            - lambda: 'id(retry_count) += 1;'
+            - delay: 0.8s
+
+      # --- ШАГ 2: ПРОВЕРКА УСПЕХА И НАЖАТИЕ ---
+      - lambda: |-
+          bool success = false;
+          if (target == 1) success = id(led_1).state;
+          else if (target == 2) success = id(led_2).state;
+          else if (target == 3) success = id(led_3).state;
+          else if (target == 4) success = id(led_4).state;
+          else if (target == 5) success = (id(led_1).state && id(led_2).state && id(led_3).state && id(led_4).state);
+
+          if (success) {
+            // Если канал найден, нажимаем нужную кнопку
+            if (action == 1) id(btn_up).press();
+            else if (action == 2) id(btn_down).press();
+            else if (action == 3) id(btn_stop).press();
+            
+            id(system_led).turn_off().perform();
+          } else {
+            // Если ошибка — ничего не нажимаем, только индикация
+            id(retry_count) = 10;
+            id(active_channel_text).publish_state("Ошибка: Канал не найден");
+            auto call = id(rgb_led).turn_on();
+            call.set_rgb(1.0, 0.0, 0.0);
+            call.set_effect("Error Flash");
+            call.perform();
+          }
+
+cover:
+  # Маркиза 1 (Dach)
+  - platform: time_based
+    name: "${c1_name}"
+    device_class: awning
+    icon: "mdi:storefront"
+    id: cover_1
+    has_built_in_endstop: True
+    open_action:
+      - script.execute: { id: execute_somfy_command, target: 1, action: 1 }
+    open_duration: 50s
+    close_action:
+      - script.execute: { id: execute_somfy_command, target: 1, action: 2 }
+    close_duration: 50s
+    stop_action:
+      - script.execute: { id: execute_somfy_command, target: 1, action: 3 }
+
+  # Маркиза 2 (Seite)
+  - platform: time_based
+    name: "${c2_name}"
+    device_class: awning
+    icon: "mdi:window-shutter"
+    id: cover_2
+    has_built_in_endstop: True
+    open_action:
+      - script.execute: { id: execute_somfy_command, target: 2, action: 1 }
+    open_duration: 28s
+    close_action:
+      - script.execute: { id: execute_somfy_command, target: 2, action: 2 }
+    close_duration: 26s
+    stop_action:
+      - script.execute: { id: execute_somfy_command, target: 2, action: 3 }
+
+  # Маркиза 3 (Links)
+  - platform: time_based
+    name: "${c3_name}"
+    device_class: awning
+    icon: "mdi:window-shutter"
+    id: cover_3
+    has_built_in_endstop: True
+    open_action:
+      - script.execute: { id: execute_somfy_command, target: 3, action: 1 }
+    open_duration: 28s
+    close_action:
+      - script.execute: { id: execute_somfy_command, target: 3, action: 2 }
+    close_duration: 26s
+    stop_action:
+      - script.execute: { id: execute_somfy_command, target: 3, action: 3 }
+
+  # Маркиза 4 (Rechts)
+  - platform: time_based
+    name: "${c4_name}"
+    device_class: awning
+    icon: "mdi:window-shutter"
+    id: cover_4
+    has_built_in_endstop: True
+    open_action:
+      - script.execute: { id: execute_somfy_command, target: 4, action: 1 }
+    open_duration: 28s
+    close_action:
+      - script.execute: { id: execute_somfy_command, target: 4, action: 2 }
+    close_duration: 26s
+    stop_action:
+      - script.execute: { id: execute_somfy_command, target: 4, action: 3 }
+
+  # Группа Все (Alle) - Канал 5
+  - platform: time_based
+    name: "${c5_name}"
+    device_class: awning
+    icon: "mdi:group"
+    id: cover_all
+    has_built_in_endstop: True
+    open_action:
+      - script.execute: { id: execute_somfy_command, target: 5, action: 1 }
+    open_duration: 50s
+    close_action:
+      - script.execute: { id: execute_somfy_command, target: 5, action: 2 }
+    close_duration: 50s
+    stop_action:
+      - script.execute: { id: execute_somfy_command, target: 5, action: 3 }
+
+# Настройка RGB светодиода (обычно это WS2812 на C6 Super Mini)
+light:
+  - platform: esp32_rmt_led_strip
+    id: rgb_led
+    pin: '${rgb_led_gpio}'
+    num_leds: 1
+    chipset: ws2812
+    rgb_order: GRB
+    name: "Статус"
+    restore_mode: ALWAYS_OFF
+    effects:
+      - pulse:
+          name: "Error Flash"
+          transition_length: 100ms
+          update_interval: 500ms
+
+  # Обычный зелёный LED на плате
+  - platform: status_led
+    id: system_led
+    pin: '${system_led_gpio}'
+
+text_sensor:
+  - platform: template
+    name: "Aktiver Kanal"
+    id: active_channel_text
+    icon: "mdi:remote-tv"
+    # Убираем update_interval, чтобы сенсор обновлялся мгновенно только по событиям
+    lambda: |-
+      if (id(retry_count) >= 10) {
+        return {"Kanal nicht gefunden"};
+      }
+      
+      if (id(led_1).state && id(led_2).state && id(led_3).state && id(led_4).state) {
+        return {"Alle (Все)"};
+      } else if (id(led_1).state) {
+        return {"Dach (Крыша)"};
+      } else if (id(led_2).state) {
+        return {"Seite (Бок)"};
+      } else if (id(led_3).state) {
+        return {"Links (Лево)"};
+      } else if (id(led_4).state) {
+        return {"Rechts (Право)"};
+      } else {
+        return {"Ожидание / Сон"};
+      }
+
+    on_value:
+      then:
+        - lambda: |-
+            auto call = id(rgb_led).turn_on();
+            // Логика цвета
+            if (x == "Ошибка: Канал не найден") { 
+              call.set_rgb(1.0, 0.0, 0.0); // Ярко-красный
+              call.set_effect("Error Flash"); // Включаем мигание
+            } else {
+              call.set_effect("none"); // Выключаем мигание, если оно было
+              if (x == "Dach (Крыша)") call.set_rgb(1.0, 0.0, 0.0);
+              else if (x == "Seite (Бок)") call.set_rgb(0.0, 1.0, 0.0);
+              else if (x == "Links (Лево)") call.set_rgb(0.0, 0.0, 1.0);
+              else if (x == "Rechts (Право)") call.set_rgb(1.0, 0.5, 0.0);
+              else if (x == "Alle (Все)") call.set_rgb(1.0, 1.0, 1.0);
+              else call.set_rgb(0.1, 0.0, 0.1); // Сон
+            }
+            call.perform();
