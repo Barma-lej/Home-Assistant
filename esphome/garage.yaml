@@ -1,0 +1,365 @@
+# Garagentorsteuerung
+#
+# Garagentorsteuerung mit der Positionskontrolle von Garagentoren
+# © Barma-lej
+#
+
+substitutions:
+  name: garage
+  area: Garage
+  friendly_name: Tor
+  project_version: "2026.01.0"
+  device_description: "Garagentorsteuerung mit der Positionskontrolle von Garagentoren"
+
+  button_gate: "Tor"
+  button_airing: "Lüftung"
+
+  binary_airing: "Lüftung"
+  binary_opened: "Geöffnet"
+
+  sensor_position: "Position"
+  sensor_raw_distance: "RAW Distanz"
+  sensor_distance: "Distanz"
+  sensor_range_status_value: "Bereichsstatuswert"
+  sensor_range_status: "Bereichsstatus"
+
+  # Webserver credentials
+  web_username: !secret web_server_user
+  web_password: !secret web_server_password
+
+  # Define the GPIO pins
+  relay1_pin: GPIO16
+  relay2_pin: GPIO17
+  status_led: GPIO23
+  optocoupler_pin: GPIO32
+
+  # Laser Ranging Sensor Module TOF400C-VL53L1X
+  sda_pin: GPIO21 # TOF400C-VL53L1X PIN 3
+  scl_pin: GPIO22 # TOF400C-VL53L1X PIN 4
+
+
+external_components:
+  - source: github://mrtoy-me/esphome-vl53l1x@main
+    components: [ vl53l1x ]
+    refresh: 0s
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  comment: ${device_description}
+  area: ${area}
+  # project:
+  #   name: "barma-lej.${name}"
+  #   version: ${project_version}
+  # on_boot:
+  #   - lambda: |-
+  #       id(my_ota).set_auth_password("");
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret garage_api
+
+ota:
+  - platform: esphome
+    # id: my_ota
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Garage Fallback Hotspot"
+    password: !secret fallback_ap_password
+
+captive_portal:
+
+web_server:
+  id: esphome_web_server
+  version: 3
+  port: 80
+  auth:
+    username: '${web_username}'
+    password: '${web_password}'
+
+# https://esphome.io/components/i2c.html
+i2c:
+  - id: bus_a
+    sda: '${sda_pin}'
+    scl: '${scl_pin}'
+    scan: true
+    # VL53L1X, 0x29
+    # Higher data rates reduce the time required for read/write operations, which
+    # should prevent the "component took a long time for an operation" warning in the logs.
+    frequency: 400kHz
+
+# Example configuration entry
+output:
+  - platform: gpio
+    pin: ${relay1_pin}
+    id: relay1
+  - platform: gpio
+    pin: ${relay2_pin}
+    id: relay2
+
+button:
+  # Открываем/закрываем гараж
+  - platform: output
+    id: button_gate
+    name: ${button_gate}
+    output: relay1
+    duration: 800ms
+    icon: mdi:garage-variant
+    on_press:
+      then:
+        # Устанавливаем состояние binary_sensor binary_airing в OFF (false)
+        - binary_sensor.template.publish:
+            id: binary_airing
+            state: OFF
+
+  # Приоткрываем гараж
+  - platform: output
+    id: button_airing
+    name: ${button_airing}
+    output: relay2
+    duration: 800ms
+    icon: mdi:garage-open-variant
+    on_press:
+      then:
+        # Устанавливаем состояние binary_sensor binary_airing в ON (true)
+        - binary_sensor.template.publish:
+            id: binary_airing
+            state: ON
+
+  # Restart the ESP
+  - platform: restart
+    name: "Restart"
+    disabled_by_default: true
+
+  # Boot in Safe mode
+  - platform: safe_mode
+    name: "Safe Mode Boot"
+    entity_category: diagnostic
+    disabled_by_default: true
+
+binary_sensor:
+  # Optocoupler
+  # Gate is opened - True
+  - platform: gpio
+    id: end_stop_bottom
+    name: ${binary_opened}
+    device_class: garage_door
+    pin:
+      number: ${optocoupler_pin}
+      mode: INPUT_PULLUP
+      inverted: false
+    filters:
+      - delayed_on_off: 50ms
+    on_state:
+      - if:
+          condition:
+            binary_sensor.is_off: end_stop_bottom  # Ворота ЗАКРЫТЫ
+          then:
+            # Устанавливаем состояние binary_sensor binary_airing в OFF (false)
+            - binary_sensor.template.publish:
+                id: binary_airing
+                state: OFF
+            # Установка позиции сенсора pos_sensor на 0
+            - sensor.template.publish:
+                id: pos_sensor
+                state: 0
+
+
+  - platform: template
+    id: binary_airing
+    name: ${binary_airing}
+    device_class: running
+    trigger_on_initial_state: false
+
+sensor:
+  - platform: template
+    name: ${sensor_position}
+    id: pos_sensor
+    state_class: measurement
+    unit_of_measurement: "%"
+    accuracy_decimals: 0
+    # Этот сенсор обновляется пуш-уведомлением из vl53l1x ниже, 
+    # но можно оставить update_interval для страховки
+    update_interval: never
+
+  - platform: vl53l1x
+    distance_mode: long
+    update_interval: 1s
+    range_status:
+      id: range_status
+      name: ${sensor_range_status}
+      disabled_by_default: true
+      on_value:
+        then:
+          # 1. Обновляем дистанцию (текст/число) только если Range Status == 0
+          - sensor.template.publish:
+              id: distance
+              state: !lambda 'return (x == 0) ? id(raw_distance).state : NAN;'
+
+          # 2. Обновляем ПОЗИЦИЮ в %
+          - sensor.template.publish:
+              id: pos_sensor
+              state: !lambda |-
+                // Проверка валидности сенсора
+                if (x != 0) return NAN; 
+                
+                float current_dist = id(raw_distance).state;
+                
+                // 1. АППАРАТНЫЙ КОНЦЕВИК (приоритет)
+                // Если концевик замкнут -> точно 0%
+                if (!id(end_stop_bottom).state) {
+                  return 0.0;
+                }
+                
+                // 2. ЛОГИЧЕСКИЙ ФЛАГ ПРОВЕТРИВАНИЯ
+                // Если мы нажали кнопку проветривания, фиксируем 9%
+                if (id(binary_airing).state) {
+                   return 9.0;
+                }
+
+                // 3. МАТЕМАТИЧЕСКИЙ РАСЧЕТ ПО ЛАЗЕРУ
+                // Калибровка: 2630мм = 0%, 240мм = 100%
+                float max_dist = 2630.0; // Пол до датчика
+                float min_dist = 240.0;  // Ворота открыты
+                
+                if (current_dist >= 2600) { return 0.0; }   // Погрешность внизу
+                if (current_dist <= 250) { return 100.0; }  // Погрешность наверху
+
+                // Формула: (2630 - Текущая) / (2630 - 240) * 100
+                float calculated = ((max_dist - current_dist) / (max_dist - min_dist)) * 100.0;
+                
+                // Ограничиваем рамками 0-100
+                if (calculated < 0) return 0.0;
+                if (calculated > 100) return 100.0;
+                
+                return calculated;
+
+          # 3. Публикует текстовое описание Range Status
+          - text_sensor.template.publish:
+              id: range_value
+              state: !lambda |-
+                switch (int(x)) {
+                  case 0: return "Range Valid";
+                  case 1: return "Range valid, no wraparound check fail";
+                  case 2: return "Range valid, below minimum range threshold";
+                  case 3: return "Hardware or VCSEL fail";
+                  case 4: return "Signal fail (signal below threshold, too weak for valid measurement)";
+                  case 5: return "Out of bounds fail (nothing detected in range typically when target is at or more than maximum range)";
+                  case 6: return "Sigma fail (standard deviation is above threshold indicating poor measurement repeatability)";
+                  case 7: return "Wrap target fail (target is very reflective and is more than than maximum range)";
+                  case 8: return "Minimum range fail (target is below minimum detection threshold)";
+                  case 9: return "Undefined";
+                  default: return "Unknown Status";
+                }
+
+    distance:
+      id: raw_distance
+      name:  ${sensor_raw_distance}
+      disabled_by_default: true
+
+  - platform: template
+    id: distance
+    name: ${sensor_distance}
+    device_class: "distance"
+    state_class: "measurement"
+    unit_of_measurement: "mm"
+    accuracy_decimals: 0
+    # lambda: |-
+    #    if (id(range_status).state > 0) {
+    #      return NAN;
+    #    } else {
+    #      return id(raw_distance).state;
+    #    }
+    # update_interval: 1s
+
+text_sensor:
+  - platform: template
+    id: range_value
+    name: ${sensor_range_status_value}
+    disabled_by_default: true
+
+cover:
+  - platform: template
+    id: garage_door_cover
+    name: "${friendly_name}"
+    device_class: garage
+    has_position: true
+    assumed_state: false
+    # optimistic: false # Лучше убрать или поставить true, если позиция прыгает
+  
+    # Lambda для получения текущей позиции (0.0 = закрыто, 1.0 = открыто)
+    lambda: |-
+      if (id(pos_sensor).state > 100) return 1.0;
+      if (id(pos_sensor).state < 0) return 0.0;
+      return id(pos_sensor).state / 100.0;
+
+    # --- ДЕЙСТВИЯ КНОПОК ИНТЕРФЕЙСА ---
+    # Кнопка "Открыть" (стрелка вверх) (relay1)
+    open_action:
+      - if:
+          condition:
+            lambda: 'return id(pos_sensor).state < 99.0;' # Не нажимать, если уже открыто
+          then:
+            - button.press: button_gate
+      - binary_sensor.template.publish:
+          id: binary_airing
+          state: OFF
+
+    # Кнопка "Закрыть" (стрелка вниз) (relay1)
+    close_action:
+      - if:
+          condition:
+            binary_sensor.is_on: end_stop_bottom # ON = Ворота открыты
+          then:
+            - button.press: button_gate
+      - binary_sensor.template.publish:
+          id: binary_airing
+          state: OFF
+
+    # Кнопка "Стоп" (relay1)
+    stop_action:
+      - button.press: button_gate
+    
+    # Установка позиции (0.0-1.0)
+    # pos переменная содержит требуемую позицию
+    position_action:
+      - lambda: |-
+          // 1. ЗАКРЫТЬ (Слайдер влево < 5%)
+          if (pos < 0.05) {
+            // Нажимаем кнопку, только если ворота не закрыты
+            if (id(end_stop_bottom).state) { 
+               id(button_gate).press();
+            }
+            id(binary_airing).publish_state(false);
+          } 
+          // 2. ОТКРЫТЬ ПОЛНОСТЬЮ (Слайдер вправо > 95%)
+          else if (pos > 0.95) {
+            // Нажимаем, только если еще не открыты полностью
+            if (id(pos_sensor).state < 95.0) {
+               id(button_gate).press();
+            }
+            id(binary_airing).publish_state(false);
+          } 
+          // 3. ПРОВЕТРИВАНИЕ (Слайдер в зоне 10-20%)
+          else if (pos > 0.10 && pos < 0.20) {
+            // !!! ВАЖНО: Используем кнопку button_airing (Relay 2), а не gate
+            id(button_airing).press();
+            
+            // Устанавливаем флаг, чтобы pos_sensor показал 9%
+            id(binary_airing).publish_state(true);
+          }
