@@ -95,8 +95,6 @@ recorder:
       - sensor.date
       - sensor.time
       - sensor.date_time
-      - sensor.solar_angle
-      - sensor.sunrise
       - sensor.only_text
 
 # Logbook #############################
@@ -110,8 +108,6 @@ logbook:
       - sensor.date
       - sensor.time
       - sensor.date_time
-      - sensor.solar_angle
-      - sensor.sunrise
       - sensor.only_text
 
 # Enables support for tracking state changes over time
