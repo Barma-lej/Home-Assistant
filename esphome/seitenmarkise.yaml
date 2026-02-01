@@ -1,0 +1,152 @@
+# Somfy Markise control
+#
+# Control Somfy markise with the 
+# ESP-12F_Relay_X2 and Somfy Sender io (1822609)
+# © Barma-lej
+#
+substitutions:
+  device_name: "seitenmarkise"
+  friendly_name: Seitenmarkise
+  room: "Garten"
+  project_version: "2023.11.0"
+  device_description: "Control Somfy markise with the ESP-12F_Relay_X2 and Somfy Sender io (1822609)"
+
+  # Define the GPIO pins
+  relay1_pin: GPIO4
+  relay2_pin: GPIO5
+  status_led_pin: GPIO2
+
+  # Webserver credentials ⬇ #
+  web_username: !secret web_server_user
+  web_password: !secret web_server_password
+
+esphome:
+  name: '${device_name}'
+  comment: '${device_description}'
+  name_add_mac_suffix: false
+  project:
+    name: "Barma-lej.seitenmarkise"
+    version: "${project_version}"
+
+# Choose the right Platform
+# esp32: https://esphome.io/components/esp32.html
+# esp8266: https://esphome.io/components/esp8266.html
+esp8266:
+  board: esp12e
+
+# Enable logging
+logger:
+
+# WiFi credentials
+wifi:
+  ssid: !secret wlan_ssid
+  password: !secret wlan_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: '${device_name}'
+    password: "!secret fallback_ap_password"
+
+captive_portal:
+
+# Enable improv over serial
+improv_serial:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret seitenmarkise_api
+
+safe_mode:
+  num_attempts: 5
+  reboot_timeout: 10min
+
+web_server:
+  id: esphome_web_server
+  version: 3
+  port: 80
+  auth:
+    username: '${web_username}'
+    password: '${web_password}'
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+  - platform: web_server
+
+# Use the blue LED in the device as a status LED, which will blink if there are warnings (slow) or errors (fast)
+status_led:
+  pin:
+    number: ${status_led_pin}
+    inverted: True
+
+button:
+  # Restart the ESP
+  - platform: restart
+    name: "${friendly_name} Restart"
+  # Boot in Safe mode
+  - platform: safe_mode
+    name: "${friendly_name} Safe Mode Boot"
+    entity_category: diagnostic
+
+# x2 relay outputs, exposed as switches in Home Assistant
+switch:
+  - platform: gpio
+    pin: ${relay1_pin}
+    name: Relay1
+    interlock: &interlock_group [relay1, relay2]
+    id: relay1
+    internal: true
+  - platform: gpio
+    pin: ${relay2_pin}
+    name: Relay2
+    interlock: *interlock_group
+    id: relay2
+    internal: true
+
+  - platform: template
+    name: "Öffnen ${friendly_name}"
+    icon: "mdi:wave-arrow-up"
+    id: open_markise
+    internal: true
+    turn_on_action:
+      - switch.turn_on: relay1
+      - delay: 800ms
+      - switch.turn_off: relay1
+
+  - platform: template
+    name: "Schlissen ${friendly_name}"
+    icon: "mdi:wave-arrow-down"
+    id: close_markise
+    internal: true
+    turn_on_action:
+      - switch.turn_on: relay2
+      - delay: 800ms
+      - switch.turn_off: relay2
+
+  - platform: template
+    name: "Stop ${friendly_name}"
+    icon: "mdi:wave"
+    id: stop_markise
+    internal: true
+    turn_on_action:
+      - switch.turn_on: relay1
+      - delay: 100ms
+      - switch.turn_off: relay1
+
+cover:
+- platform: time_based
+  name: "${friendly_name}"
+  device_class: shutter
+  icon: "mdi:window-shutter"
+  id: seitenmarkise
+  has_built_in_endstop: True
+  open_action:
+    - switch.turn_on: open_markise
+  open_duration: 28s
+  close_action:
+    - switch.turn_on: close_markise
+  close_duration: 26s
+  stop_action:
+    - switch.turn_on: stop_markise
+    # - switch.turn_off: close_markise
