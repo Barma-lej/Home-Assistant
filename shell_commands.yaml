@@ -6,5 +6,6 @@
 delete_file: "rm '{{ file_path }}'"
 # esphome_run: !secret cmd_esphome_run
 # esphome_stop: "pkill esphome"
-cam_convert: ffmpeg -i {{ file_in }} -c:v copy -c:a libmp3lame -b:a 128k -ar 44100 -ac 2 -q:a 0 {{ file_out }}
-cam_remove_file: rm {{ file_in }}
+# cam_convert: ffmpeg -i {{ file_in }} -c:v copy -c:a libmp3lame -b:a 128k -ar 44100 -ac 2 -q:a 0 {{ file_out }}
+repackage_video_faststart: ffmpeg -i "{{ file_in }}" -c:v copy -c:a copy -movflags +faststart "{{ file_out }}"
+# cam_remove_file: rm {{ file_in }}
