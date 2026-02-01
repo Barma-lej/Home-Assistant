@@ -1,12 +1,13 @@
-# Home Assistant Glow
+# Home Power Meter
 #
 # Read your electricity meter by means of the pulse LED on your 
 # meter, useful if you do not have a serial port (P1).
 # © Klaas Schoute
-#
+
 substitutions:
-  device_name: "home-assistant-glow"
-  friendly_name: Haus
+  name: "home-power-meter"
+  area: Wohnzimmer
+  friendly_name: "Home Power Meter"
   project_version: "4.2.3"
   device_description: "Measure your energy consumption with the pulse LED on your smart meter"
 
@@ -21,24 +22,22 @@ substitutions:
   web_password: !secret web_server_password
 
 esphome:
-  name: '${device_name}'
+  name: '${name}'
+  friendly_name: '${friendly_name}'
   comment: '${device_description}'
   # name_add_mac_suffix: true
   min_version: 2024.6.0
-  project:
-    name: "klaasnicolaas.home-assistant-glow"
-    version: "${project_version}"
+  # project:
+  #   name: "klaasnicolaas.home-assistant-glow"
+  #   version: "${project_version}"
 
-dashboard_import:
-  package_import_url: github://klaasnicolaas/home-assistant-glow/home_assistant_glow.yaml@main
+# dashboard_import:
+#   package_import_url: github://klaasnicolaas/home-assistant-glow/home_assistant_glow.yaml@main
 
-# Choose the right Platform
-# esp32: https://esphome.io/components/esp32.html
-# esp8266: https://esphome.io/components/esp8266.html
 esp32:
   board: esp32dev
   framework:
-    type: arduino
+    type: esp-idf
 
 # Enable logging
 logger:
@@ -53,7 +52,7 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: '${device_name}'
+    ssid: '${name}'
     password: "!secret fallback_ap_password"
 
 # In combination with the `ap` this allows the user
@@ -69,7 +68,7 @@ web_server:
     username: '${web_username}'
     password: '${web_password}'
 
-# OTA configuration #
+# OTA configuration
 ota:
   - platform: esphome
     id: ota_esphome
@@ -78,11 +77,11 @@ ota:
     id: ota_http_request
   - platform: web_server
 
-update:
-  - platform: http_request
-    id: update_http_request
-    name: Firmware Update
-    source: https://glow-energy.io/home-assistant-glow/manifest.json
+# update:
+#   - platform: http_request
+#     id: update_http_request
+#     name: Firmware Update
+#     source: https://glow-energy.io/home-assistant-glow/manifest.json
 
 http_request:
   timeout: 10s
@@ -91,6 +90,17 @@ http_request:
 safe_mode:
   num_attempts: 5
   reboot_timeout: 10min
+
+# Bluetooth proxy configuration
+# esp32_ble_tracker:
+#   scan_parameters:
+#     interval: 320ms  # Консервативные значения, чтобы не мешать pulse meter
+#     window: 30ms
+#     active: true
+
+# bluetooth_proxy:
+#   active: true
+#   connection_slots: 3  # Не больше 3 для избежания проблем с памятью
 
 # Pulse meter configuration #
 
@@ -102,7 +112,7 @@ api:
         - button.press:
             id: button_reset_total
   encryption:
-    key: !secret ha_glow_api
+    key: !secret home_power_meter_api
 
 number:
   # Select the correct pulse rate for your meter
@@ -132,12 +142,12 @@ number:
 button:
   # Restart the ESP
   - platform: restart
-    name: "Restart - Glow"
+    name: "Restart"
 
   # Reset the total energy entity
   - platform: template
     id: button_reset_total
-    name: "Reset - Total Energy"
+    name: "Reset Total Energy"
     on_press:
       - pulse_meter.set_total_pulses:
           id: sensor_energy_pulse_meter
@@ -146,13 +156,13 @@ button:
 sensor:
   # WiFi signal
   - platform: wifi_signal
-    name: "${friendly_name} - WiFi Signal"
+    name: "WiFi Signal"
     update_interval: 120s
 
   # Pulse meter
   - platform: pulse_meter
     id: sensor_energy_pulse_meter
-    name: '${friendly_name} - Power Consumption'
+    name: 'Power Consumption'
     # internal_filter_mode: PULSE
     unit_of_measurement: 'W'
     state_class: measurement
@@ -181,7 +191,7 @@ sensor:
 
     total:
       id: sensor_total_energy
-      name: '${friendly_name} - Total Energy'
+      name: 'Total Energy'
       unit_of_measurement: 'kWh'
       icon: mdi:circle-slice-3
       state_class: total_increasing
@@ -201,7 +211,7 @@ sensor:
   # Total day usage
   - platform: total_daily_energy
     id: sensor_total_daily_energy
-    name: '${friendly_name} - Daily Energy'
+    name: 'Daily Energy'
     power_id: sensor_energy_pulse_meter
     unit_of_measurement: 'kWh'
     icon: mdi:circle-slice-3
@@ -213,7 +223,7 @@ sensor:
       - multiply: 0.001
 
   - platform: uptime
-    name: '${friendly_name} - Uptime'
+    name: 'Uptime'
 
 output:
   # - platform: gpio
@@ -243,8 +253,8 @@ status_led:
 text_sensor:
   # Installed version
   - platform: template
-    id: glow_version
-    name: "Glow - Installed version"
+    id: pm_version
+    name: "Version"
     icon: "mdi:label-outline"
     entity_category: diagnostic
     lambda: |-
@@ -253,14 +263,14 @@ text_sensor:
   # ESPHome version
   - platform: version
     hide_timestamp: true
-    name: '${friendly_name} - ESPHome Version'
+    name: 'ESPHome Version'
   # IP address and connected SSID
   - platform: wifi_info
     ip_address:
-      name: '${friendly_name} - IP Address'
+      name: 'IP Address'
       icon: mdi:wifi
     ssid:
-      name: '${friendly_name} - Connected SSID'
+      name: 'Connected SSID'
       icon: mdi:wifi-strength-2
 
 # Enable time component to reset energy at midnight
@@ -268,3 +278,5 @@ text_sensor:
 time:
   - platform: homeassistant
     id: homeassistant_time
+
+    
