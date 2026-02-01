@@ -8,17 +8,17 @@ utility_meter:
 
   haus_energy_m:
     unique_id: haus_energy_m
-    source: sensor.haus_total_energy
+    source: sensor.home_power_meter_total_energy
     cycle: monthly
 
   haus_energy_y:
     unique_id: haus_energy_y
-    source: sensor.haus_total_energy
+    source: sensor.home_power_meter_total_energy
     cron: "0 0 1 5 *"
 
   haus_energy_t:
     unique_id: haus_energy_t
-    source: sensor.haus_total_energy
+    source: sensor.home_power_meter_total_energy
 
 # Customize #################
 homeassistant:
@@ -27,7 +27,7 @@ homeassistant:
       friendly_name: Leistung (Haus)
       icon: mdi:lightning-bolt
       device_class: power
-    sensor.haus_total_energy:
+    sensor.home_power_meter_total_energy:
       friendly_name: Verbrauch seit Einschaltung (Haus)
       # icon: mdi:counter
     sensor.haus_daily_energy:
