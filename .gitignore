@@ -44,11 +44,12 @@ addons
 custom_components
 community
 deps
-# esphome Settings in the folder
 manuals
 script
 tts
 unused
+__pycache__/
+**/__pycache__/
 
 # Ensure these YAML files are ignored, otherwise your secret data/credentials will leak.
 .HA_VERSION
