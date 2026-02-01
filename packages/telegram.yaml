@@ -12,30 +12,30 @@
 #       - !secret telegram_bot_veronika
 
 # Notify ############################################################
-notify:
-  - name: telegram_schick_home
-    platform: telegram
-    chat_id: !secret telegram_channel
+# notify:
+#   - name: telegram_schick_home
+#     platform: telegram
+#     chat_id: !secret telegram_channel
 
-  - name: telegram_bot_familie
-    platform: telegram
-    chat_id: !secret telegram_bot_familie
+#   - name: telegram_bot_familie
+#     platform: telegram
+#     chat_id: !secret telegram_bot_familie
 
-  - name: telegram_bot_anatolij
-    platform: telegram
-    chat_id: !secret telegram_bot_anatolij
+#   - name: telegram_bot_anatolij
+#     platform: telegram
+#     chat_id: !secret telegram_bot_anatolij
 
-  - name: telegram_bot_natalja
-    platform: telegram
-    chat_id: !secret telegram_bot_natalja
+#   - name: telegram_bot_natalja
+#     platform: telegram
+#     chat_id: !secret telegram_bot_natalja
 
-  - name: telegram_bot_kristina
-    platform: telegram
-    chat_id: !secret telegram_bot_kristina
+#   - name: telegram_bot_kristina
+#     platform: telegram
+#     chat_id: !secret telegram_bot_kristina
 
-  - name: telegram_bot_veronika
-    platform: telegram
-    chat_id: !secret telegram_bot_veronika
+#   - name: telegram_bot_veronika
+#     platform: telegram
+#     chat_id: !secret telegram_bot_veronika
 
 # Automation ########################################################
 automation:
