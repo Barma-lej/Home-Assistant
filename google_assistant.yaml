@@ -86,10 +86,10 @@ entity_config:
 
   # media_player.sony_bravia_kd55x8505b:
   # media_player.tv_gq75qn92catxzg:
-  media_player.sony_kd_55x8505b:
-    name: Sony
-    room: Kristina
-    expose: true
+  # media_player.sony_kd_55x8505b:
+  #   name: Sony
+  #   room: Kristina
+  #   expose: true
 
   group.ambientelight:
     name: Ambiente Licht
@@ -131,8 +131,15 @@ entity_config:
     room: Garten
     expose: true
 
-  # cover.tor:
-  #   name: Tor
+  cover.tor_tor:
+    name: Tor
+    aliases:
+      - tor
+    room: Garage
+    expose: true
+
+  # switch.tor:
+  #   name: Garage
   #   aliases:
   #     - garagentor
   #     - tor
@@ -141,18 +148,24 @@ entity_config:
   #   room: Garage
   #   expose: true
 
-  switch.tor:
+  # switch.torteil:
+  #   name: "Tor teilöffnen"
+  #   room: Garage
+  #   expose: true
+
+  button.tor_tor:
     name: Garage
     aliases:
       - garagentor
-      - tor
       - garage
       - ворота
     room: Garage
     expose: true
 
-  switch.torteil:
+  button.tor_luftung:
     name: "Tor teilöffnen"
+    aliases:
+      - lüftung
     room: Garage
     expose: true
 
