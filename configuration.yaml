@@ -109,30 +109,23 @@ recorder:
 
 # Logbook #############################
 logbook:
-  exclude:
-    domains:
-      - calendar
-      - weblink
-      - media_player  # Добавить
-    entities:
-      - sun.sun
-      - sensor.date
-      - sensor.time
-      - sensor.date_time
-      - sensor.only_text
-    entity_globs:
-      - sensor.weather_*
-      - sensor.*_rssi
+  # exclude:
+  #   domains:
+  #     - calendar
+  #     - weblink
+  #     - media_player  # Добавить
+  #   entities:
+  #     - sun.sun
+  #     - sensor.date
+  #     - sensor.time
+  #     - sensor.date_time
+  #     - sensor.only_text
+  #   entity_globs:
+  #     - sensor.weather_*
+  #     - sensor.*_rssi
 
 # Enables support for tracking state changes over time
 history:
-  exclude:
-    domains:
-      - updater
-      - camera  # История камер не нужна в UI
-    entity_globs:
-      - sensor.*_rssi
-      - binary_sensor.updater
 
 # TTS #################################
 tts:
