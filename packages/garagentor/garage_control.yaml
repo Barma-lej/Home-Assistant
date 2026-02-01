@@ -1,79 +1,20 @@
 # Garage
 # Control
 
-# Recorder
-recorder:
-  exclude:
-    entities:
-      - sensor.tor_esphome_version
-      - sensor.tor_uptime
-      - input_boolean.torteil
-
-# Logbook
-logbook:
-  exclude:
-    entities:
-      - sensor.tor_esphome_version
-      - sensor.tor_uptime
-      - input_boolean.torteil
-
-# Input
-input_boolean:
-  torteil:
-    name: "Tor Teiloffnung"
-    icon: mdi:garage-alert
-
 # Template Sensors
 template:
   - binary_sensor:
       - name: "Garage Open Too Long"
         unique_id: garage_open_too_long # Unique ID for Home Assistant
         state: >
-          {{ states('cover.tor') == 'open' and 
-            state_attr('cover.tor', 'current_position') | int(0) > 13 }}
+          {{ states('cover.tor_tor') == 'open' and 
+            state_attr('cover.tor_tor', 'current_position') | int(0) > 13 }}
         delay_on:
           minutes: 30 # Turns on after the condition is true for 30 minutes
         # Turns off as soon as the condition is false
 
 # Automations
 automation:
-  - id: torteiloffnung_on
-    alias: Garage - Torteiloffnung ON
-    triggers:
-      - trigger: state
-        entity_id: switch.torteil
-        to: "on"
-
-    conditions:
-      - condition: state
-        entity_id: input_boolean.torteil
-        state: "off"
-
-    actions:
-      - delay:
-          seconds: 2
-      - alias: ""
-        action: input_boolean.turn_on
-        data:
-          entity_id: input_boolean.torteil
-
-  #- id: 'torteil_off'
-  #  alias: Torteiloffnung OFF
-  #  description: ''
-  #  triggers:
-  #  - entity_id: binary_sensor.tor_geoffnet
-  #    trigger: state
-  #    to: 'on'
-  #  conditions:
-  #  - condition: state
-  #    entity_id: input_boolean.torteil
-  #    state: 'on'
-  #  actions:
-  #  - alias: ''
-  #    action: homeassistant.turn_off
-  #    data:
-  #      entity_id: input_boolean.torteil
-
   - id: telegram_tor
     alias: "Telegram - Tor"
     mode: restart
@@ -102,13 +43,13 @@ automation:
               - condition: template
                 value_template: "{{ trigger.event.data.command == '/tor' }}"
             sequence:
-              - action: switch.toggle
-                data:
-                  entity_id: switch.tor
+              - action: button.press
+                target:
+                  entity_id: button.tor_tor
 
               - wait_for_trigger:
                   - trigger: state
-                    entity_id: cover.tor
+                    entity_id: cover.tor_tor
                 timeout: "00:00:05"
                 continue_on_timeout: true
 
@@ -116,19 +57,19 @@ automation:
                 data:
                   target: "{{ trigger.event.data.chat_id }}"
                   message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
-                  message: "{{ state_attr('switch.tor', 'friendly_name') }} - {{ state_attr('cover.tor', 'current_position') }}%"
+                  message: "{{ state_attr('button.tor_tor', 'friendly_name') }} - {{ state_attr('cover.tor_tor', 'current_position') }}%"
 
           - conditions:
               - condition: template
                 value_template: "{{ trigger.event.data.command == '/torteil' }}"
             sequence:
-              - action: switch.toggle
-                data:
-                  entity_id: switch.torteil
+              - action: button.press
+                target:
+                  entity_id: button.tor_luftung
 
               - wait_for_trigger:
                   - trigger: state
-                    entity_id: cover.tor
+                    entity_id: cover.tor_tor
                 timeout: "00:00:05"
                 continue_on_timeout: true
 
@@ -136,7 +77,7 @@ automation:
                 data:
                   target: "{{ trigger.event.data.chat_id }}"
                   message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
-                  message: "{{ state_attr('switch.torteil', 'friendly_name') }} - {{ state_attr('cover.tor', 'current_position') }}%"
+                  message: "{{ state_attr('button.tor_luftung', 'friendly_name') }} - {{ state_attr('cover.tor_tor', 'current_position') }}%"
 
   - id: garage_auto_close
     alias: "Garage - Autoschließen"
@@ -171,7 +112,7 @@ automation:
 
     actions:
       - variables:
-          initial_pos: "{{ state_attr('cover.tor', 'current_position') | int }}"
+          initial_pos: "{{ state_attr('cover.tor_tor', 'current_position') | int }}"
 
       - action: notify.telegram_schick_home
         data:
@@ -188,7 +129,7 @@ automation:
                 - conditions:
                     - condition: template
                       value_template: >
-                        {% set current_pos = state_attr('cover.tor', 'current_position') | int(0) %}
+                        {% set current_pos = state_attr('cover.tor_tor', 'current_position') | int(0) %}
                         {{ (current_pos - initial_pos) | abs > 10 }}
                   sequence:
                     - action: notify.telegram_schick_home
@@ -213,10 +154,10 @@ automation:
       # Финальная проверка перед закрытием (на случай, если состояние изменилось или отмена сработала в последний момент)
       - condition: template
         value_template: >
-          {% set current_pos = state_attr('cover.tor', 'current_position') | int(0) %}
+          {% set current_pos = state_attr('cover.tor_tor', 'current_position') | int(0) %}
           {{ (current_pos - initial_pos) | abs <= 10 }}
       - condition: template # Убедимся, что ворота все еще открыты и соответствуют условию
-        value_template: "{{ states('cover.tor') == 'open' and state_attr('cover.tor', 'current_position') | int(0) > 13 }}"
+        value_template: "{{ states('cover.tor_tor') == 'open' and state_attr('cover.tor_tor', 'current_position') | int(0) > 13 }}"
 
       - action: notify.telegram_schick_home
         data:
@@ -225,16 +166,17 @@ automation:
 
       # Попытка 1
       - alias: "Закрытие гаража - Попытка 1"
-        action: switch.toggle
+        action: button.press
         target:
-          entity_id: switch.tor
+          entity_id: button.tor_tor
+
       - delay:
           seconds: 3 # Дать время на реакцию и обновление состояния
 
       - choose:
           # Успех: ворота закрываются или уже закрыты
           - conditions:
-              - "{{ states('cover.tor') == 'closing' or states('cover.tor') == 'closed' }}"
+              - "{{ states('cover.tor_tor') == 'closing' or states('cover.tor_tor') == 'closed' }}"
             sequence:
               - action: notify.telegram_schick_home
                 data:
@@ -242,26 +184,26 @@ automation:
                   message: "Ворота закрываются/закрыты после 1-й команды."
           # Неудача: ворота открываются или все еще открыты (остановлены)
           - conditions:
-              - "{{ states('cover.tor') == 'opening' or states('cover.tor') == 'open' }}"
+              - "{{ states('cover.tor_tor') == 'opening' or states('cover.tor_tor') == 'open' }}"
             sequence:
               - action: notify.telegram_schick_home
                 data:
                   title: "🚗Гараж"
-                  message: "После 1-й команды, ворота {{ states('cover.tor') }}. Отправляю 2-ю команду..."
+                  message: "После 1-й команды, ворота {{ states('cover.tor_tor') }}. Отправляю 2-ю команду..."
               # Попытка 2:
               # Если было 'opening', это будет 'stop'.
               # Если было 'open' (stopped), это должно быть 'close'.
               - alias: "Закрытие гаража - Попытка 2"
-                action: switch.toggle
+                action: button.press
                 target:
-                  entity_id: switch.tor
+                  entity_id: button.tor_tor
               - delay:
                   seconds: 3
 
               - choose:
                   # Успех со 2-й попытки
                   - conditions:
-                      - "{{ states('cover.tor') == 'closing' or states('cover.tor') == 'closed' }}"
+                      - "{{ states('cover.tor_tor') == 'closing' or states('cover.tor_tor') == 'closed' }}"
                     sequence:
                       - action: notify.telegram_schick_home
                         data:
@@ -269,39 +211,39 @@ automation:
                           message: "Ворота закрываются/закрыты после 2-й команды."
                   # Неудача: ворота все еще открываются, или открыты (остановлены) после 2-й попытки
                   - conditions:
-                      - "{{ states('cover.tor') == 'opening' or states('cover.tor') == 'open' }}"
+                      - "{{ states('cover.tor_tor') == 'opening' or states('cover.tor_tor') == 'open' }}"
                     sequence:
                       - action: notify.telegram_schick_home
                         data:
                           title: "🚗Гараж"
-                          message: "После 2-й команды, ворота {{ states('cover.tor') }}. Отправляю 3-ю команду..."
+                          message: "После 2-й команды, ворота {{ states('cover.tor_tor') }}. Отправляю 3-ю команду..."
                       # Попытка 3:
                       # Если последовательность была: open -> stop -> (эта команда должна быть close)
                       - alias: "Закрытие гаража - Попытка 3"
-                        action: switch.toggle
+                        action: button.press
                         target:
-                          entity_id: switch.tor
+                          entity_id: button.tor_tor
                       - delay:
                           seconds: 3 # Дать время на реакцию
                       - action: notify.telegram_schick_home
                         data:
                           title: "🚗Гараж"
-                          message: "3-я команда отправлена. Текущее состояние: {{ states('cover.tor') }}. Ожидаю полного закрытия."
+                          message: "3-я команда отправлена. Текущее состояние: {{ states('cover.tor_tor') }}. Ожидаю полного закрытия."
                 default: # Неожиданное состояние после 2-й попытки
                   - action: notify.telegram_schick_home
                     data:
                       title: "🚗Гараж - Ошибка"
-                      message: "Неожиданное состояние ворот {{ states('cover.tor') }} после 2-й попытки закрытия."
+                      message: "Неожиданное состояние ворот {{ states('cover.tor_tor') }} после 2-й попытки закрытия."
         default: # Неожиданное состояние после 1-й попытки
           - action: notify.telegram_schick_home
             data:
               title: "🚗Гараж - Ошибка"
-              message: "Неожиданное состояние ворот {{ states('cover.tor') }} после 1-й попытки закрытия."
+              message: "Неожиданное состояние ворот {{ states('cover.tor_tor') }} после 1-й попытки закрытия."
 
-      # Ожидание закрытия ворот (мониторим cover.tor)
+      # Ожидание закрытия ворот (мониторим cover.tor_tor)
       - wait_for_trigger:
           - trigger: state
-            entity_id: cover.tor
+            entity_id: cover.tor_tor
             to: "closed"
         timeout:
           minutes: 2 # Таймаут ожидания закрытия (настройте под свои ворота)
@@ -309,7 +251,7 @@ automation:
 
       # Уведомление о результате
       - variables:
-          garage_closed_successfully: "{{ wait.trigger is not none and states('cover.tor') == 'closed' }}"
+          garage_closed_successfully: "{{ wait.trigger is not none and states('cover.tor_tor') == 'closed' }}"
       - action: notify.telegram_schick_home
         data:
           title: "🚗Гараж"
@@ -317,14 +259,5 @@ automation:
             {% if garage_closed_successfully %}
               Гараж успешно закрыт автоматически.
             {% else %}
-              Гараж не закрылся (состояние: {{ states('cover.tor') }}, позиция: {{ state_attr('cover.tor', 'current_position') }}%) в течение 2 минут после команды автоматического закрытия.
+              Гараж не закрылся (состояние: {{ states('cover.tor_tor') }}, позиция: {{ state_attr('cover.tor_tor', 'current_position') }}%) в течение 2 минут после команды автоматического закрытия.
             {% endif %}
-
-# Customize
-homeassistant:
-  customize:
-    # Sensors
-    sensor.tor_wifi_signal:
-      unit_of_measurement: "dBm"
-    cover.tor:
-      icon: mdi:garage
