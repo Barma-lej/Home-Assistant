@@ -87,7 +87,7 @@ automation:
           - conditions:
               - "{{ is_video }}"
             sequence:
-              - action: shell_command.cam_convert
+              - action: shell_command.repackage_video_faststart
                 data:
                   file_in: "{{ file_path }}"
                   file_out: "{{ file_path[:-4] }}e.mp4"
@@ -96,20 +96,16 @@ automation:
           - conditions:
               - "{{ is_converted_video }}"
             sequence:
-              - action: notify.telegram_schick_home
+              - action: telegram_bot.send_video
                 data:
-                  title: "{{ camera_info.name }}"
-                  message: "Bewegung erkannt!"
-                  data:
-                    video:
-                      - file: "{{ file_path }}"
-                        caption: "{{ camera_info.icon }} *{{ camera_info.name }}*"
-                        # timeout: 1000
+                  target: !secret telegram_channel
+                  file: "{{ file_path }}"
+                  caption: "{{ camera_info.icon }} *{{ camera_info.name }}*"
 
               # Удаляем оригинальный файл после отправки
-              - action: shell_command.cam_remove_file
+              - action: shell_command.delete_file
                 data:
-                  file_in: "{{ file_path[:-5] }}.mp4"
+                  file_path: "{{ file_path[:-5] }}.mp4"
 
               # AI анализ и уведомление для видео с промптом
               - if:
@@ -143,14 +139,11 @@ automation:
           - conditions:
               - "{{ is_image }}"
             sequence:
-              - action: notify.telegram_schick_home
+              - action: telegram_bot.send_photo
                 data:
-                  title: "{{ camera_info.name }}"
-                  message: "Bewegung erkannt!"
-                  data:
-                    photo:
-                      - file: "{{ file_path }}"
-                        caption: "{{ camera_info.icon }} *{{ camera_info.name }}*"
+                  target: !secret telegram_channel
+                  file: "{{ file_path }}"
+                  caption: "{{ camera_info.icon }} *{{ camera_info.name }}*"
 
               # AI анализ и уведомление для изображения с промптом
               - if:
