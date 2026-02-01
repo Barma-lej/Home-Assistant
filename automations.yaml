@@ -25,10 +25,10 @@
       entity_id: cover.rolladen
       position: 100
     action: cover.set_cover_position
-  - data:
-      message: Rolladen geöffnet
-      title: "\U0001F53C Rolladen"
-    action: notify.telegram_schick_home
+  - action: telegram_bot.send_message
+    metadata: {}
+    data:
+      message: "\U0001F53C Rolladen geöffnet"
   mode: single
 - id: rolladen_zu
   alias: Rolladen - Zu
@@ -43,10 +43,10 @@
       entity_id: cover.rolladen
       position: 0
     action: cover.set_cover_position
-  - data:
-      message: Rolladen geschlossen
-      title: "\U0001F53D Rolladen"
-    action: notify.telegram_schick_home
+  - action: telegram_bot.send_message
+    metadata: {}
+    data:
+      message: \U0001F53D Rolladen geschlossen
   mode: single
 - id: garagenlicht_einschalten
   alias: Garage - Licht einschalten
@@ -357,20 +357,18 @@
       filename: /config/www/screenshots/3dprinter.jpg
     target:
       entity_id: camera.ender_3_s1_pro_sony
-  - action: notify.telegram_schick_home
+  - action: telegram_bot.send_photo
+    metadata: {}
     data:
-      message: "\U0001F3ED 3D Druck ist fertig"
-      data:
-        photo:
-        - file: /config/www/screenshots/3dprinter.jpg
-          caption: "\U0001F3ED 3D Druck ist fertig"
-  - action: notify.telegram_schick_home
+      verify_ssl: true
+      file: /config/www/screenshots/3dprinter.jpg
+      caption: \U0001F3ED 3D Druck ist fertig
+  - action: telegram_bot.send_photo
+    metadata: {}
     data:
-      message: "\U0001F3ED 3D Druck ist fertig"
-      data:
-        photo:
-        - url: '{{ state_attr(''sensor.ender_3_s1_pro_thumbnail'',''url'') }}'
-          caption: "\U0001F3ED 3D Druck ist fertig"
+      verify_ssl: true
+      url: '{{ state_attr("sensor.ender_3_s1_pro_thumbnail","url") }}'
+      caption: \U0001F3ED 3D Druck ist fertig
     enabled: false
   - wait_for_trigger:
     - trigger: numeric_state
@@ -392,9 +390,10 @@
       data: {}
       target:
         entity_id: switch.tuyaplug1
-    - action: notify.telegram_schick_home
+    - action: telegram_bot.send_message
+      metadata: {}
       data:
-        message: "\U0001F3ED 3D Drucker ist ausgeschaltet"
+        message: \U0001F3ED 3D Drucker ist ausgeschaltet
     enabled: true
   mode: single
 - id: '1674336725023'
@@ -406,7 +405,7 @@
       garbage_sensor_1: sensor.restabfall
       garbage_sensor_2: sensor.leichtverpackungen
       garbage_sensor_3: sensor.papier
-      notifier: notify.telegram_schick_home
+      notifier: telegram_bot.send_message
       day_offset: '1'
       reminder_time: '18:20:00'
       reminder_message: 'Folgender Müll wird morgen abgeholt: '
