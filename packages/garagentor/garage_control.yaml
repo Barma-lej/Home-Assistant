@@ -251,12 +251,12 @@ automation:
       # Уведомление о результате
       - variables:
           garage_closed_successfully: "{{ wait.trigger is not none and states('cover.tor_tor') == 'closed' }}"
-      - action: notify.telegram_schick_home
+      - action: telegram_bot.send_message
         data:
-          title: "🚗Гараж"
+          target: !secret telegram_channel
           message: >
             {% if garage_closed_successfully %}
-              Гараж успешно закрыт автоматически.
+              🚗Гараж успешно закрыт автоматически.
             {% else %}
-              Гараж не закрылся (состояние: {{ states('cover.tor_tor') }}, позиция: {{ state_attr('cover.tor_tor', 'current_position') }}%) в течение 2 минут после команды автоматического закрытия.
+              🚗Гараж не закрылся (состояние: {{ states('cover.tor_tor') }}, позиция: {{ state_attr('cover.tor_tor', 'current_position') }}%) в течение 2 минут после команды автоматического закрытия.
             {% endif %}
