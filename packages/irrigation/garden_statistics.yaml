@@ -231,10 +231,10 @@ automation:
           action: "Start"
 
     actions:
-      - action: notify.telegram_schick_home
+      - action:   telegram_bot.send_message
         data:
-          title: 💦 Bewässerung
-          message: "{{ action }} *{{ trigger.from_state.attributes.friendly_name}}*"
+          target: !secret telegram_channel
+          message: "💦 Bewässerung {{ action }} *{{ trigger.from_state.attributes.friendly_name}}*"
 
 # Customize #########################################################
 homeassistant:

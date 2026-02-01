@@ -326,10 +326,10 @@ automation:
         - "{{ trigger.to_state.state != 'unavailable' }}"
 
     actions:
-      - action: notify.telegram_schick_home
+      - action: telegram_bot.send_message
         data:
-          title: 🐁 Robi
-          message: "{{ state_attr('vacuum.robi','status') }} <- {{ trigger.from_state.state }}"
+          target: !secret telegram_channel
+          message: "🐁 Robi - {{ state_attr('vacuum.robi','status') }} <- {{ trigger.from_state.state }}"
           # message: "{{ states('vacuum.robi') }}, {{ state_attr('vacuum.robi','status') }}, {{ trigger.to_state.state }} <- {{ trigger.from_state.state }}"
 
 # Küche oben links - Area: Süd, Ost, Nord, West [left, bottom, right, top]

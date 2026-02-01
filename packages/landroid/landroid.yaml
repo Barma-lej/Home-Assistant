@@ -22,10 +22,10 @@ automation:
         value_template: "{{ trigger.to_state.state != trigger.from_state.state }}"
 
     actions:
-      - action: notify.telegram_schick_home
+      - action:   telegram_bot.send_message
         data:
-          title: 🏎️ Lanroid M500
-          message: "*{{ trigger.to_state.state }}* <- {{ trigger.from_state.state }}"
+          target: !secret telegram_channel
+          message: "🏎️ Lanroid M500 - *{{ trigger.to_state.state }}* <- {{ trigger.from_state.state }}"
 
     #  - action: persistent_notification.create
     #    data:
@@ -48,10 +48,11 @@ automation:
         value_template: "{{ trigger.to_state.state != trigger.from_state.state }}"
 
     actions:
-      - action: notify.telegram_schick_home
+      - action:   telegram_bot.send_message
         data:
-          title: 🏎️ Lanroid M500
+          target: !secret telegram_channel
           message: >-
+            🏎️ Lanroid M500 Error -
             *{{ trigger.to_state.state }}: {{ states('sensor.mower_error') }}*
             <- {{ trigger.from_state.state }}: {{ states('sensor.mower_error') }}
           # *{{ trigger.to_state.state }}: {{ state_attr('vacuum.mower','error')['description'] }}*
