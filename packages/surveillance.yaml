@@ -62,9 +62,9 @@ automation:
       terrasse_prompt: !secret terrasse_prompt
 
       # Определяем иконку и название камеры один раз
-      camera_info: >
+      camera_info: >-
         {% if 'einfahrt' in folder_name %}
-          {{ {'icon': '🏠', 'name': 'Einfahrt', 'uid': einfahrt_uid, 'prompt': einfahrt_prompt} }}
+          {{ {'icon': '🏠', 'name': 'Einfahrt', 'uid': einfahrt_uid} }} {#, 'prompt': einfahrt_prompt} }} #}
         {% elif 'terrasse' in folder_name %}
           {{ {'icon': '🏡', 'name': 'Terrasse', 'uid': terrasse_uid} }}
         {% elif 'garage' in folder_name %}
@@ -74,7 +74,7 @@ automation:
         {% endif %}
 
       # Reolink intent URI для открытия приложения
-      reolink_intent_uri: >
+      reolink_intent_uri: >-
         {% if camera_info.uid != null %}
           intent:#Intent;launchFlags=0x14000000;component=com.mcu.reolink/com.android.bc.login.WelcomeActivity;S.UID={{ camera_info.uid }};S.ALMTIME={{now().isoformat()}};S.ALMNAME=Detection;S.DEVNAME=DontCare;S.ALMTYPE=PEOPLE;S.ALMCHN=1;end
         {% else %}
@@ -104,7 +104,7 @@ automation:
                     video:
                       - file: "{{ file_path }}"
                         caption: "{{ camera_info.icon }} *{{ camera_info.name }}*"
-                        timeout: 1000
+                        # timeout: 1000
 
               # Удаляем оригинальный файл после отправки
               - action: shell_command.cam_remove_file
@@ -117,13 +117,15 @@ automation:
                 then:
                   - action: ai_task.generate_data
                     data:
-                      prompt: "{{ camera_info.prompt }} {{ common_prompt }}"
-                      filenames:
-                        - "{{ file_path }}"
+                      task_name: "{{ this.entity_id }}"
+                      instructions: "{{ camera_info.prompt }} {{ common_prompt }}"
+                      attachments:
+                        media_content_id: media-source://media_source/nuc{{ file_path[16:] }}
+                        media_content_type: video/mp4
                     response_variable: response
                   - action: notify.mobile_app_as25
                     data:
-                      message: "{{ response.text }}"
+                      message: "{{ response.data }}"
                       title: "{{ camera_info.name }}"
                       data:
                         video: "/media/nuc{{ file_path[16:] }}"
@@ -156,13 +158,16 @@ automation:
                 then:
                   - action: ai_task.generate_data
                     data:
-                      prompt: "{{ camera_info.prompt }} {{ common_prompt }}"
-                      filenames:
-                        - "{{ file_path }}"
+                      task_name: "{{ this.entity_id }}"
+                      instructions: "{{ camera_info.prompt }} {{ common_prompt }}"
+                      attachments:
+                        media_content_id: media-source://media_source/nuc{{ file_path[16:] }}
+                        media_content_type: image/jpeg
+
                     response_variable: response
                   - action: notify.mobile_app_as25
                     data:
-                      message: "{{ response.text }}"
+                      message: "{{ response.data }}"
                       title: "{{ camera_info.name }}"
                       data:
                         image: "/media/nuc{{ file_path[16:] }}"
@@ -226,22 +231,22 @@ automation:
         entity_id: button.innen_ptz_stop
 
 # Script
-script:
-  camera_ptz:
-    alias: Camera - PTZ Control
-    icon: mdi:arrow-all
-    sequence:
-      - action: reolink_cctv.ptz_control
-        data:
-          entity_id: "{{ entity_id }}"
-          command: "{{ command }}"
+# script:
+#   camera_ptz:
+#     alias: Camera - PTZ Control
+#     icon: mdi:arrow-all
+#     sequence:
+#       - action: reolink_cctv.ptz_control
+#         data:
+#           entity_id: "{{ entity_id }}"
+#           command: "{{ command }}"
 
-      - delay: "00:00:01"
+#       - delay: "00:00:01"
 
-      - action: reolink_cctv.ptz_control
-        data:
-          entity_id: "{{ entity_id }}"
-          command: STOP
+#       - action: reolink_cctv.ptz_control
+#         data:
+#           entity_id: "{{ entity_id }}"
+#           command: STOP
 
 homeassistant:
   customize:
