@@ -108,7 +108,6 @@ recorder:
       - sensor.only_text
 
 # Logbook #############################
-
 logbook:
   exclude:
     domains:
@@ -187,19 +186,6 @@ ffmpeg:
   # ffmpeg_bin: /usr/bin/ffmpeg
 
 stream:
-
-# MQTT ################################
-# mqtt:
-#   broker: !secret mqtt_brocker
-#   port: 8883
-#   client_id: hass-nuc
-#   username: !secret mqtt_user
-#   password: !secret mqtt_pass
-#   tls_insecure: true
-#   discovery: true
-#   discovery_prefix: homeassistant
-#   # certificate: auto
-#   certificate: !secret http_ssl_cert
 
 # Google ##############################
 # google:
