@@ -6,7 +6,7 @@ scene:
       light.tuyaplug3: "on"
       light.sonoffpow_04: "on"
       light.sonoffpow_01: "off"
-      light.shellyswitch25_10c7c3_channel_1: "off"
+      light.shelly1pmminig3_34b7da8db254_switch_0: "off"
       light.shellyswitch25_10a36d_channel_1: "off"
       light.shellyswitch25_10a36d_channel_2: "off"
 
@@ -22,7 +22,7 @@ script:
           transition: 2.5
       - action: media_player.play_media
         target:
-          entity_id: media_player.chromecast
+          entity_id: media_player.chromecast_ultra
         data:
           media_content_id: ' { "app_name": "youtube", "media_id": "_zWlJpP-ptA" }'
           media_content_type: cast
@@ -38,17 +38,17 @@ script:
           transition: 2.5
       - action: media_player.turn_on
         target:
-          entity_id: media_player.sony_kd_55x8505b
+          entity_id: media_player.gq75qn92catxzg
       - wait_for_trigger:
           - trigger: state
-            entity_id: media_player.sony_kd_55x8505b
+            entity_id: media_player.gq75qn92catxzg
             to: "on"
             for: 10
         timeout: "00:00:20"
         continue_on_timeout: true
       - action: media_player.select_source
         target:
-          entity_id: media_player.sony_kd_55x8505b
+          entity_id: media_player.gq75qn92catxzg
         data:
           source: "HDMI 2/MHL"
 
