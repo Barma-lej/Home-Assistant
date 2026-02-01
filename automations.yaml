@@ -54,16 +54,15 @@
     ist
   triggers:
   - type: value
-    trigger: device
-    device_id: db8b13c767d84865a607aca77975a221
-    entity_id: sensor.torposition
+    device_id: c5cde2f638bb2d714e26ec65441e181d
+    entity_id: 20cc22d784de80f84b097c3d27e581c0
     domain: sensor
-    above: 40
+    trigger: device
+    above: 35
     for:
       hours: 0
       minutes: 0
       seconds: 5
-      milliseconds: 0
   conditions:
   - condition: or
     conditions:
@@ -95,15 +94,18 @@
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.tor_ist_geschlossen
-    to: 'on'
+    - binary_sensor.tor_geoffnet
+    to:
+    - 'off'
     for:
       hours: 0
       minutes: 0
       seconds: 5
   - trigger: state
-    entity_id: input_boolean.torteil
-    to: 'on'
+    entity_id:
+    - binary_sensor.tor_luftung
+    to:
+    - 'on'
     for:
       hours: 0
       minutes: 0
@@ -120,20 +122,20 @@
   description: Направление камеры в зависимости от положения гаражных ворот
   triggers:
   - type: value
-    trigger: device
-    device_id: db8b13c767d84865a607aca77975a221
-    entity_id: sensor.torposition
+    device_id: c5cde2f638bb2d714e26ec65441e181d
+    entity_id: 20cc22d784de80f84b097c3d27e581c0
     domain: sensor
+    trigger: device
     above: 30
     for:
       hours: 0
       minutes: 0
       seconds: 5
   - type: value
-    trigger: device
-    device_id: db8b13c767d84865a607aca77975a221
-    entity_id: sensor.torposition
+    device_id: c5cde2f638bb2d714e26ec65441e181d
+    entity_id: 20cc22d784de80f84b097c3d27e581c0
     domain: sensor
+    trigger: device
     below: 20
     for:
       hours: 0
@@ -141,15 +143,18 @@
       seconds: 5
   - trigger: state
     entity_id:
-    - binary_sensor.tor_ist_geschlossen
-    to: 'on'
+    - binary_sensor.tor_geoffnet
+    to:
+    - 'off'
     for:
       hours: 0
       minutes: 0
       seconds: 3
   - trigger: state
-    entity_id: input_boolean.torteil
-    to: 'on'
+    entity_id:
+    - binary_sensor.tor_luftung
+    to:
+    - 'on'
     for:
       hours: 0
       minutes: 0
@@ -160,8 +165,8 @@
     - conditions:
       - type: is_value
         condition: device
-        device_id: db8b13c767d84865a607aca77975a221
-        entity_id: sensor.torposition
+        device_id: c5cde2f638bb2d714e26ec65441e181d
+        entity_id: 20cc22d784de80f84b097c3d27e581c0
         domain: sensor
         above: 30
       sequence:
@@ -173,8 +178,8 @@
     - conditions:
       - type: is_value
         condition: device
-        device_id: db8b13c767d84865a607aca77975a221
-        entity_id: sensor.tor_distanz
+        device_id: c5cde2f638bb2d714e26ec65441e181d
+        entity_id: 20cc22d784de80f84b097c3d27e581c0
         domain: sensor
         below: 20
       sequence:
@@ -203,10 +208,11 @@
     tag_id: 4d4d9d64-59ff-4a65-8d8c-d1a088f46599
   conditions: []
   actions:
-  - action: switch.toggle
-    data: {}
+  - action: button.press
+    metadata: {}
     target:
-      entity_id: switch.tor
+      entity_id: button.tor_tor
+    data: {}
   mode: single
 - id: '1661607357549'
   alias: Считана метка Green
@@ -238,8 +244,8 @@
     state: B4:EC:02:94:8A:CF (VW BT 1505)
     enabled: false
   - condition: numeric_state
-    entity_id: sensor.torposition
-    below: 15
+    entity_id: sensor.tor_position
+    below: 70
   - condition: or
     conditions:
     - condition: template
@@ -249,10 +255,11 @@
       value_template: '{{ "B4:EC:02:94:8A:CF (VW BT 1505)" in state_attr("sensor.as25_bluetooth_connection",
         "connected_paired_devices") }}'
   actions:
-  - data: {}
+  - action: button.press
+    metadata: {}
+    data: {}
     target:
-      entity_id: switch.tor
-    action: switch.turn_on
+      entity_id: button.tor_tor
   - data:
       message: TTS
       title: Garage
@@ -288,13 +295,14 @@
       value_template: '{{ "B4:EC:02:94:8A:CF (VW BT 1505)" in state_attr("sensor.as25_bluetooth_connection",
         "connected_paired_devices") }}'
   - condition: numeric_state
-    entity_id: sensor.torposition
+    entity_id: sensor.tor_position
     above: 15
   actions:
-  - data: {}
+  - action: button.press
+    metadata: {}
     target:
-      entity_id: switch.tor
-    action: switch.turn_on
+      entity_id: button.tor_tor
+    data: {}
   - data:
       message: TTS
       title: Garage
@@ -306,7 +314,8 @@
     action: notify.mobile_app_as25
   - wait_for_trigger:
     - trigger: numeric_state
-      entity_id: sensor.torposition
+      entity_id:
+      - sensor.tor_position
       for:
         hours: 0
         minutes: 0
@@ -418,9 +427,6 @@
     target:
       entity_id:
       - button.fritz_box_5590_fiber_cleanup
-      - button.fritz_box_7590_ax_cleanup
-  - action: ble_monitor.cleanup_entries
-    data: {}
   - action: tts.clear_cache
     data: {}
   mode: single
@@ -431,18 +437,13 @@
     path: mdegat01/update_notifications.yaml
     input:
       update_entities:
-      - update.einfahrt_update
       - update.esphome_update
       - update.fritz_box_5590_fiber_fritz_os
       - update.ftp_update
-      - update.garage_update
-      - update.garagegate_firmware
       - update.home_assistant_core_update
       - update.home_assistant_supervisor_update
-      - update.markise_firmware
       - update.mosquitto_broker_update
       - update.nginx_home_assistant_ssl_proxy_update
-      - update.pi_hole_v6_integration_update
       - update.pi_hole_core_update_available
       - update.pi_hole_ftl_update_available
       - update.samba_share_update
@@ -450,17 +451,13 @@
       - update.studio_code_server_update
       - update.tasmoadmin_update
       - update.terminal_ssh_update
-      - update.terrasse_update
-      - update.innen_firmware
       - update.matter_server_update
       - update.vlc_update
-      - update.fritz_box_7590_ax_fritz_os
       - update.music_assistant_server_update
       - update.shelly1pmminig3_34b7da8db254_firmware_update
       - update.aha_region_update
       - update.card_tools_update
       - update.comfortable_environment_card_update
-      - update.firmware_update
       - update.fold_entity_row_update
       - update.go2rtc_update
       - update.hacs_update
@@ -472,7 +469,6 @@
       - update.frigate_card_update
       - update.moonraker_update
       - update.passive_ble_monitor_integration_update
-      - update.polr_ytube_media_card_update
       - update.restriction_card_update
       - update.samsung_soundbar_update
       - update.spook_your_homie_update
@@ -486,11 +482,16 @@
       - update.yandex_smart_home_update
       - update.yandex_station_intents_update
       - update.yandex_station_update
-      - update.ytube_music_player_update
       - update.pi_hole_web_update_available
-      - update.seitenmarkise_74aab6_firmware
       - update.tuya_local_update
       - update.home_assistant_operating_system_update
+      - update.steba_humidifier_firmware
+      - update.home_power_meter_firmware
+      - update.tor_firmware
+      - update.innen_firmware
+      - update.einfahrt_firmware
+      - update.garage_firmware_2
+      - update.terrasse_update
       mobile_app_device: d65b64c785a29ffed795c6d22780bb9f
       reminder_hours: '6'
       run_config_check: true
@@ -596,19 +597,10 @@
     trigger: time_pattern
   conditions:
   - condition: template
-    value_template: "{% set sun_azimuth = state_attr('sun.sun', 'azimuth') | float(0)
-      %} {% set sun_elevation = state_attr('sun.sun', 'elevation') | float(-91) %}
-      {# По умолчанию ниже любого типичного SUN_ELEVATION_MIN_ACTIVE #} {% set current_clouds
-      = state_attr('weather.openweathermap', 'cloud_coverage') | int(CLOUD_COVERAGE_MAX)
-      %} {# По умолчанию, чтобы условие current_clouds < CLOUD_COVERAGE_MAX стало
-      ложным #} {% set ground_temp = states('sensor.rasen_temperature') | float(GROUND_TEMP_THRESHOLD
-      - 1) %} {# По умолчанию, чтобы условие ground_temp > GROUND_TEMP_THRESHOLD стало
-      ложным #} {% set terrasse_temp = states('sensor.ble_temperature_temperatur_gt')
-      | float(TERRASSE_TEMP_THRESHOLD - 1) %} {# По умолчанию, чтобы условие terrasse_temp
-      > TERRASSE_TEMP_THRESHOLD стало ложным #}\n{{ SUN_AZIMUTH_MIN_ACTIVE < sun_azimuth
-      < SUN_AZIMUTH_MAX_ACTIVE\n  and sun_elevation > SUN_ELEVATION_MIN_ACTIVE\n  and
-      (ground_temp > GROUND_TEMP_THRESHOLD or terrasse_temp > TERRASSE_TEMP_THRESHOLD)\n
-      \ and current_clouds < CLOUD_COVERAGE_MAX\n}}\n"
+    value_template: "{% set current_clouds = state_attr('weather.openweathermap',
+      'cloud_coverage') | int(CLOUD_COVERAGE_MAX) %} {# По умолчанию, чтобы условие
+      current_clouds < CLOUD_COVERAGE_MAX стало ложным #}\n{{ states('binary_sensor.klima_beschattungsbereich')\n
+      \ and states('binary_sensor.klima_heiss')\n  and current_clouds < CLOUD_COVERAGE_MAX\n}}\n"
   actions:
   - repeat:
       for_each: '{{ COVERS_TO_MANAGE }}'
@@ -633,12 +625,7 @@
           position: '{{ repeat.item.target_pos }}'
         action: cover.set_cover_position
   variables:
-    GROUND_TEMP_THRESHOLD: 22
-    TERRASSE_TEMP_THRESHOLD: 22
     CLOUD_COVERAGE_MAX: 40
-    SUN_AZIMUTH_MIN_ACTIVE: 150
-    SUN_AZIMUTH_MAX_ACTIVE: 300
-    SUN_ELEVATION_MIN_ACTIVE: 10
     COOLDOWN_MINUTES: 240
     COVERS_TO_MANAGE:
     - entity: cover.shellyswitch25_f37a8c
@@ -1001,27 +988,6 @@
     POSITION_RETRACTED: 100
     COOLDOWN_MINUTES: 120
   mode: single
-- id: '1746608947446'
-  alias: debug
-  description: ''
-  triggers:
-  - trigger: state
-    entity_id:
-    - switch.sonoffs20_2
-    to: 'on'
-    id: cycle1
-  - trigger: state
-    entity_id:
-    - switch.sonoffs20_2
-    to: 'off'
-    id: cycle2
-  conditions: []
-  actions:
-  - action: notify.telegram_bot_anatolij
-    metadata: {}
-    data:
-      message: '{{ trigger.id[-1] }}'
-  mode: single
 - id: garage_smartthing_sync
   alias: Garage - Smarttagsverwaltung
   description: ''
@@ -1037,20 +1003,20 @@
       - condition: template
         value_template: '{{ trigger.entity_id == ''switch.st_virtual_switch1'' }}'
       sequence:
-      - action: switch.toggle
+      - action: button.press
         metadata: {}
-        data: {}
         target:
-          entity_id: switch.tor
+          entity_id: button.tor_tor
+        data: {}
     - conditions:
       - condition: template
         value_template: '{{ trigger.entity_id == ''switch.st_virtual_switch2'' }}'
       sequence:
-      - action: switch.toggle
+      - action: button.press
         metadata: {}
-        data: {}
         target:
-          entity_id: switch.torteil
+          entity_id: button.tor_luftung
+        data: {}
   mode: single
 - id: mower_reload_cloud_on_startup
   alias: Mower - Reload Cloud on startup
@@ -1088,54 +1054,263 @@
   - action: switch.turn_off
     entity_id: switch.irrigation_pump
   mode: single
-- id: '1760294578683'
-  alias: Camera - Motion
+- id: steba_humidifier_ion_heat_set
+  alias: Steba - Humidifier ION HEAT Set
+  description: ''
+  triggers:
+  - type: turned_on
+    device_id: 6a40c79f98c56d85b6cd83dfe31c6ebb
+    entity_id: f5533e297a1df26dc68b804a1da06956
+    domain: binary_sensor
+    trigger: device
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 10
+    enabled: false
+  - trigger: state
+    entity_id:
+    - binary_sensor.steba_humidifier_stable_status
+    to:
+    - 'on'
+  conditions: []
+  actions:
+  - if:
+    - condition: state
+      entity_id: binary_sensor.steba_humidifier_ionization
+      state:
+      - 'off'
+    then:
+    - action: button.press
+      metadata: {}
+      target:
+        entity_id:
+        - button.steba_humidifier_ion
+      data: {}
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  - if:
+    - condition: state
+      entity_id: binary_sensor.steba_humidifier_heating
+      state:
+      - 'off'
+    then:
+    - action: button.press
+      metadata: {}
+      target:
+        entity_id:
+        - button.steba_humidifier_heat
+      data: {}
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 2
+      milliseconds: 0
+    enabled: true
+  - action: button.press
+    metadata: {}
+    target:
+      entity_id: button.steba_humidifier_intensity
+    data: {}
+    enabled: true
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 2
+      milliseconds: 0
+    enabled: true
+  - action: button.press
+    metadata: {}
+    target:
+      entity_id: button.steba_humidifier_intensity
+    data: {}
+    enabled: true
+  mode: single
+- id: steba_restart_period
+  alias: Steba - Restart period
+  description: ''
+  triggers:
+  - trigger: time_pattern
+    hours: /1
+  conditions: []
+  actions:
+  - action: button.press
+    metadata: {}
+    target:
+      entity_id: button.steba_humidifier_restart
+    data: {}
+  mode: single
+- id: steba_worktime
+  alias: Steba - Worktime
+  description: ''
+  triggers:
+  - trigger: time_pattern
+    id: night
+    hours: '0'
+    minutes: '0'
+    seconds: '0'
+  - trigger: time_pattern
+    id: morning
+    hours: '9'
+    minutes: '0'
+    seconds: '0'
+  - trigger: state
+    entity_id:
+    - binary_sensor.steba_humidifier_no_water
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 10
+    id: no_water
+    to:
+    - 'on'
+  - trigger: state
+    entity_id:
+    - binary_sensor.steba_humidifier_stable_status
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 30
+    id: power_on
+    to:
+    - 'on'
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - morning
+      sequence:
+      - action: humidifier.turn_on
+        metadata: {}
+        target:
+          entity_id: humidifier.steba
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - night
+      sequence:
+      - action: humidifier.turn_off
+        metadata: {}
+        target:
+          entity_id: humidifier.steba
+        data: {}
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 15
+          milliseconds: 0
+      - if:
+        - condition: state
+          entity_id: binary_sensor.steba_humidifier_stable_status
+          state:
+          - 'on'
+        then:
+        - device_id: 6a40c79f98c56d85b6cd83dfe31c6ebb
+          domain: button
+          entity_id: 6777bfd23333d595640e44895070baed
+          type: press
+    - conditions:
+      - condition: and
+        conditions:
+        - condition: trigger
+          id:
+          - no_water
+        - condition: state
+          entity_id: humidifier.steba
+          state:
+          - 'on'
+      sequence:
+      - action: humidifier.turn_off
+        metadata: {}
+        target:
+          entity_id: humidifier.steba
+        data: {}
+    - conditions:
+      - condition: and
+        conditions:
+        - condition: trigger
+          id:
+          - power_on
+        - condition: state
+          entity_id: binary_sensor.steba_humidifier_no_water
+          state:
+          - 'off'
+      sequence:
+      - action: humidifier.turn_on
+        metadata: {}
+        target:
+          entity_id: humidifier.steba
+        data: {}
+  mode: single
+- id: steba_nobody_home
+  alias: Steba - Nobody Home
   description: ''
   triggers:
   - trigger: state
     entity_id:
-    - binary_sensor.terrasse_person
-    to: 'on'
-    id: motion
+    - group.family_wlan
+    to:
+    - home
+    id: home
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
   - trigger: state
     entity_id:
-    - binary_sensor.terrasse_person
-    id: no_motion
-    from: 'on'
-  conditions: []
+    - group.family_wlan
+    to:
+    - not_home
+    id: not_home
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+  conditions:
+  - condition: time
+    after: 09:00:00
+    before: 00:00:00
   actions:
-  - if:
-    - condition: trigger
-      id:
-      - motion
-    then:
-    - action: camera.snapshot
-      metadata: {}
-      data:
-        filename: /share/nuc/media/cams/terrasse/{{ now().strftime("%Y") }}/{{ now().strftime("%m")
-          }}/{{ now().strftime("%d") }}/{{ state_attr(trigger.entity_id, 'friendly_name')
-          }}_{{ now().strftime("%Y%m%d-%H%M%S") }}.jpg
-      target:
-        entity_id: camera.terrasse_main
-    - action: camera.record
-      metadata: {}
-      data:
-        filename: /share/nuc/media/cams/terrasse/{{ now().strftime("%Y") }}/{{ now().strftime("%m")
-          }}/{{ now().strftime("%d") }}/{{ state_attr(trigger.entity_id, 'friendly_name')
-          }}_{{ now().strftime("%Y%m%d-%H%M%S") }}.mp4
-        lookback: 5
-        duration: 30
-      target:
-        entity_id: camera.terrasse_main
-    else:
-    - action: camera.record
-      metadata: {}
-      data:
-        filename: /share/nuc/media/cams/terrasse/{{ now().strftime("%Y") }}/{{ now().strftime("%m")
-          }}/{{ now().strftime("%d") }}/{{ state_attr(trigger.entity_id, 'friendly_name')
-          }}_{{ now().strftime("%Y%m%d-%H%M%S") }}.mp4
-        lookback: 5
-      target:
-        device_id: 640eb6fc39334e3d5850722d3b8057ac
-      enabled: false
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - home
+      sequence:
+      - action: humidifier.turn_on
+        metadata: {}
+        target:
+          entity_id: humidifier.steba
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - not_home
+      sequence:
+      - action: humidifier.turn_off
+        metadata: {}
+        target:
+          entity_id: humidifier.steba
+        data: {}
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 15
+          milliseconds: 0
+      - if:
+        - condition: state
+          entity_id: binary_sensor.steba_humidifier_stable_status
+          state:
+          - 'on'
+        then:
+        - device_id: 6a40c79f98c56d85b6cd83dfe31c6ebb
+          domain: button
+          entity_id: 6777bfd23333d595640e44895070baed
+          type: press
   mode: single
