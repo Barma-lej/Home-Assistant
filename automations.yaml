@@ -627,19 +627,19 @@
     CLOUD_COVERAGE_MAX: 40
     COOLDOWN_MINUTES: 240
     COVERS_TO_MANAGE:
-    - entity: cover.shellyswitch25_f37a8c
+    - entity: cover.rollade_1
       azimuth_close_trigger: 150
       current_pos_above: 40
       target_pos: 0
-    - entity: cover.shellyswitch25_f37b28
+    - entity: cover.rollade_2
       azimuth_close_trigger: 180
       current_pos_above: 40
       target_pos: 0
-    - entity: cover.shellyswitch25_10eaa4
+    - entity: cover.rollade_3
       azimuth_close_trigger: 220
       current_pos_above: 40
       target_pos: 0
-    - entity: cover.shellyswitch25_10d315
+    - entity: cover.rollade_4
       azimuth_close_trigger: 240
       current_pos_above: 75
       target_pos: 60
