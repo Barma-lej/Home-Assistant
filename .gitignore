@@ -26,6 +26,8 @@
 !www/mower/
 !www/vacuum/
 
+# Разрешить саму папку esphome
+!esphome/
 # Разрешить YAML в корне esphome
 !esphome/*.yaml
 # Но secrets.yaml в esphome игнорировать
