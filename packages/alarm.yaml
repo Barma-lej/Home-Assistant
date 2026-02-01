@@ -100,10 +100,10 @@ automation:
         repeat:
           count: 4
           sequence:
-            - action: notify.telegram_schick_home
+            - action: telegram_bot.send_message
               data:
-                title: 🚨👮🆘 Alarm aufgelöst!!!
-                message: "Etwas passiert!!!"
+                target: !secret telegram_channel
+                message: "🚨👮🆘 Alarm ausgelöst!!!\n\nEtwas passiert!!!"
             - delay: 00:00:05
 
   - id: telegram_alarm
