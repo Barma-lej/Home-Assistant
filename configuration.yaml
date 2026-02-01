@@ -7,7 +7,7 @@ homeassistant:
   # unit_system: metric
   # external_url: !secret ha_external_url
   # internal_url: !secret ha_internal_url
-  packages: !include_dir_named packages
+  packages: !include_dir_named packages/
   customize: !include customize.yaml
   allowlist_external_dirs:
     - /share/nuc/media/cams
@@ -53,26 +53,30 @@ http:
   use_x_forwarded_for: true
   trusted_proxies:
     - 172.30.32.0/23
+  cors_allowed_origins:
+    - !secret ha_external_url
+    - !secret ha_internal_url
 
 logger:
   # default: critical
   default: warning
   logs:
-    homeassistant.components.onvif: info
-    homeassistant.components.http.ban: warn
-    homeassistant.components.device_tracker: warn
-    homeassistant.components.camera: warn
-    # homeassistant.core: debug
-    # homeassistant.components: warn
+    # homeassistant.components: warning
+    homeassistant.components.camera: warning
+    homeassistant.components.device_tracker: warning
+    homeassistant.components.http.ban: warning
+    homeassistant.components.onvif: warning
+    homeassistant.components.recorder.core: warning
+    homeassistant.components.recorder.util: warning
+    # homeassistant.components.rfxtrx: warning
     # homeassistant.components.syncthru: debug
-    # homeassistant.components.rfxtrx: warn
-    # homeassistant.components.websocket_api: debug
-    fritzconnection: warn
+    homeassistant.components.websocket_api: error
+    # homeassistant.core: debug
+
+    fritzconnection: warning
     miio.miioprotocol: fatal
-    # reolink_ip: debug
-    custom_components.landroid_cloud: warn
+    custom_components.landroid_cloud: error
     custom_components.localtuya.common: critical
-    # custom_components.reolink_cctv: debug
     custom_components.xiaomi_miio_fan.fan: fatal
 
 # Recorder ############################
@@ -81,15 +85,21 @@ recorder:
   # db_url: sqlite:////media/cams/1/home-assistant_v2_1.db
   # db_url: !secret mariadb_url
   purge_keep_days: 90
-  commit_interval: 20
+  commit_interval: 30
+  auto_purge: true
   auto_repack: true
   exclude:
     domains:
       - calendar
       - sun
       - weblink
+      - weather
+      - updater
+      - persistent_notification
     entity_globs:
       - sensor.weather_*
+      - sensor.*_rssi
+      - sensor.date*
     entities:
       - sun.sun
       - sensor.date
@@ -98,20 +108,32 @@ recorder:
       - sensor.only_text
 
 # Logbook #############################
+
 logbook:
   exclude:
     domains:
       - calendar
       - weblink
+      - media_player  # Добавить
     entities:
       - sun.sun
       - sensor.date
       - sensor.time
       - sensor.date_time
       - sensor.only_text
+    entity_globs:
+      - sensor.weather_*
+      - sensor.*_rssi
 
 # Enables support for tracking state changes over time
 history:
+  exclude:
+    domains:
+      - updater
+      - camera  # История камер не нужна в UI
+    entity_globs:
+      - sensor.*_rssi
+      - binary_sensor.updater
 
 # TTS #################################
 tts:
