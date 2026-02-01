@@ -1,0 +1,13 @@
+template:
+  - binary_sensor:
+      - name: "Steba Humidifier Stable Status"
+        unique_id: steba_humidifier_stable_status
+        # Состояние сенсора повторяет состояние источника
+        state: >
+          {{ is_state('binary_sensor.steba_humidifier_power', 'on') }}
+        # Ждать 10 секунд перед переключением в ON (True)
+        delay_on: 10
+        # Ждать 10 секунд перед переключением в OFF (False)
+        delay_off: 10
+        # Опционально: выберите класс устройства (например, power, connectivity, running)
+        device_class: power

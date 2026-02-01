@@ -1,0 +1,167 @@
+substitutions:
+  # device_name: "Steba Humidifier"
+  name: "steba-humidifier"
+  friendly_name: "Steba Humidifier"
+  room: "Wohnzimmer"
+  project_name: ""
+  project_version: "2025.12.0"
+  device_description: "Control Steba humidifier with the ESP32 C3 Supermini"
+
+  # Webserver credentials
+  web_username: !secret web_server_user
+  web_password: !secret web_server_password
+
+  # GPIO пины для управления (кнопки)
+  intensity_gpio: GPIO00
+  heatwater_gpio: GPIO01
+  ion_gpio: GPIO03
+  power_gpio: GPIO04
+
+  # GPIO пины для СНИФФЕРА TM1628
+  stb_gpio: 5 # STB Пин 4 TM1628
+  clk_gpio: 6 # CLK Пин 3 TM1628
+  dio_gpio: 7 # DIO Пин 2 TM1628
+
+esphome:
+  name: "${name}"
+  friendly_name: "${friendly_name}"
+  comment: "${device_description}"
+  project:
+    name: "barma-lej.${name}"
+    version: "${project_version}"# Enable Home Assistant API
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+  level: DEBUG
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret steba_humidifier
+
+ota:
+  - platform: esphome
+    id: my_ota
+    password: !secret ota_password # "40e6740005cdb5b0b8ccde511b3799cf"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "${name}"
+    password: !secret fallback_ap_password
+
+captive_portal:
+
+web_server:
+  id: esphome_web_server
+  version: 3
+  port: 80
+  auth:
+    username: "${web_username}"
+    password: "${web_password}"
+
+external_components:
+  - source:
+      type: local
+      path: components
+    components: [tm1628_sniffer]
+
+button:
+    # Restart the ESP
+  - platform: restart
+    name: "Restart"
+
+  - platform: output
+    name: "Power"
+    output: power_output
+    duration: 0.15s
+
+  - platform: output
+    name: "Ion"
+    output: ion_output
+    duration: 0.15s
+
+  - platform: output
+    name: "Heat"
+    output: heatwater_output
+    duration: 0.15s
+
+  - platform: output
+    name: "Intensity"
+    output: intensity_output
+    duration: 0.15s
+
+output:
+  - platform: gpio
+    pin: '${power_gpio}'
+    id: power_output
+    inverted: false
+
+  - platform: gpio
+    pin: '${ion_gpio}'
+    id: ion_output
+    inverted: false
+
+  - platform: gpio
+    pin: '${heatwater_gpio}'
+    id: heatwater_output
+    inverted: false
+
+  - platform: gpio
+    pin: '${intensity_gpio}'
+    id: intensity_output
+    inverted: false
+
+sensor:
+
+binary_sensor:
+
+tm1628_sniffer:
+  stb_pin: 5
+  clk_pin: 6
+  dio_pin: 7
+  
+  # Датчики температуры и влажности
+  temperature:
+    name: "Temperature"
+    filters:
+      - delta: 1.0
+      - throttle: 2s
+  
+  humidity:
+    name: "Humidity"
+    filters:
+      - delta: 1.0
+      - throttle: 2s
+  
+  # Бинарные датчики
+  power_sensor:
+    name: "Power"
+    filters:
+      - delayed_on: 200ms
+      - delayed_off: 200ms
+  
+  heat_sensor:
+    name: "Heating"
+    filters:
+      - delayed_on: 200ms
+      - delayed_off: 200ms
+  
+  ion_sensor:
+    name: "Ionization"
+    filters:
+      - delayed_on: 200ms
+      - delayed_off: 200ms
+  
+  no_water_sensor:
+    name: "No Water"
+    filters:
+      - delayed_on: 200ms
+      - delayed_off: 200ms
