@@ -52,7 +52,10 @@ http:
   login_attempts_threshold: 15
   use_x_forwarded_for: true
   trusted_proxies:
+    - ::1
+    - 127.0.0.1
     - 172.30.32.0/23
+    - 192.168.8.0/23
   cors_allowed_origins:
     - !secret ha_external_url
     - !secret ha_internal_url
@@ -61,6 +64,9 @@ logger:
   # default: critical
   default: warning
   logs:
+    custom_components.beurer_bf700: debug
+    bleak: debug
+
     # homeassistant.components: warning
     homeassistant.components.camera: warning
     homeassistant.components.device_tracker: warning
