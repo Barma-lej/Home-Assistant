@@ -41,6 +41,9 @@ esp32:
 
 # Enable logging
 logger:
+  level: DEBUG
+  logs:
+    light: WARN
 
 # Enable improv over serial
 improv_serial:
