@@ -252,12 +252,12 @@ automation:
         # attribute: rain_sensor.triggered
         # to: "true"
 
-        entity_id: binary_sensor.mower_rainsensor_triggered
+        entity_id: binary_sensor.mower_rain_sensor
         to: "on"
 
       - trigger: template
         # value_template: "{{ state_attr('vacuum.mower', 'rain_sensor').triggered == True }}"
-        value_template: "{{ is_state('binary_sensor.mower_rainsensor_triggered','on') }}"
+        value_template: "{{ is_state('binary_sensor.mower_rain_sensor','on') }}"
         for: "00:01:00"
 
     actions:
@@ -288,7 +288,7 @@ script:
         value_template: >
           {{ is_state('input_boolean.irrigation_cycle' ~ cycle ~ '_use_sensor_data', 'off')
             or (is_state('input_boolean.irrigation_cycle' ~ cycle ~ '_use_sensor_data', 'on')
-              and is_state('binary_sensor.mower_rainsensor_triggered','off')) }}
+              and is_state('binary_sensor.mower_rain_sensor','off')) }}
 
       # and not state_attr('vacuum.mower', 'rain_sensor').triggered == True) }}
       # and not is_state_attr('sensor.landroid_mower_error', 'error_id', 5)) }}
@@ -386,7 +386,7 @@ script:
         value_template: >
           {{ is_state('input_boolean.irrigation_cycle' ~ cycle ~ '_use_sensor_data', 'off')
             or (is_state('input_boolean.irrigation_cycle' ~ cycle ~ '_use_sensor_data', 'on')
-              and is_state('binary_sensor.mower_rainsensor_triggered','off')) }}
+              and is_state('binary_sensor.mower_rain_sensor','off')) }}
 
       # Call the script to set the Tasmota PULSETIME
       - action: script.irrigation_set_tasmota_pulsetime
