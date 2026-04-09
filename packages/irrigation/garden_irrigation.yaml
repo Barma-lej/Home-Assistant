@@ -45,8 +45,9 @@ automation:
       - variables:
           cycle_num: "{{ '1' if 'cycle1' in trigger.entity_id else '2' }}"
       - action: input_datetime.set_datetime
-        data:
+        target:
           entity_id: "input_datetime.irrigation_cycle{{ cycle_num }}_next_run_time"
+        data:
           date: >
             {% set schedule_time_str = states('input_select.irrigation_cycle' ~ cycle_num ~ '_schedule_time') %}
             {% if now().strftime('%H:%M') < schedule_time_str %}
@@ -125,19 +126,16 @@ automation:
     actions:
       # Update progress in ui
       - action: input_text.set_value
-        data:
+        target:
           entity_id: input_text.irrigation_current_zone
+        data:
           value: "Initialisierung..."
 
       # Make sure nothing in the system is running
       # Turn off valves
       - action: switch.turn_off
-        data:
+        target:
           entity_id: switch.irrigation_valves
-
-      # - action: homeassistant.turn_off
-      #   data:
-      #     entity_id: group.irrigation_switches
 
       # Turn off scripts if they were somehow running
       - action: script.turn_off
@@ -174,6 +172,8 @@ automation:
 
       # Wait until script is finished
       - wait_template: "{{ is_state('script.irrigation_run_a_cycle', 'off') }}"
+        timeout: "02:00:00"
+        continue_on_timeout: true
 
       # Turn off both manual run booleans (in case one was turned on while the other was already running)
       - action: input_boolean.turn_off
@@ -191,7 +191,7 @@ automation:
         target:
           entity_id: input_boolean.irrigation_cycle2_enable
 
-  # Cancel A Manual Cycle #############################################
+  # Cancel A Manual Cycle
   - id: irrigation_cancel_a_manual_cycle
     alias: Irrigation - Abbrechen manueller Zyklus
     # initial_state: on
@@ -204,38 +204,32 @@ automation:
         to: "off"
 
     actions:
-      # Turn off valves #####################
+      # Turn off valves
       - action: switch.turn_off
-        data:
+        target:
           entity_id: switch.irrigation_valves
 
-      # - action: homeassistant.turn_off
-      #   data:
-      #     entity_id: group.irrigation_switches
-
-      # Turn off scripts ####################
+      # Turn off scripts
       - action: script.turn_off
         target:
           entity_id:
             - script.irrigation_run_a_cycle
             - script.irrigation_irrigate_a_zone
 
-      # Cancel the timer ####################
+      # Cancel the timer
       - action: timer.cancel
-        data:
+        target:
           entity_id: timer.irrigation_zone_duration
 
       # Update progress in ui ###############
       - action: homeassistant.turn_off
         target:
           entity_id: "input_boolean.irrigation_cycle{{ '1' if trigger.entity_id == 'input_boolean.irrigation_cycle1_manual_run' else '2' }}_running"
-        # data: # Kept for reference, target is preferred for service calls
-        #   entity_id: >
-        #     {% if trigger.entity_id == 'input_boolean.irrigation_cycle1_manual_run' %} input_boolean.irrigation_cycle1_running {% else %} input_boolean.irrigation_cycle2_running {% endif %}
 
       - action: input_text.set_value
-        data:
+        target:
           entity_id: input_text.irrigation_current_zone
+        data:
           value: "-"
 
   # Cancel an irrigation if it rains ####
@@ -245,24 +239,14 @@ automation:
 
     triggers:
       - trigger: state
-        # entity_id: sensor.landroid_mower_error
-        # attribute: error_id
-        # to: "5"
-        # entity_id: vacuum.mower
-        # attribute: rain_sensor.triggered
-        # to: "true"
-
         entity_id: binary_sensor.mower_rain_sensor
         to: "on"
-
-      - trigger: template
-        # value_template: "{{ state_attr('vacuum.mower', 'rain_sensor').triggered == True }}"
-        value_template: "{{ is_state('binary_sensor.mower_rain_sensor','on') }}"
-        for: "00:01:00"
+        for: "00:00:30" # небольшая задержка для защиты от дребезга
 
     actions:
       - action: timer.cancel
-        entity_id: timer.irrigation_zone_duration
+        target:
+          entity_id: timer.irrigation_zone_duration
 
 # Scripts ###################
 script:
@@ -315,7 +299,7 @@ script:
 
       # Update ui to show cycle is running
       - action: input_boolean.turn_on
-        data:
+        target:
           entity_id: input_boolean.irrigation_cycle{{ cycle }}_running
 
       # Call the script to irrigate zone 1
@@ -326,6 +310,8 @@ script:
 
       # Wait for script.irrigation_irrigate_a_zone to end
       - wait_template: "{{ is_state('script.irrigation_irrigate_a_zone', 'off') }}"
+        timeout: "02:00:00"
+        continue_on_timeout: true
 
       # Call the script to irrigate zone 2
       - action: script.irrigation_irrigate_a_zone
@@ -335,15 +321,18 @@ script:
 
       # Wait for script.irrigation_irrigate_a_zone to end
       - wait_template: "{{ is_state('script.irrigation_irrigate_a_zone', 'off') }}"
+        timeout: "02:00:00"
+        continue_on_timeout: true
 
       # Update progress in ui
       - action: input_text.set_value
-        data:
+        target:
           entity_id: input_text.irrigation_current_zone
+        data:
           value: "-"
 
       - action: input_boolean.turn_off
-        data:
+        target:
           entity_id: input_boolean.irrigation_cycle{{ cycle }}_running
 
       # Turn off schedule if run 'Once' selected
@@ -399,39 +388,46 @@ script:
 
       # Update progress in ui
       - action: input_text.set_value
-        data:
+        target:
           entity_id: input_text.irrigation_current_zone
+        data:
           value: "{{ zone }}"
 
       - action: switch.turn_on
-        data:
+        target:
           entity_id: switch.irrigation_zone{{ zone }}_valve
 
       # Start timer for zone duration
       - action: timer.start
-        data:
+        target:
           entity_id: timer.irrigation_zone_duration
+        data:
           duration: >
             {{ states('input_number.irrigation_cycle' ~ cycle ~ '_zone' ~ zone ~ '_duration') | int(0) * 60 }}
 
       - wait_template: >
           {% set entity = 'timer.irrigation_zone_duration' %}
           {{ is_state(entity , 'idle') }}
+        timeout: "02:00:00"
+        continue_on_timeout: true
 
       - action: switch.turn_off
-        data:
+        target:
           entity_id: switch.irrigation_zone{{ zone }}_valve
 
       # Update progress in ui
       - action: input_text.set_value
-        data:
+        target:
           entity_id: input_text.irrigation_current_zone
+        data:
           value: "Zonenwechsel..."
 
       # Be sure the current zone switch is off
       - wait_template: >
           {% set entity = 'switch.irrigation_zone' ~ zone ~ '_valve' %}
           {{ is_state(entity , 'off') }}
+        timeout: "02:00:00"
+        continue_on_timeout: true
 
   #######################################
   # Script to update next runtime
@@ -442,15 +438,16 @@ script:
     alias: Irrigation - Zeitplan aktualisieren
     sequence:
       - action: input_datetime.set_datetime
-        data:
+        target:
           entity_id: input_datetime.irrigation_cycle{{ cycle }}_next_run_time
+        data:
           date: >
             {% if states('input_select.irrigation_cycle' ~ cycle ~ '_watering_days') == 'Täglich' %}
-              {{ (as_timestamp(now() ) + 24 * 3600 ) | timestamp_custom("%Y-%m-%d") }}
+              {{ (now() + timedelta(days=1)).strftime('%Y-%m-%d') }}
             {% elif states('input_select.irrigation_cycle' ~ cycle ~ '_watering_days') == 'Alle 2 Tage' %}
-              {{ (as_timestamp(now() ) + 48 * 3600 ) | timestamp_custom("%Y-%m-%d") }}
+              {{ (now() + timedelta(days=2)).strftime('%Y-%m-%d') }}
             {% elif states('input_select.irrigation_cycle' ~ cycle ~ '_watering_days') == 'Alle 3 Tage' %}
-              {{ (as_timestamp(now() ) + 72 * 3600 ) | timestamp_custom("%Y-%m-%d") }}
+              {{ (now() + timedelta(days=3)).strftime('%Y-%m-%d') }}
             {% else %}
               {{ states('input_datetime.irrigation_cycle' ~ cycle ~ '_next_run_time').split(' ')[0] }}
             {% endif %}
