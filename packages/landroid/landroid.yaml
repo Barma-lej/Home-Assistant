@@ -1,5 +1,12 @@
 # Worx Landroid (M500 WR141E) package
 
+recorder:
+  exclude:
+    entities:
+      - sensor.mower_pitch
+      - sensor.mower_roll
+      - sensor.mower_yaw
+
 # Input boolean #####################################################
 input_boolean:
   mower_views_switch:
@@ -22,7 +29,7 @@ automation:
         value_template: "{{ trigger.to_state.state != trigger.from_state.state }}"
 
     actions:
-      - action:   telegram_bot.send_message
+      - action: telegram_bot.send_message
         data:
           target: !secret telegram_channel
           message: "🏎️ Lanroid M500 - *{{ trigger.to_state.state }}* <- {{ trigger.from_state.state }}"
@@ -48,7 +55,7 @@ automation:
         value_template: "{{ trigger.to_state.state != trigger.from_state.state }}"
 
     actions:
-      - action:   telegram_bot.send_message
+      - action: telegram_bot.send_message
         data:
           target: !secret telegram_channel
           message: >-

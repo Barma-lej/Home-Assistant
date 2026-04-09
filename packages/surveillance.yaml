@@ -98,7 +98,8 @@ automation:
             sequence:
               - action: telegram_bot.send_video
                 data:
-                  target: !secret telegram_channel
+                  chat_id:
+                    - !secret telegram_channel
                   file: "{{ file_path }}"
                   caption: "{{ camera_info.icon }} *{{ camera_info.name }}*"
 
@@ -141,7 +142,8 @@ automation:
             sequence:
               - action: telegram_bot.send_photo
                 data:
-                  target: !secret telegram_channel
+                  chat_id:
+                    - !secret telegram_channel
                   file: "{{ file_path }}"
                   caption: "{{ camera_info.icon }} *{{ camera_info.name }}*"
 
