@@ -442,7 +442,6 @@
       - update.home_assistant_core_update
       - update.home_assistant_supervisor_update
       - update.mosquitto_broker_update
-      - update.nginx_home_assistant_ssl_proxy_update
       - update.pi_hole_core_update_available
       - update.pi_hole_ftl_update_available
       - update.samba_share_update
@@ -462,7 +461,6 @@
       - update.hacs_update
       - update.landroid_card_update
       - update.landroid_cloud_update
-      - update.let_s_encrypt_update
       - update.local_tuya_update
       - update.mini_media_player_update
       - update.frigate_card_update
@@ -491,6 +489,7 @@
       - update.einfahrt_firmware
       - update.garage_firmware_2
       - update.terrasse_update
+      - update.nginx_proxy_manager_update
       mobile_app_device: d65b64c785a29ffed795c6d22780bb9f
       reminder_hours: '6'
       run_config_check: true
@@ -598,8 +597,9 @@
   - condition: template
     value_template: "{% set current_clouds = state_attr('weather.openweathermap',
       'cloud_coverage') | int(CLOUD_COVERAGE_MAX) %} {# По умолчанию, чтобы условие
-      current_clouds < CLOUD_COVERAGE_MAX стало ложным #}\n{{ states('binary_sensor.klima_beschattungsbereich')\n
-      \ and states('binary_sensor.klima_heiss')\n  and current_clouds < CLOUD_COVERAGE_MAX\n}}\n"
+      current_clouds < CLOUD_COVERAGE_MAX стало ложным #}\n{{ is_state('binary_sensor.klima_beschattungsbereich',
+      'on')\n  and is_state('binary_sensor.klima_heiss', 'on')\n  and current_clouds
+      < CLOUD_COVERAGE_MAX\n}}\n"
   actions:
   - repeat:
       for_each: '{{ COVERS_TO_MANAGE }}'
