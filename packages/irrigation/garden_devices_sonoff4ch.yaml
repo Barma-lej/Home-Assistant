@@ -8,7 +8,7 @@ template:
       # States
       - name: Irrigation WiFi
         unique_id: irrigation_wifi
-        state: "{{ states('sensor.sonoff4ch1_rssi') }}"
+        state: "{{ states('sensor.sonoff4ch1_rssi') | float(0) }}"
         unit_of_measurement: "%"
         icon: >-
           {% if states('sensor.sonoff4ch1_rssi')|float(0) > 80 -%}mdi:wifi-strength-4
