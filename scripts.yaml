@@ -89,28 +89,24 @@ mower_start:
     - if:
         - condition: or
           conditions:
-            - condition: device
-              device_id: b2433e6a3cf7900f69e6978e42cd0749
-              domain: landroid_cloud
-              entity_id: fcbb7a8aff31130444cd0ffe677aa1d9
-              type: is_mowing
-            - condition: device
-              device_id: b2433e6a3cf7900f69e6978e42cd0749
-              domain: landroid_cloud
-              entity_id: fcbb7a8aff31130444cd0ffe677aa1d9
-              type: is_edgecut
-            - condition: device
-              device_id: b2433e6a3cf7900f69e6978e42cd0749
-              domain: landroid_cloud
-              entity_id: fcbb7a8aff31130444cd0ffe677aa1d9
-              type: has_error
+            - condition: state
+              entity_id: lawn_mower.mower
+              state:
+                - mowing
+            - condition: state
+              entity_id: lawn_mower.mower
+              state:
+                - error
+          enabled: true
       then:
-        - device_id: b2433e6a3cf7900f69e6978e42cd0749
-          domain: landroid_cloud
-          entity_id: fcbb7a8aff31130444cd0ffe677aa1d9
-          type: dock
+        - action: lawn_mower.dock
+          metadata: {}
+          target:
+            entity_id: lawn_mower.mower
+          data: {}
       else:
-        - device_id: b2433e6a3cf7900f69e6978e42cd0749
-          domain: landroid_cloud
-          entity_id: fcbb7a8aff31130444cd0ffe677aa1d9
-          type: mow
+        - action: lawn_mower.start_mowing
+          metadata: {}
+          target:
+            entity_id: lawn_mower.mower
+          data: {}
