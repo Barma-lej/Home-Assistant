@@ -84,7 +84,7 @@ web_server:
 # Трекер для Bluetooth
 esp32_ble_tracker:
   scan_parameters:
-    active: false
+    active: true
 
 # Включаем сам прокси
 bluetooth_proxy:
@@ -100,6 +100,9 @@ binary_sensor:
     filters:
       - delayed_on: 10ms
       - delayed_off: 10ms
+    on_state:
+      then:
+        - script.execute: update_status_ui
   - platform: gpio
     id: led_2
     pin: 
@@ -108,6 +111,9 @@ binary_sensor:
     filters:
       - delayed_on: 10ms
       - delayed_off: 10ms
+    on_state:
+      then:
+        - script.execute: update_status_ui
   - platform: gpio
     id: led_3
     pin: 
@@ -116,6 +122,9 @@ binary_sensor:
     filters:
       - delayed_on: 10ms
       - delayed_off: 10ms
+    on_state:
+      then:
+        - script.execute: update_status_ui
   - platform: gpio
     id: led_4
     pin: 
@@ -124,6 +133,9 @@ binary_sensor:
     filters:
       - delayed_on: 10ms
       - delayed_off: 10ms
+    on_state:
+      then:
+        - script.execute: update_status_ui
 
 output:
   - platform: gpio
@@ -143,6 +155,19 @@ button:
     # Restart the ESP
   - platform: restart
     name: "Restart"
+
+  - platform: template
+    name: "Somfy: Сброс статуса"
+    id: btn_reset_status
+    icon: "mdi:refresh"
+    on_press:
+      - lambda: |-
+          id(retry_count) = 0;
+          auto call = id(rgb_led).turn_on();
+          call.set_effect("none");
+          call.set_rgb(0.1, 0, 0.1); // Возвращаем цвет "сна"
+          call.perform();
+          id(active_channel_text).publish_state("Готов");
 
   - platform: output
     name: "Hoch"
@@ -169,7 +194,7 @@ button:
     name: "Auswahl"
     id: btn_select
     output: select_output
-    internal: True
+    # internal: True
     duration: 0.4s
 
 # Скрипт выбора канала
@@ -177,53 +202,84 @@ script:
   - id: execute_somfy_command
     parameters:
       target: int
-      action: int # 1: Up, 2: Down, 3: Stop
+      action: int
     mode: restart
     then:
       - lambda: 'id(retry_count) = 0;'
       - light.turn_on: system_led
       
-      # --- ШАГ 1: ПОИСК КАНАЛА ---
+      # Запускаем эффект пульсации сразу
+      - light.turn_on:
+          id: rgb_led
+          effect: "Channel Pulse"
+
+      # Проверка на сон: если всё выключено, будим пульт первым нажатием
+      - if:
+          condition:
+            lambda: 'return ((id(led_4).state << 3) | (id(led_3).state << 2) | (id(led_2).state << 1) | id(led_1).state) == 0;'
+          then:
+            - button.press: btn_select
+            - delay: 0.5s # Ждем, пока пульт "очухается"
+
+      # 2. Основной цикл выбора канала
       - while:
           condition:
             lambda: |-
-              bool found = false;
-              if (target == 1) found = id(led_1).state;
-              else if (target == 2) found = id(led_2).state;
-              else if (target == 3) found = id(led_3).state;
-              else if (target == 4) found = id(led_4).state;
-              else if (target == 5) found = (id(led_1).state && id(led_2).state && id(led_3).state && id(led_4).state);
-              return (!found && id(retry_count) < 10);
+              int current = (id(led_4).state << 3) | (id(led_3).state << 2) | (id(led_2).state << 1) | id(led_1).state;
+              int desired = (target == 5) ? 0b1111 : (1 << (target - 1));
+              return (current != desired && id(retry_count) < 15);
           then:
             - button.press: btn_select
             - lambda: 'id(retry_count) += 1;'
-            - delay: 0.8s
+            - delay: 0.7s # Оптимизированная задержка
 
-      # --- ШАГ 2: ПРОВЕРКА УСПЕХА И НАЖАТИЕ ---
+      # Финальное нажатие (Вверх/Вниз/Стоп)
       - lambda: |-
-          bool success = false;
-          if (target == 1) success = id(led_1).state;
-          else if (target == 2) success = id(led_2).state;
-          else if (target == 3) success = id(led_3).state;
-          else if (target == 4) success = id(led_4).state;
-          else if (target == 5) success = (id(led_1).state && id(led_2).state && id(led_3).state && id(led_4).state);
-
-          if (success) {
-            // Если канал найден, нажимаем нужную кнопку
+          int current = (id(led_4).state << 3) | (id(led_3).state << 2) | (id(led_2).state << 1) | id(led_1).state;
+          int desired = (target == 5) ? 0b1111 : (1 << (target - 1));
+          
+          if (current == desired) {
             if (action == 1) id(btn_up).press();
             else if (action == 2) id(btn_down).press();
             else if (action == 3) id(btn_stop).press();
-            
             id(system_led).turn_off().perform();
           } else {
-            // Если ошибка — ничего не нажимаем, только индикация
-            id(retry_count) = 10;
-            id(active_channel_text).publish_state("Ошибка: Канал не найден");
+            id(active_channel_text).publish_state("Ошибка");
+            // При ошибке включаем красный мигающий свет без эффекта
             auto call = id(rgb_led).turn_on();
             call.set_rgb(1.0, 0.0, 0.0);
             call.set_effect("Error Flash");
             call.perform();
           }
+
+  - id: update_status_ui
+    mode: restart # Важно: перезапуск сбрасывает таймер 30 секунд
+    then:
+      # Устанавливаем цвет RGB в зависимости от ТЕКУЩЕГО (промежуточного) канала
+      - lambda: |-
+          // 1. Рассчитываем текущий канал
+          int current = (id(led_4).state << 3) | (id(led_3).state << 2) | (id(led_2).state << 1) | id(led_1).state;
+          auto call = id(rgb_led).turn_on();
+          
+          // 2. Устанавливаем цвет HA Hex
+          switch (current) {
+            case 0b0001: call.set_rgb(0.01, 0.66, 0.95); break; // HA Blue
+            case 0b0010: call.set_rgb(0.30, 0.68, 0.31); break; // HA Green
+            case 0b0100: call.set_rgb(1.00, 0.60, 0.00); break; // HA Orange
+            case 0b1000: call.set_rgb(0.60, 0.40, 0.80); break; // Purple
+            case 0b1111: call.set_rgb(1.00, 0.80, 0.00); break; // HA Yellow
+            case 0b0000: call.set_rgb(0.50, 0.50, 0.50); break; // White (Sleep)
+            default:     call.set_rgb(1.00, 1.00, 1.00); break;
+          }
+          call.set_effect("Channel Pulse");
+          call.perform();
+          
+          // 3. Обновляем текстовый сенсор принудительно
+          id(active_channel_text).update();
+
+      - delay: 30s
+      - light.turn_off: rgb_led
+      - lambda: 'id(active_channel_text).publish_state("Сон (Эко)");'
 
 cover:
   # Маркиза 1 (Dach)
@@ -321,52 +377,43 @@ light:
           name: "Error Flash"
           transition_length: 100ms
           update_interval: 500ms
+      - addressable_lambda:
+          name: "Channel Pulse"
+          update_interval: 20ms
+          lambda: |-
+            // Создаем плавную пульсацию яркости от 30% до 100%
+            float progress = sinf(millis() * 0.003f); 
+            float multiplier = remap(progress, -1.0f, 1.0f, 0.3f, 1.0f);
+            
+            // Мы НЕ объявляем current_color, она уже есть в контексте.
+            // Просто используем её значения для расчета новой яркости.
+            it[0] = Color(
+              uint8_t(current_color.r * multiplier),
+              uint8_t(current_color.g * multiplier),
+              uint8_t(current_color.b * multiplier)
+            );
 
-  # Обычный зелёный LED на плате
+  # Обычный синий LED на плате
   - platform: status_led
     id: system_led
     pin: '${system_led_gpio}'
 
 text_sensor:
   - platform: template
-    name: "Aktiver Kanal"
+    name: "Статус пульта Somfy"
     id: active_channel_text
     icon: "mdi:remote-tv"
-    # Убираем update_interval, чтобы сенсор обновлялся мгновенно только по событиям
     lambda: |-
-      if (id(retry_count) >= 10) {
-        return {"Kanal nicht gefunden"};
-      }
+      if (id(retry_count) >= 10) return {"Ошибка"};
       
-      if (id(led_1).state && id(led_2).state && id(led_3).state && id(led_4).state) {
-        return {"Alle (Все)"};
-      } else if (id(led_1).state) {
-        return {"Dach (Крыша)"};
-      } else if (id(led_2).state) {
-        return {"Seite (Бок)"};
-      } else if (id(led_3).state) {
-        return {"Links (Лево)"};
-      } else if (id(led_4).state) {
-        return {"Rechts (Право)"};
-      } else {
-        return {"Ожидание / Сон"};
+      int state = (id(led_4).state << 3) | (id(led_3).state << 2) | (id(led_2).state << 1) | id(led_1).state;
+      
+      switch (state) {
+        case 0b0001: return {"1. Dach (Крыша)"};
+        case 0b0010: return {"2. Seite (Бок)"};
+        case 0b0100: return {"3. Links (Лево)"};
+        case 0b1000: return {"4. Rechts (Право)"};
+        case 0b1111: return {"5. Alle (Все)"};
+        case 0:      return {"Eco (Сон)"};
+        default:     return {"Auswahl (Переход...)"};
       }
-
-    on_value:
-      then:
-        - lambda: |-
-            auto call = id(rgb_led).turn_on();
-            // Логика цвета
-            if (x == "Ошибка: Канал не найден") { 
-              call.set_rgb(1.0, 0.0, 0.0); // Ярко-красный
-              call.set_effect("Error Flash"); // Включаем мигание
-            } else {
-              call.set_effect("none"); // Выключаем мигание, если оно было
-              if (x == "Dach (Крыша)") call.set_rgb(1.0, 0.0, 0.0);
-              else if (x == "Seite (Бок)") call.set_rgb(0.0, 1.0, 0.0);
-              else if (x == "Links (Лево)") call.set_rgb(0.0, 0.0, 1.0);
-              else if (x == "Rechts (Право)") call.set_rgb(1.0, 0.5, 0.0);
-              else if (x == "Alle (Все)") call.set_rgb(1.0, 1.0, 1.0);
-              else call.set_rgb(0.1, 0.0, 0.1); // Сон
-            }
-            call.perform();
