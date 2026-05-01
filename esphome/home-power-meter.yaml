@@ -38,6 +38,8 @@ esp32:
   board: esp32dev
   framework:
     type: esp-idf
+    advanced:
+      sram1_as_iram: true
 
 # Enable logging
 logger:
@@ -52,6 +54,7 @@ improv_serial:
 wifi:
   ssid: !secret wlan_ssid
   password: !secret wlan_password
+  min_auth_mode: WPA2
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
@@ -121,7 +124,7 @@ number:
   # Select the correct pulse rate for your meter
   - platform: template
     id: select_pulse_rate
-    name: 'Puls rate - imp/kWh'
+    name: 'Puls rate - imp per kWh'
     optimistic: true
     mode: box
     min_value: 100
