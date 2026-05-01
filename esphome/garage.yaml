@@ -59,6 +59,9 @@ esp32:
   board: esp32dev
   framework:
     type: esp-idf
+    advanced: 
+      minimum_chip_revision: "3.1"
+      sram1_as_iram: true
 
 # Enable logging
 logger:
@@ -183,7 +186,8 @@ binary_sensor:
   - platform: template
     id: binary_airing
     name: ${binary_airing}
-    device_class: running
+    icon: mdi:garage-open-variant
+    # device_class: window
     trigger_on_initial_state: false
 
 sensor:
@@ -209,23 +213,29 @@ sensor:
           # 1. Обновляем дистанцию (текст/число) только если Range Status == 0
           - sensor.template.publish:
               id: distance
-              state: !lambda 'return (x == 0) ? id(raw_distance).state : NAN;'
+              state: !lambda |-
+                // Если статус не 0, возвращаем предыдущее значение сенсора
+                if (x != 0) {
+                  return id(distance).state;
+                } else {
+                  return id(raw_distance).state;
+                }
 
           # 2. Обновляем ПОЗИЦИЮ в %
           - sensor.template.publish:
               id: pos_sensor
               state: !lambda |-
-                // Проверка валидности сенсора
-                if (x != 0) return NAN; 
-                
+                // Если статус не 0, оставляем предыдущее значение позиции ворот
+                if (x != 0) return id(pos_sensor).state; 
+
                 float current_dist = id(raw_distance).state;
-                
+
                 // 1. АППАРАТНЫЙ КОНЦЕВИК (приоритет)
                 // Если концевик замкнут -> точно 0%
                 if (!id(end_stop_bottom).state) {
                   return 0.0;
                 }
-                
+
                 // 2. ЛОГИЧЕСКИЙ ФЛАГ ПРОВЕТРИВАНИЯ
                 // Если мы нажали кнопку проветривания, фиксируем 9%
                 if (id(binary_airing).state) {
@@ -236,17 +246,17 @@ sensor:
                 // Калибровка: 2630мм = 0%, 240мм = 100%
                 float max_dist = 2630.0; // Пол до датчика
                 float min_dist = 240.0;  // Ворота открыты
-                
+
                 if (current_dist >= 2600) { return 0.0; }   // Погрешность внизу
                 if (current_dist <= 250) { return 100.0; }  // Погрешность наверху
 
                 // Формула: (2630 - Текущая) / (2630 - 240) * 100
                 float calculated = ((max_dist - current_dist) / (max_dist - min_dist)) * 100.0;
-                
+
                 // Ограничиваем рамками 0-100
                 if (calculated < 0) return 0.0;
                 if (calculated > 100) return 100.0;
-                
+
                 return calculated;
 
           # 3. Публикует текстовое описание Range Status
@@ -266,6 +276,19 @@ sensor:
                   case 9: return "Undefined";
                   default: return "Unknown Status";
                 }
+
+          # 4. Автоматическое определение режима проветривания
+          - if:
+              condition:
+                and:
+                  - lambda: 'return x == 0;' # Только если измерение валидно
+                  - binary_sensor.is_off: binary_airing # И статус еще не включен
+                  # Если расчетная позиция находится в пределах 8% - 15%
+                  - lambda: 'return id(pos_sensor).state >= 8.0 && id(pos_sensor).state <= 12.0;'
+              then:
+                - binary_sensor.template.publish:
+                    id: binary_airing
+                    state: ON
 
     distance:
       id: raw_distance
@@ -300,13 +323,17 @@ cover:
     device_class: garage
     has_position: true
     assumed_state: false
-    # optimistic: false # Лучше убрать или поставить true, если позиция прыгает
+    # optimistic: true # Поставить true, если позиция прыгает
   
     # Lambda для получения текущей позиции (0.0 = закрыто, 1.0 = открыто)
     lambda: |-
-      if (id(pos_sensor).state > 100) return 1.0;
-      if (id(pos_sensor).state < 0) return 0.0;
-      return id(pos_sensor).state / 100.0;
+      float pos = id(pos_sensor).state;
+      if (std::isnan(pos)) {
+        return {}; // Игнорируем NAN, чтобы избежать бесконечного цикла
+      }
+      if (pos > 100.0) return 1.0;
+      if (pos < 0.0) return 0.0;
+      return pos / 100.0;
 
     # --- ДЕЙСТВИЯ КНОПОК ИНТЕРФЕЙСА ---
     # Кнопка "Открыть" (стрелка вверх) (relay1)
