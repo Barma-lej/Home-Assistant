@@ -231,9 +231,10 @@ automation:
           action: "Start"
 
     actions:
-      - action:   telegram_bot.send_message
+      - action: telegram_bot.send_message
         data:
-          target: !secret telegram_channel
+          chat_id:
+            - !secret telegram_channel
           message: "💦 Bewässerung {{ action }} *{{ trigger.from_state.attributes.friendly_name}}*"
 
 # Customize #########################################################
