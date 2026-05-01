@@ -1,17 +1,3 @@
-- id: tasmota_state_on_startup
-  alias: Tasmota - Power state on HA startup
-  triggers:
-  - event: start
-    trigger: homeassistant
-  actions:
-  - action: mqtt.publish
-    data:
-      payload: '1'
-      topic: sonoffs/cmnd/state
-  - action: mqtt.publish
-    data:
-      payload: '1'
-      topic: sonoffs/tele/STATE
 - id: rolladen_auf
   alias: Rolladen - Auf
   description: ''
@@ -467,7 +453,6 @@
       - update.moonraker_update
       - update.passive_ble_monitor_integration_update
       - update.restriction_card_update
-      - update.samsung_soundbar_update
       - update.spook_your_homie_update
       - update.thermal_comfort_icons_update
       - update.thermal_comfort_update
@@ -724,29 +709,6 @@
   - action: script.robi_flur
     metadata: {}
     data: {}
-  mode: single
-- id: '1726090038559'
-  alias: HA - Renew certificate
-  description: ''
-  triggers:
-  - trigger: time
-    at: 04:00:00
-  conditions:
-  - condition: template
-    value_template: '{% set expired = (states(''sensor.barma_partia_de_cert_expiry'')
-      | as_datetime | as_local) %}
-
-      {{ (expired.date() - now().date()).days < 7 }}'
-  actions:
-  - action: hassio.addon_start
-    metadata: {}
-    data:
-      addon: core_letsencrypt
-    enabled: false
-  - action: hassio.addon_restart
-    metadata: {}
-    data:
-      addon: core_letsencrypt
   mode: single
 - id: weihnachten_licht_an
   alias: Weihnachten - Licht An
@@ -1048,10 +1010,16 @@
     state: 'off'
   actions:
   - action: switch.turn_on
-    entity_id: switch.irrigation_pump
+    metadata: {}
+    target:
+      entity_id: switch.irrigation_pump
+    data: {}
   - delay: 15
   - action: switch.turn_off
-    entity_id: switch.irrigation_pump
+    metadata: {}
+    target:
+      entity_id: switch.irrigation_pump
+    data: {}
   mode: single
 - id: steba_humidifier_ion_heat_set
   alias: Steba - Humidifier ION HEAT Set
@@ -1312,4 +1280,60 @@
           domain: button
           entity_id: 6777bfd23333d595640e44895070baed
           type: press
+  mode: single
+- id: '1776508483422'
+  alias: Steba - Deactivate Humidifier if Steba unavailable
+  description: Выключение увлажнителя при потере датчика
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.steba_humidifier_power
+    to:
+    - unavailable
+    - unknown
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 30
+    id: sensor_lost
+  - trigger: state
+    entity_id:
+    - binary_sensor.steba_humidifier_power
+    from:
+    - unavailable
+    - unknown
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 30
+    id: sensor_recovered
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: sensor_lost
+      sequence:
+      - action: humidifier.turn_off
+        target:
+          entity_id: humidifier.steba
+      - action: automation.turn_off
+        target:
+          entity_id:
+          - automation.steba_humidifier_worktime
+          - automation.steba_humidifier_nobody_home
+          - automation.steba_humidifier_restart_period
+          - automation.steba_humidifier_ion_heat_set
+        data:
+          stop_actions: true
+    - conditions:
+      - condition: trigger
+        id: sensor_recovered
+      sequence:
+      - action: automation.turn_on
+        target:
+          entity_id:
+          - automation.steba_humidifier_worktime
+          - automation.steba_humidifier_nobody_home
+          - automation.steba_humidifier_restart_period
+          - automation.steba_humidifier_ion_heat_set
   mode: single
