@@ -34,14 +34,14 @@ input_text:
     initial: opening
     icon: mdi:window-shutter-open
 
-  markise_last_action:
-    name: Markise - Last action
-    initial: opening
-    icon: mdi:storefront-outline
-  seitenmarkise_last_action:
-    name: Seitenmarkise - Last action
-    initial: opening
-    icon: mdi:storefront-outline
+  # markise_last_action:
+  #   name: Markise - Last action
+  #   initial: opening
+  #   icon: mdi:storefront-outline
+  # seitenmarkise_last_action:
+  #   name: Seitenmarkise - Last action
+  #   initial: opening
+  #   icon: mdi:storefront-outline
 
 # Automation ########################################################
 automation:
