@@ -311,7 +311,7 @@ automation:
           entity_id: vacuum.robi
 
   # Notifictaion
-  - id: robi__notify
+  - id: robi_notify
     alias: Robi - Notify
     mode: parallel
     triggers:
@@ -328,7 +328,8 @@ automation:
     actions:
       - action: telegram_bot.send_message
         data:
-          target: !secret telegram_channel
+          chat_id:
+            - !secret telegram_channel
           message: "🐁 Robi - {{ state_attr('vacuum.robi','status') }} <- {{ trigger.from_state.state }}"
           # message: "{{ states('vacuum.robi') }}, {{ state_attr('vacuum.robi','status') }}, {{ trigger.to_state.state }} <- {{ trigger.from_state.state }}"
 
