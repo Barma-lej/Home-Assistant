@@ -2,6 +2,6 @@
 
 yeelight:
   devices:
-    192.168.2.239:
+    192.168.9.239:
       name: Kristinas Licht
       model: ceiling1
