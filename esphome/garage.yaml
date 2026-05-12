@@ -370,7 +370,7 @@ cover:
           if (pos < 0.05) {
             // Нажимаем кнопку, только если ворота не закрыты
             if (id(end_stop_bottom).state) { 
-               id(button_gate).press();
+              id(button_gate).press();
             }
             id(binary_airing).publish_state(false);
           } 
@@ -378,7 +378,7 @@ cover:
           else if (pos > 0.95) {
             // Нажимаем, только если еще не открыты полностью
             if (id(pos_sensor).state < 95.0) {
-               id(button_gate).press();
+              id(button_gate).press();
             }
             id(binary_airing).publish_state(false);
           } 
