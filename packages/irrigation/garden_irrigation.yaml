@@ -16,15 +16,13 @@ automation:
     triggers:
       - trigger: state
         entity_id:
-          - input_boolean.irrigation_cycle1_enable
+          - input_boolean.irrigation_cycle2_enable
           - input_boolean.irrigation_cycle2_enable
         to: "on"
       - trigger: state
         entity_id:
           - input_select.irrigation_cycle1_schedule_time
           - input_select.irrigation_cycle2_schedule_time
-      - trigger: state
-        entity_id:
           - input_select.irrigation_cycle1_watering_days
           - input_select.irrigation_cycle2_watering_days
 
