@@ -407,11 +407,6 @@
     weekday:
     - mon
   actions:
-  - action: button.press
-    data: {}
-    target:
-      entity_id:
-      - button.fritz_box_5590_fiber_cleanup
   - action: tts.clear_cache
     data: {}
   mode: single
