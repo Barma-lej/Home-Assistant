@@ -55,6 +55,7 @@ http:
     - ::1
     - 127.0.0.1
     - 172.30.32.0/23
+    - 172.30.33.3
     - 192.168.8.0/23
   cors_allowed_origins:
     - !secret ha_external_url
