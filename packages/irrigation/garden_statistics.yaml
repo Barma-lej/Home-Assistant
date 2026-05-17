@@ -3,6 +3,11 @@
 # Отслеживает длительность полива, расход воды и стоимость
 # по каждой зоне (Zone1=Hinten, Zone2=Vorne, Zone3=Hahn)
 # и насосу в целом.
+#
+# Ключевая логика:
+#   sensor.sonoffpow_02_energy_power > 100 W = насос реально качает воду.
+#   При срабатывании датчика давления (кран закрыт) потребление 2–10 W —
+#   switch.irrigation_pump_active = off → время не считается.
 # ==============================================================
 
 # Switch Groups ─────────────────────────────────────────────────
@@ -17,6 +22,7 @@ switch:
       - switch.irrigation_zone1_valve
       - switch.irrigation_pump
       - switch.irrigation_watering
+      - switch.irrigation_pump_active
 
   - platform: group
     name: Irrigation - Switches Zone2
@@ -26,6 +32,7 @@ switch:
       - switch.irrigation_zone2_valve
       - switch.irrigation_pump
       - switch.irrigation_watering
+      - switch.irrigation_pump_active
 
   - platform: group
     name: Irrigation - Switches Zone3
@@ -35,6 +42,7 @@ switch:
       - switch.irrigation_zone3_valve
       - switch.irrigation_pump
       - switch.irrigation_watering
+      - switch.irrigation_pump_active
 
   - platform: group
     name: Irrigation - Switches Pump
@@ -43,6 +51,7 @@ switch:
     entities:
       - switch.irrigation_pump
       - switch.irrigation_watering
+      - switch.irrigation_pump_active
 
 # Template ──────────────────────────────────────────────────────
 template:
@@ -71,7 +80,8 @@ template:
 
   - sensor:
       # ── Расход воды ──────────────────────────────────────────
-      # Zone1: 2x Gardena OS 140, расход = os140_volume * 1.5 m³/h
+      # Zone1: 2x Gardena OS 140 (одна прикрыта ≈ 50%) → коэф. 1.5
+      # Формула: время_в_часах(yearly) × os140_volume × 1.5 = м³
       - name: Irrigation - Water Consumption Zone1
         unique_id: irrigation_water_consumption_zone1
         state: >-
@@ -86,7 +96,7 @@ template:
             {{ (states('sensor.irrigation_water_consumption_zone1') | float(0)
             * states('input_number.water_price') | float(0)) | round(2) }}
 
-      # Zone2: 2x Gardena OS 140, расход = os140_volume * 2 m³/h
+      # Zone2: 2x Gardena OS 140 (обе полностью открыты) → коэф. 2
       - name: Irrigation - Water Consumption Zone2
         unique_id: irrigation_water_consumption_zone2
         state: >-
@@ -102,7 +112,7 @@ template:
             * states('input_number.water_price') | float(0)) | round(2) }}
 
       # Zone3: Hahn, расход = input_number.hahn_volume m³/h
-      # (10 л за 72 сек ≈ 0.5 m³/h)
+      # (10 л за 72 сек ≈ 0.5 m³)
       - name: Irrigation - Water Consumption Zone3
         unique_id: irrigation_water_consumption_zone3
         state: >-
@@ -133,8 +143,19 @@ template:
             {{ (states('sensor.irrigation_water_consumption_pump') | float(0)
             * states('input_number.water_price') | float(0)) | round(2) }}
 
+  # "Насос реально качает воду" — используется в Switch Groups
+  - switch:
+      - name: Irrigation - Pump Active
+        unique_id: irrigation_pump_active
+        icon: mdi:lightning-bolt
+        # Виртуальный switch, отражает реальное потребление насоса
+        state: >-
+          {{ states('sensor.sonoffpow_02_energy_power') | float(0) > 100 }}
+        turn_on: [] # только read-only, управление не нужно
+        turn_off: []
+
 # History Stats ─────────────────────────────────────────────────
-# Считают время работы каждой группы за текущий день (в часах)
+# Считают РЕАЛЬНОЕ время работы насоса (power > 100W) за текущий день
 sensor:
   # Watering durations
   - platform: history_stats
@@ -174,7 +195,8 @@ sensor:
     end: "{{ now() }}"
 
 # Utility Meters ────────────────────────────────────────────────
-# Накапливают время полива по периодам для каждой зоны и насоса
+# Накапливают время полива за год для каждой зоны и насоса.
+# unique_id сохранены — статистика продолжится без сброса.
 utility_meter:
   irrigation_watering_duration_zone1_yearly:
     unique_id: irrigation_watering_duration_zone1_yearly
@@ -228,10 +250,9 @@ automation:
         data:
           chat_id:
             - !secret telegram_channel
-          message: "💦 Bewässerung {{ action }} *{{ trigger.from_state.attributes.friendly_name}}*"
+          message: "💦 Bewässerung {{ action }} *{{ trigger.from_state.attributes.friendly_name }}*"
 
 # Customize ─────────────────────────────────────────────────────
-# Накапливают время полива по периодам для каждой зоны и насоса
 homeassistant:
   customize:
     # Groups of switches
@@ -262,7 +283,7 @@ homeassistant:
     sensor.irrigation_water_consumption_pump:
       friendly_name: "Irrigation - Wasserverbrauch Pumpe"
 
-    # Watering duration
+    # Watering duration daily
     sensor.irrigation_watering_duration_zone1_daily:
       friendly_name: "Irrigation - Dauer Hinterhof Täglich"
       icon: mdi:clock-outline
@@ -276,6 +297,7 @@ homeassistant:
       friendly_name: "Irrigation - Dauer Pumpe Täglich"
       icon: mdi:clock-outline
 
+    # Watering duration yearly
     sensor.irrigation_watering_duration_zone1_yearly:
       friendly_name: "Irrigation - Dauer Hinterhof Jährlich"
     sensor.irrigation_watering_duration_zone2_yearly:
