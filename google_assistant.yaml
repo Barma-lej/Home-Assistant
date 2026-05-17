@@ -131,6 +131,13 @@ entity_config:
     room: Garten
     expose: true
 
+  cover.terrasse:
+    name: Terrasse
+    aliases:
+      - terrasse
+    room: Garten
+    expose: true
+
   cover.tor_tor:
     name: Tor
     aliases:
@@ -169,25 +176,25 @@ entity_config:
     room: Garage
     expose: true
 
-  cover.markise:
-    name: Markise
-    aliases:
-      - markise
-      - terrasse
-      - маркиза
-      - терраса
-    room: Garten
-    expose: true
+  # cover.markise:
+  #   name: Markise
+  #   aliases:
+  #     - markise
+  #     - terrasse
+  #     - маркиза
+  #     - терраса
+  #   room: Garten
+  #   expose: true
 
-  cover.seitenmarkise:
-    name: Seitenmarkise
-    aliases:
-      - seitenmarkise
-      - сторона
-      - бок
-      - боковушка
-    room: Garten
-    expose: true
+  # cover.seitenmarkise:
+  #   name: Seitenmarkise
+  #   aliases:
+  #     - seitenmarkise
+  #     - сторона
+  #     - бок
+  #     - боковушка
+  #   room: Garten
+  #   expose: true
 
   # sensor.gartorpos:
   #   name: Tor Status
