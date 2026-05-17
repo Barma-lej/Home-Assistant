@@ -1,5 +1,43 @@
 # Automations and scripts for covers
 
+template:
+  - cover:
+      - name: Markise (inverted)
+        unique_id: markise_inverted
+        device_class: awning
+        default_entity_id: cover.markise_inverted
+        open_cover:
+          - action: cover.open_cover
+            target:
+              entity_id:
+                - cover.markise
+        close_cover:
+          - action: cover.close_cover
+            target:
+              entity_id:
+                - cover.markise
+        stop_cover:
+          - action: cover.stop_cover
+            target:
+              entity_id:
+                - cover.markise
+        set_cover_position:
+          - action: cover.set_cover_position
+            target:
+              entity_id:
+                - cover.markise
+            data:
+              position: "{{ 100 - position }}"
+        state: >
+          {% if is_state('cover.markise', 'closed') %}
+            open
+          {% elif is_state('cover.markise', 'open') %}
+            closed
+          {% else %}
+            open
+          {% endif %}
+        position: "{{ 100 - state_attr('cover.markise', 'current_position') | int(0) }}"
+
 # Cover #############################################################
 cover:
   - platform: group
@@ -34,14 +72,26 @@ input_text:
     initial: opening
     icon: mdi:window-shutter-open
 
-  # markise_last_action:
-  #   name: Markise - Last action
-  #   initial: opening
-  #   icon: mdi:storefront-outline
-  # seitenmarkise_last_action:
-  #   name: Seitenmarkise - Last action
-  #   initial: opening
-  #   icon: mdi:storefront-outline
+  terrasse_last_action:
+    name: Markise - Last action
+    initial: opening
+    icon: mdi:storefront-outline
+  markise_last_action:
+    name: Markise - Last action
+    initial: opening
+    icon: mdi:storefront-outline
+  seitenmarkise_last_action:
+    name: Seitenmarkise - Last action
+    initial: opening
+    icon: mdi:storefront-outline
+  markise_links_last_action:
+    name: Markise - Last action
+    initial: opening
+    icon: mdi:storefront-outline
+  markise_rechts_last_action:
+    name: Markise - Last action
+    initial: opening
+    icon: mdi:storefront-outline
 
 # Automation ########################################################
 automation:
@@ -57,8 +107,11 @@ automation:
           - cover.rollade_3
           - cover.rollade_1
           - cover.rollade_2
+          - cover.terrasse
           - cover.markise
           - cover.seitenmarkise
+          - cover.markise_links
+          - cover.markise_rechts
 
     conditions:
       - condition: or
