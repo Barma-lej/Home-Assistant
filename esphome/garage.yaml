@@ -236,13 +236,7 @@ sensor:
                   return 0.0;
                 }
 
-                // 2. ЛОГИЧЕСКИЙ ФЛАГ ПРОВЕТРИВАНИЯ
-                // Если мы нажали кнопку проветривания, фиксируем 9%
-                if (id(binary_airing).state) {
-                   return 9.0;
-                }
-
-                // 3. МАТЕМАТИЧЕСКИЙ РАСЧЕТ ПО ЛАЗЕРУ
+                // 2. МАТЕМАТИЧЕСКИЙ РАСЧЕТ ПО ЛАЗЕРУ
                 // Калибровка: 2630мм = 0%, 240мм = 100%
                 float max_dist = 2630.0; // Пол до датчика
                 float min_dist = 240.0;  // Ворота открыты
@@ -276,19 +270,6 @@ sensor:
                   case 9: return "Undefined";
                   default: return "Unknown Status";
                 }
-
-          # 4. Автоматическое определение режима проветривания
-          - if:
-              condition:
-                and:
-                  - lambda: 'return x == 0;' # Только если измерение валидно
-                  - binary_sensor.is_off: binary_airing # И статус еще не включен
-                  # Если расчетная позиция находится в пределах 8% - 15%
-                  - lambda: 'return id(pos_sensor).state >= 8.0 && id(pos_sensor).state <= 12.0;'
-              then:
-                - binary_sensor.template.publish:
-                    id: binary_airing
-                    state: ON
 
     distance:
       id: raw_distance
