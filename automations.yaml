@@ -462,14 +462,14 @@
       - update.pi_hole_web_update_available
       - update.tuya_local_update
       - update.home_assistant_operating_system_update
-      - update.steba_humidifier_firmware
       - update.home_power_meter_firmware
       - update.tor_firmware
       - update.innen_firmware
       - update.einfahrt_firmware
-      - update.garage_firmware_2
-      - update.terrasse_update
+      - update.garage_firmware
+      - update.terrasse_firmware
       - update.nginx_proxy_manager_update
+      - update.mower_firmware
       mobile_app_device: d65b64c785a29ffed795c6d22780bb9f
       reminder_hours: '6'
       run_config_check: true
