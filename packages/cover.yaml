@@ -85,11 +85,11 @@ input_text:
     initial: opening
     icon: mdi:storefront-outline
   markise_links_last_action:
-    name: Markise - Last action
+    name: Markise Links - Last action
     initial: opening
     icon: mdi:storefront-outline
   markise_rechts_last_action:
-    name: Markise - Last action
+    name: Markise Rechts - Last action
     initial: opening
     icon: mdi:storefront-outline
 
