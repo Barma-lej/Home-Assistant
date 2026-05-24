@@ -8,9 +8,10 @@
   conditions: []
   actions:
   - data:
-      entity_id: cover.rolladen
       position: 100
     action: cover.set_cover_position
+    target:
+      entity_id: cover.rolladen
   - action: telegram_bot.send_message
     metadata: {}
     data:
@@ -26,9 +27,11 @@
   conditions: []
   actions:
   - data:
-      entity_id: cover.rolladen
       position: 0
     action: cover.set_cover_position
+    target:
+      entity_id:
+      - cover.rolladen
   - action: telegram_bot.send_message
     metadata: {}
     data:
@@ -1332,3 +1335,80 @@
           - automation.steba_humidifier_restart_period
           - automation.steba_humidifier_ion_heat_set
   mode: single
+- id: markisen_automatisch_steuern
+  alias: Markisen - Automatisch steuern
+  description: Kombinierte Verwaltung für Markise, Seitenmarkise und Markise Links
+    basierend auf Sonne, Hitze, Wolken und Regen.
+  triggers:
+  - trigger: time_pattern
+    minutes: /5
+  - trigger: state
+    entity_id: binary_sensor.mower_rain_sensor
+    to: 'on'
+  actions:
+  - repeat:
+      for_each: '{{ COVERS_TO_MANAGE }}'
+      sequence:
+      - variables:
+          cover_entity_id: '{{ repeat.item.entity }}'
+          sun_azimuth: '{{ state_attr(''sun.sun'', ''azimuth'') | float(0) }}'
+          sun_elevation: '{{ state_attr(''sun.sun'', ''elevation'') | float(0) }}'
+          cloud_coverage: '{{ state_attr(WEATHER_SENSOR, ''cloud_coverage'') | float(101)
+            }}'
+          current_pos: '{{ state_attr(cover_entity_id, ''current_position'') | int(-1)
+            }}'
+          cover_last_changed_timestamp: '{{ as_timestamp(states[cover_entity_id].last_changed,
+            0) }}'
+      - choose:
+        - conditions:
+          - condition: template
+            value_template: "{{ sun_azimuth > repeat.item.azimuth_min_deploy and\n
+              \  sun_elevation >= repeat.item.elevation_min_deploy and\n   is_state('binary_sensor.klima_heiss',
+              'on') and\n   cloud_coverage < CLOUD_COVERAGE_THRESHOLD and\n   is_state(RAIN_SENSOR,
+              'off') and\n   current_pos != repeat.item.pos_sun_protection and\n   ((as_timestamp(now())
+              - cover_last_changed_timestamp) / 60) > repeat.item.cooldown_minutes\n}}\n"
+          alias: Если солнце мешает, жарко, нет облаков и дождя
+          sequence:
+          - action: cover.set_cover_position
+            data:
+              position: '{{ repeat.item.pos_sun_protection }}'
+            target:
+              entity_id: '{{ cover_entity_id }}'
+        - conditions:
+          - condition: template
+            value_template: "{{ (is_state(RAIN_SENSOR, 'on') or\n   sun_elevation
+              < repeat.item.elevation_threshold_retract) and\n   current_pos != repeat.item.pos_retracted\n}}\n"
+          alias: Если солнце уже не мешает или дождь
+          sequence:
+          - action: cover.set_cover_position
+            data:
+              position: '{{ repeat.item.pos_retracted }}'
+            target:
+              entity_id: '{{ cover_entity_id }}'
+  mode: single
+  variables:
+    RAIN_SENSOR: binary_sensor.mower_rain_sensor
+    WEATHER_SENSOR: weather.openweathermap
+    CLOUD_COVERAGE_THRESHOLD: 40
+    COVERS_TO_MANAGE:
+    - entity: cover.markise
+      azimuth_min_deploy: 180
+      elevation_min_deploy: 15
+      elevation_threshold_retract: 11
+      pos_sun_protection: 100
+      pos_retracted: 0
+      cooldown_minutes: 60
+    - entity: cover.seitenmarkise
+      azimuth_min_deploy: 180
+      elevation_min_deploy: 12
+      elevation_threshold_retract: 8.5
+      pos_sun_protection: 15
+      pos_retracted: 100
+      cooldown_minutes: 120
+    - entity: cover.markise_links
+      azimuth_min_deploy: 180
+      elevation_min_deploy: 12
+      elevation_threshold_retract: 8.5
+      pos_sun_protection: 15
+      pos_retracted: 100
+      cooldown_minutes: 120
