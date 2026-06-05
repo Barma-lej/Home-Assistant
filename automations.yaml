@@ -107,7 +107,7 @@
     domain: light
   mode: restart
 - id: camera_garage_richtung
-  alias: Camera - Garage Richtung
+  alias: Camera Garage Richtung
   description: Направление камеры в зависимости от положения гаражных ворот
   triggers:
   - type: value
@@ -432,7 +432,7 @@
       - update.sqlite_web_update
       - update.studio_code_server_update
       - update.tasmoadmin_update
-      - update.terminal_ssh_update
+      - update.advanced_ssh_web_terminal_update
       - update.matter_server_update
       - update.vlc_update
       - update.music_assistant_server_update
@@ -479,7 +479,8 @@
       send_to_ha: true
       mobile_app_device_2: d65b64c785a29ffed795c6d22780bb9f
 - id: camera_manage_status_led
-  alias: Camera - Manage status LED
+  alias: Camera Manage status LED
+  description: ''
   triggers:
   - trigger: sun
     event: sunrise
@@ -625,7 +626,7 @@
     - entity: cover.rollade_4
       azimuth_close_trigger: 240
       current_pos_above: 75
-      target_pos: 60
+      target_pos: 80
 - id: markise_control
   alias: Markise Verwaltung
   description: Markise automatisch steuern basierend auf Sonne, Temperatur, Wolken
@@ -1020,7 +1021,7 @@
     data: {}
   mode: single
 - id: steba_humidifier_ion_heat_set
-  alias: Steba - Humidifier ION HEAT Set
+  alias: Steba Humidifier ION HEAT Set
   description: ''
   triggers:
   - type: turned_on
@@ -1095,7 +1096,7 @@
     enabled: true
   mode: single
 - id: steba_restart_period
-  alias: Steba - Restart period
+  alias: Steba Restart period
   description: ''
   triggers:
   - trigger: time_pattern
@@ -1109,7 +1110,7 @@
     data: {}
   mode: single
 - id: steba_worktime
-  alias: Steba - Worktime
+  alias: Steba Worktime
   description: ''
   triggers:
   - trigger: time_pattern
@@ -1214,7 +1215,7 @@
         data: {}
   mode: single
 - id: steba_nobody_home
-  alias: Steba - Nobody Home
+  alias: Steba Nobody Home
   description: ''
   triggers:
   - trigger: state
@@ -1280,7 +1281,7 @@
           type: press
   mode: single
 - id: '1776508483422'
-  alias: Steba - Deactivate Humidifier if Steba unavailable
+  alias: Steba Deactivate Humidifier if Steba unavailable
   description: Выключение увлажнителя при потере датчика
   triggers:
   - trigger: state
@@ -1401,14 +1402,21 @@
     - entity: cover.seitenmarkise
       azimuth_min_deploy: 180
       elevation_min_deploy: 12
-      elevation_threshold_retract: 8.5
-      pos_sun_protection: 15
+      elevation_threshold_retract: 9
+      pos_sun_protection: 2
       pos_retracted: 100
-      cooldown_minutes: 120
+      cooldown_minutes: 60
     - entity: cover.markise_links
-      azimuth_min_deploy: 180
+      azimuth_min_deploy: 240
       elevation_min_deploy: 12
-      elevation_threshold_retract: 8.5
-      pos_sun_protection: 15
+      elevation_threshold_retract: 9
+      pos_sun_protection: 10
       pos_retracted: 100
-      cooldown_minutes: 120
+      cooldown_minutes: 60
+    - entity: cover.markise_rechts
+      azimuth_min_deploy: 240
+      elevation_min_deploy: 90
+      elevation_threshold_retract: 9
+      pos_sun_protection: 10
+      pos_retracted: 100
+      cooldown_minutes: 60
