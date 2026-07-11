@@ -12,7 +12,8 @@ automation:
 
     actions:
       - action: switch.turn_off
-        entity_id: switch.irrigation_pump
+        target:
+          entity_id: switch.irrigation_pump
 
   # Включение насоса, если открылся один из клапанов
   - id: irrigation_pump_on
@@ -33,7 +34,8 @@ automation:
 
     actions:
       - action: switch.turn_on
-        entity_id: switch.irrigation_pump
+        target:
+          entity_id: switch.irrigation_pump
 
   # Выключение насоса, если закрыты все клапаны с задержкой для смены зоны полива
   - id: irrigation_pump_off
@@ -64,7 +66,8 @@ automation:
 
     actions:
       - action: switch.turn_off
-        entity_id: switch.irrigation_pump
+        target:
+          entity_id: switch.irrigation_pump
 
   # Включение насоса для подкачки
   # - id: irrigation_regular_pumping

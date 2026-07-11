@@ -45,7 +45,7 @@ automation:
     actions:
       # Stop both cycles ####################
       - action: input_boolean.turn_off
-        data:
+        target:
           entity_id:
             - input_boolean.irrigation_cycle1_manual_run
             - input_boolean.irrigation_cycle2_manual_run
@@ -58,7 +58,7 @@ automation:
             automation.turn_off
           {% endif %}
 
-        data:
+        target:
           entity_id: >
             {% for item in states['automation'] if item.name.startswith('Irrigation - ')
               and item.name.find('Master Control Switch') == -1

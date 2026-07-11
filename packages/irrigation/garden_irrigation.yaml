@@ -1,12 +1,3 @@
-## Customize ################
-#homeassistant:
-#  customize:
-#    sensor.zone1to4_valve:
-#      unit_of_measurement: '%'
-#
-#    sensor.zone5_valve:
-#      unit_of_measurement: '%'
-
 # Automations ###############
 automation:
   # Set next run time when schedule enabled or time changed
@@ -16,7 +7,7 @@ automation:
     triggers:
       - trigger: state
         entity_id:
-          - input_boolean.irrigation_cycle2_enable
+          - input_boolean.irrigation_cycle1_enable
           - input_boolean.irrigation_cycle2_enable
         to: "on"
       - trigger: state

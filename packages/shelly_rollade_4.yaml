@@ -1,4 +1,4 @@
-# Shelly Rollade Terrasse
+# Shelly Rollade 4
 # https://www.home-assistant.io/integrations/shelly/
 
 # Sensor ############################################################
@@ -21,7 +21,7 @@ utility_meter:
 # Automation ########################################################
 automation:
   - id: telegram_rollade_4
-    alias: "Telegram - Rollade Terrasse"
+    alias: "Telegram - Rollade 4"
     mode: restart
     triggers:
       - trigger: event
@@ -55,12 +55,12 @@ automation:
 homeassistant:
   customize:
     cover.rollade_4:
-      friendly_name: Rollade Terrasse
+      friendly_name: Rollade 4
     sensor.rollade_4_power:
-      friendly_name: Leistung (Rollade Terrasse)
+      friendly_name: Leistung (Rollade 4)
       icon: mdi:gauge
     sensor.rollade_4_energy:
-      friendly_name: Verbrauch (Rollade Terrasse)
+      friendly_name: Verbrauch (Rollade 4)
     binary_sensor.rollade_4_overheating:
-      friendly_name: Überhitzen (Rollade Terrasse)
+      friendly_name: Überhitzen (Rollade 4)
       icon: mdi:thermometer-alert
