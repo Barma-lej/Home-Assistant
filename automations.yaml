@@ -438,7 +438,6 @@
       - update.music_assistant_server_update
       - update.shelly1pmminig3_34b7da8db254_firmware_update
       - update.aha_region_update
-      - update.card_tools_update
       - update.comfortable_environment_card_update
       - update.fold_entity_row_update
       - update.go2rtc_update
@@ -458,7 +457,6 @@
       - update.weather_chart_card_update
       - update.webrtc_camera_update
       - update.xiaomi_smartmi_fan_card_update
-      - update.xiaomi_vacuum_map_card_update
       - update.yandex_smart_home_update
       - update.yandex_station_intents_update
       - update.yandex_station_update
@@ -530,10 +528,6 @@
   conditions:
   - condition: or
     conditions:
-    - condition: state
-      entity_id: media_player.sony_kd_55x8505b
-      state: 'off'
-      enabled: false
     - condition: state
       entity_id: media_player.gq75qn92catxzg
       state: 'off'
@@ -608,7 +602,7 @@
           position: '{{ repeat.item.target_pos }}'
         action: cover.set_cover_position
   variables:
-    CLOUD_COVERAGE_MAX: 40
+    CLOUD_COVERAGE_MAX: 150
     COOLDOWN_MINUTES: 240
     COVERS_TO_MANAGE:
     - entity: cover.rollade_1
@@ -1390,7 +1384,7 @@
   variables:
     RAIN_SENSOR: binary_sensor.mower_rain_sensor
     WEATHER_SENSOR: weather.openweathermap
-    CLOUD_COVERAGE_THRESHOLD: 40
+    CLOUD_COVERAGE_THRESHOLD: 150
     COVERS_TO_MANAGE:
     - entity: cover.markise
       azimuth_min_deploy: 180
