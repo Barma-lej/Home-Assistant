@@ -370,13 +370,13 @@ input_number:
 
   # The moisture below which the irrigation will started
   irrigation_zone1_moisture_threshold:
-    name: Irrigation - Bodenfeuchte vorne
+    name: Irrigation - Bodenfeuchte hinten
     min: 5
     max: 45
     icon: mdi:water-percent
     unit_of_measurement: "%"
   irrigation_zone2_moisture_threshold:
-    name: Irrigation - Bodenfeuchte hinten
+    name: Irrigation - Bodenfeuchte vorne
     min: 5
     max: 45
     icon: mdi:water-percent
