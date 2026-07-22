@@ -992,15 +992,22 @@
   mode: single
 - id: irrigation_regular_pumping
   alias: Irrigation - Regular pumping
-  description: Регулярная подкачка воды
+  description: Регулярная подкачка воды — кратковременный пуск насоса каждые 12 ч
+    (защита от простоя).
   triggers:
   - trigger: time_pattern
     hours: /12
     minutes: '2'
+    note: Jeden Tag um 00:02 und 12:02 Uhr
   conditions:
   - condition: state
     entity_id: switch.irrigation_pump
     state: 'off'
+    note: Pumpe muss aus sein (sonst läuft gerade eine Bewässerung)
+  - condition: template
+    value_template: "{{ not is_state('input_boolean.irrigation_cycle1_running', 'on')\n
+      \ and not is_state('input_boolean.irrigation_cycle2_running', 'on') }}\n"
+    note: Nicht während eines laufenden Zyklus (doppelte Absicherung)
   actions:
   - action: switch.turn_on
     metadata: {}
