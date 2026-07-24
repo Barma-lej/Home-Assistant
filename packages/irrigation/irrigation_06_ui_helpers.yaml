@@ -1,0 +1,41 @@
+# ============================================================================
+# Irrigation 06 — UI-Helfer für das Lovelace-Dashboard  ·  Version 2.1
+# ----------------------------------------------------------------------------
+# Diese Helfer werden vom bestehenden Dashboard (Dashboard.yml) benötigt:
+#   * "_view"-Booleans steuern das Aufklappen von Detail-Kacheln
+#     (Tap auf "Zeitplan"/"Wetterbedingungen" blendet Details ein/aus).
+#   * irrigation_view_settings ist der Umschalter für die NEUE Registerkarte
+#     "Einstellungen" mit allen Erweiterungen aus 2.1 (Wetter, Wochentage,
+#     adaptive Dauer, Benachrichtigungen, Zonensensoren).
+#
+# Das vorhandene Skript script.irrigation_views_toggle schaltet automatisch
+# alle input_boolean.irrigation_view_* gegeneinander um — die neue Registerkarte
+# funktioniert daher ohne weitere Anpassung des Skripts.
+# ============================================================================
+
+# input_boolean:
+#   # Detail-Einblendung für den Morgen-Zeitplan
+#   irrigation_cycle1_enable_view:
+#     name: Irrigation - Morgen Zeitplan Details
+#     icon: mdi:calendar-expand
+#     unique_id: irrigation_cycle1_enable_view
+#   irrigation_cycle1_use_sensor_data_view:
+#     name: Irrigation - Morgen Wetterbedingungen Details
+#     icon: mdi:thermometer-lines
+#     unique_id: irrigation_cycle1_use_sensor_data_view
+
+#   # Detail-Einblendung für den Abend-Zeitplan
+#   irrigation_cycle2_enable_view:
+#     name: Irrigation - Abend Zeitplan Details
+#     icon: mdi:calendar-expand
+#     unique_id: irrigation_cycle2_enable_view
+#   irrigation_cycle2_use_sensor_data_view:
+#     name: Irrigation - Abend Wetterbedingungen Details
+#     icon: mdi:thermometer-lines
+#     unique_id: irrigation_cycle2_use_sensor_data_view
+
+#   # NEUE Registerkarte "Einstellungen" (2.1-Erweiterungen)
+#   irrigation_view_settings:
+#     name: Irrigation - Einstellungen
+#     icon: mdi:cog
+#     unique_id: irrigation_view_settings

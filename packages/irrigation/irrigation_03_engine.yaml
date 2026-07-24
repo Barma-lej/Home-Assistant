@@ -1,0 +1,919 @@
+# ============================================================================
+# Irrigation 03 — Engine (Automatisierungen + Skripte)  ·  Version 2.1
+# ----------------------------------------------------------------------------
+# Das Herz der Bewässerung mit den sechs Erweiterungen:
+#   [W] Wettervorhersage      — weather.get_forecasts, überspringt bei Regen
+#   [D] Wochentage            — konkreter Tagesplan statt "Alle N Tage"
+#   [S] Zonen-Feuchtesensoren — eigener Sensor je Zone (input_text)
+#   [A] Adaptive Dauer        — Laufzeit nach Temperatur/Feuchte (ET-Heuristik)
+#   [N] Actionable Notify     — Telegram-Buttons "Verlängern"/"Stopp"
+#   [R] Aktiver Lauf          — Tracking Zyklus:Zone für die Buttons
+#
+# Bewährte Grundlagen aus 2.0 bleiben erhalten:
+#   * synchrone Skriptaufrufe (kein wait_template-Polling auf script.X)
+#   * Zonen data-driven via repeat.for_each
+#   * Tasmota Pulsetime als Hardware-Failsafe
+#   * Failsafes bleiben immer aktiv
+# ============================================================================
+
+# ---------------------------------------------------------------------------
+# [W] Hilfs-Helfer für die UI: max. Regenwahrscheinlichkeit im Vorhersagefenster
+# (wird stündlich von automation.irrigation_update_forecast aktualisiert)
+# ---------------------------------------------------------------------------
+input_number:
+  irrigation_forecast_rain_now:
+    name: Irrigation - Regenwahrscheinlichkeit (Vorhersage)
+    min: 0
+    max: 100
+    step: 1
+    unit_of_measurement: "%"
+    mode: box
+    icon: mdi:weather-pouring
+
+# ---------------------------------------------------------------------------
+# Gruppe der (vom Master Control) schaltbaren Automatisierungen — für die UI
+# ---------------------------------------------------------------------------
+group:
+  irrigation_automations:
+    name: "Irrigation - Automatisierungen"
+    icon: mdi:sprinkler-variant
+    entities:
+      - automation.irrigation_zeitplan_setzen
+      - automation.irrigation_start_morgenzyklus
+      - automation.irrigation_start_abendzyklus
+      - automation.irrigation_manuell_starten
+      - automation.irrigation_abbrechen_manueller_zyklus
+      - automation.irrigation_cancel_if_it_rains
+      - automation.irrigation_pump_on
+      - automation.irrigation_pump_off
+      - automation.irrigation_update_forecast
+      - automation.irrigation_telegram_abbrechen
+      - automation.irrigation_telegram_verlangern
+
+# ===========================================================================
+# AUTOMATISIERUNGEN
+# ===========================================================================
+automation:
+  # -------------------------------------------------------------------------
+  # Nächsten Startzeitpunkt setzen (bei Aktivierung/Änderung von Zeit, Tagen,
+  # Planungsmodus oder Wochentagen).
+  # -------------------------------------------------------------------------
+  - id: irrigation_set_next_run_time
+    alias: Irrigation - Zeitplan setzen
+    description: "Berechnet den nächsten Startzeitpunkt je Zyklus (Intervall oder Wochentage)."
+    mode: queued
+    triggers:
+      - trigger: state
+        entity_id:
+          - input_boolean.irrigation_cycle1_enable
+          - input_boolean.irrigation_cycle2_enable
+        to: "on"
+      - trigger: state
+        entity_id:
+          - input_datetime.irrigation_cycle1_start_time
+          - input_datetime.irrigation_cycle2_start_time
+          - input_select.irrigation_cycle1_watering_days
+          - input_select.irrigation_cycle2_watering_days
+          - input_select.irrigation_cycle1_schedule_mode
+          - input_select.irrigation_cycle2_schedule_mode
+          # [D] Wochentage
+          - input_boolean.irrigation_cycle1_day_mon
+          - input_boolean.irrigation_cycle1_day_tue
+          - input_boolean.irrigation_cycle1_day_wed
+          - input_boolean.irrigation_cycle1_day_thu
+          - input_boolean.irrigation_cycle1_day_fri
+          - input_boolean.irrigation_cycle1_day_sat
+          - input_boolean.irrigation_cycle1_day_sun
+          - input_boolean.irrigation_cycle2_day_mon
+          - input_boolean.irrigation_cycle2_day_tue
+          - input_boolean.irrigation_cycle2_day_wed
+          - input_boolean.irrigation_cycle2_day_thu
+          - input_boolean.irrigation_cycle2_day_fri
+          - input_boolean.irrigation_cycle2_day_sat
+          - input_boolean.irrigation_cycle2_day_sun
+    conditions:
+      - condition: state
+        entity_id: input_boolean.irrigation_master_control_switch
+        state: "on"
+      - condition: template
+        value_template: >
+          {{ is_state('input_boolean.irrigation_cycle1_enable', 'on')
+            or is_state('input_boolean.irrigation_cycle2_enable', 'on') }}
+    actions:
+      - action: script.irrigation_update_next_runtime
+        data:
+          cycle: "{{ '1' if 'cycle1' in trigger.entity_id else '2' }}"
+          after_run: false
+
+  # -------------------------------------------------------------------------
+  # Zyklus 1 (Morgen) starten
+  # -------------------------------------------------------------------------
+  - id: irrigation_run_cycle_1
+    alias: Irrigation - Start Morgenzyklus
+    mode: single
+    triggers:
+      - trigger: time
+        at: input_datetime.irrigation_cycle1_next_run_time
+    conditions:
+      - condition: state
+        entity_id: input_boolean.irrigation_cycle1_enable
+        state: "on"
+      - condition: state
+        entity_id: input_boolean.irrigation_master_control_switch
+        state: "on"
+    actions:
+      - action: script.irrigation_check_sensor_data
+        data:
+          cycle: "1"
+      - action: script.irrigation_update_next_runtime
+        data:
+          cycle: "1"
+          after_run: true
+
+  # -------------------------------------------------------------------------
+  # Zyklus 2 (Abend) starten
+  # -------------------------------------------------------------------------
+  - id: irrigation_run_cycle_2
+    alias: Irrigation - Start Abendzyklus
+    mode: single
+    triggers:
+      - trigger: time
+        at: input_datetime.irrigation_cycle2_next_run_time
+    conditions:
+      - condition: state
+        entity_id: input_boolean.irrigation_cycle2_enable
+        state: "on"
+      - condition: state
+        entity_id: input_boolean.irrigation_master_control_switch
+        state: "on"
+    actions:
+      - action: script.irrigation_check_sensor_data
+        data:
+          cycle: "2"
+      - action: script.irrigation_update_next_runtime
+        data:
+          cycle: "2"
+          after_run: true
+
+  # -------------------------------------------------------------------------
+  # Manuellen Zyklus starten
+  # -------------------------------------------------------------------------
+  - id: irrigation_run_a_cycle_manually
+    alias: Irrigation - Manuell starten
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id:
+          - input_boolean.irrigation_cycle1_manual_run
+          - input_boolean.irrigation_cycle2_manual_run
+        from: "off"
+        to: "on"
+    conditions:
+      - condition: template
+        value_template: >
+          {{ not is_state('input_boolean.irrigation_cycle1_running', 'on')
+            and not is_state('input_boolean.irrigation_cycle2_running', 'on') }}
+      - condition: state
+        entity_id: input_boolean.irrigation_master_control_switch
+        state: "on"
+    actions:
+      - variables:
+          cycle: "{{ '1' if trigger.entity_id == 'input_boolean.irrigation_cycle1_manual_run' else '2' }}"
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.irrigation_current_zone
+        data:
+          value: "Initialisierung …"
+      - action: switch.turn_off
+        target:
+          entity_id: switch.irrigation_valves
+      - action: script.turn_off
+        target:
+          entity_id:
+            - script.irrigation_run_a_cycle
+            - script.irrigation_irrigate_a_zone
+      - action: script.irrigation_run_a_cycle
+        data:
+          cycle: "{{ cycle }}"
+      - action: input_boolean.turn_off
+        target:
+          entity_id:
+            - input_boolean.irrigation_cycle1_manual_run
+            - input_boolean.irrigation_cycle2_manual_run
+
+  # -------------------------------------------------------------------------
+  # Manuellen Zyklus abbrechen
+  # -------------------------------------------------------------------------
+  - id: irrigation_cancel_a_manual_cycle
+    alias: Irrigation - Abbrechen manueller Zyklus
+    mode: restart
+    triggers:
+      - trigger: state
+        entity_id:
+          - input_boolean.irrigation_cycle1_manual_run
+          - input_boolean.irrigation_cycle2_manual_run
+        from: "on"
+        to: "off"
+    actions:
+      - action: script.irrigation_abort
+
+  # -------------------------------------------------------------------------
+  # Abbruch bei Regen (stoppt alles + Benachrichtigung)
+  # -------------------------------------------------------------------------
+  - id: irrigation_cancel_if_it_rains
+    alias: Irrigation - Abbrechen wenn es regnet
+    description: "Stoppt die laufende Bewässerung bei Regen (30 s Entprellung)."
+    mode: single
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.mower_rain_sensor
+        to: "on"
+        for: "00:00:30"
+    conditions:
+      - condition: template
+        value_template: >
+          {{ is_state('input_boolean.irrigation_cycle1_running', 'on')
+            or is_state('input_boolean.irrigation_cycle2_running', 'on')
+            or is_state('switch.irrigation_valves', 'on') }}
+        # or is_state('switch.irrigation_zone3_valve', 'on') }}
+    actions:
+      - action: script.irrigation_abort
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.irrigation_current_zone
+        data:
+          value: "Regen – abgebrochen"
+      - action: telegram_bot.send_message
+        data:
+          chat_id:
+            - !secret telegram_channel
+          message: "🌧️ Bewässerung wegen Regen abgebrochen."
+
+  # -------------------------------------------------------------------------
+  # [W] Wettervorhersage stündlich laden → max. Regenwahrscheinlichkeit
+  # -------------------------------------------------------------------------
+  - id: irrigation_update_forecast
+    alias: Irrigation - Update Forecast
+    description: "Lädt die Stundenvorhersage und speichert die max. Regenwahrscheinlichkeit."
+    mode: restart
+    triggers:
+      - trigger: time_pattern
+        minutes: "/30"
+      - trigger: homeassistant
+        event: start
+      - trigger: state
+        entity_id: input_text.irrigation_weather_entity
+    conditions:
+      - condition: state
+        entity_id: input_boolean.irrigation_use_weather_forecast
+        state: "on"
+    actions:
+      - variables:
+          weather_entity: "{{ states('input_text.irrigation_weather_entity') }}"
+          fc_hours: "{{ states('input_number.irrigation_forecast_hours') | int(12) }}"
+      - action: weather.get_forecasts
+        data:
+          type: hourly
+        target:
+          entity_id: "{{ weather_entity }}"
+        response_variable: fc
+      - variables:
+          max_rain: >
+            {% set entries = fc.get(weather_entity, {}).get('forecast', [])[: fc_hours | int(12)] %}
+            {% set ns = namespace(p=0) %}
+            {% for e in entries %}
+              {% set ns.p = [ns.p, e.precipitation_probability | default(0) | float(0)] | max %}
+            {% endfor %}
+            {{ ns.p | round(0) }}
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.irrigation_forecast_rain_now
+        data:
+          value: "{{ max_rain }}"
+
+  # -------------------------------------------------------------------------
+  # Master Control — schaltet alle Zeitplan-/Manuell-Automatisierungen.
+  # Failsafes (Name enthält 'Failsafe') bleiben IMMER aktiv.
+  # -------------------------------------------------------------------------
+  - id: irrigation_master_control_switch
+    alias: Irrigation - Master Control Switch
+    mode: restart
+    triggers:
+      - trigger: state
+        entity_id: input_boolean.irrigation_master_control_switch
+      - trigger: homeassistant
+        event: start
+    actions:
+      - action: script.irrigation_abort
+      - action: input_boolean.turn_off
+        target:
+          entity_id:
+            - input_boolean.irrigation_cycle1_manual_run
+            - input_boolean.irrigation_cycle2_manual_run
+      - action: >
+          {{ 'automation.turn_on' if is_state('input_boolean.irrigation_master_control_switch', 'on')
+            else 'automation.turn_off' }}
+        target:
+          entity_id: >
+            {% set ns = namespace(list=[]) %}
+            {% for a in states['automation']
+              if a.name.startswith('Irrigation - ')
+              and 'Master Control Switch' not in a.name
+              and 'Failsafe' not in a.name %}
+              {% set ns.list = ns.list + [a.entity_id] %}
+            {% endfor %}
+            {{ ns.list | join(',') }}
+      - repeat:
+          count: 4
+          sequence:
+            - action: mqtt.publish
+              data:
+                topic: "cmnd/sonoff4ch/pulsetime{{ repeat.index }}"
+                payload: "0"
+
+  # -------------------------------------------------------------------------
+  # Pumpe AN / AUS
+  # -------------------------------------------------------------------------
+  - id: irrigation_pump_on
+    alias: Irrigation - Pump ON
+    description: "Pumpe an, sobald ein Ventil öffnet."
+    mode: restart
+    triggers:
+      - trigger: state
+        entity_id:
+          - switch.irrigation_valves
+          - switch.irrigation_zone3_valve
+        to: "on"
+        for: "00:00:01"
+    conditions:
+      - condition: state
+        entity_id: switch.irrigation_pump
+        state: "off"
+    actions:
+      - action: switch.turn_on
+        target:
+          entity_id: switch.irrigation_pump
+
+  - id: irrigation_pump_off
+    alias: Irrigation - Pump OFF
+    description: "Pumpe aus, wenn alle Ventile zu sind (4 s Zonenwechsel-Puffer)."
+    mode: restart
+    triggers:
+      - trigger: state
+        entity_id: switch.irrigation_valves
+        to: "off"
+        for: "00:00:04"
+      - trigger: time_pattern
+        minutes: "/15"
+    conditions:
+      - condition: state
+        entity_id: switch.irrigation_valves
+        state: "off"
+      - condition: state
+        entity_id: switch.irrigation_zone3_valve
+        state: "off"
+    actions:
+      - action: switch.turn_off
+        target:
+          entity_id: switch.irrigation_pump
+
+  # =========================================================================
+  # FAILSAFES — bleiben immer aktiv
+  # =========================================================================
+  - id: irrigation_failsafe_pump_control_switch
+    alias: Irrigation - Failsafe Pump Control Switch
+    description: "Pumpe aus, sobald der Bewässerungsautomat deaktiviert wird."
+    mode: restart
+    triggers:
+      - trigger: state
+        entity_id: input_boolean.irrigation_master_control_switch
+        to: "off"
+    actions:
+      - action: switch.turn_off
+        target:
+          entity_id: switch.irrigation_pump
+
+  - id: irrigation_failsafe_master_control_switch
+    alias: Irrigation - Failsafe Master Control Switch
+    mode: restart
+    triggers:
+      - trigger: state
+        entity_id: input_boolean.irrigation_master_control_switch
+        to: "off"
+      - trigger: homeassistant
+        event: start
+    actions:
+      - action: script.irrigation_abort
+      - action: input_boolean.turn_off
+        target:
+          entity_id:
+            - input_boolean.irrigation_cycle1_manual_run
+            - input_boolean.irrigation_cycle2_manual_run
+
+  - id: irrigation_failsafe_valve_1_on
+    alias: Irrigation - Failsafe Valve 1 On
+    mode: restart
+    triggers:
+      - trigger: state
+        entity_id: switch.irrigation_zone1_valve
+        to: "on"
+    actions:
+      - action: switch.turn_off
+        target:
+          entity_id:
+            - switch.irrigation_zone2_valve
+            # - switch.irrigation_zone3_valve
+      - delay: "02:00:00"
+      - condition: state
+        entity_id: switch.irrigation_zone1_valve
+        state: "on"
+      - action: switch.turn_off
+        target:
+          entity_id: switch.irrigation_zone1_valve
+
+  - id: irrigation_failsafe_valve_2_on
+    alias: Irrigation - Failsafe Valve 2 On
+    mode: restart
+    triggers:
+      - trigger: state
+        entity_id: switch.irrigation_zone2_valve
+        to: "on"
+    actions:
+      - action: switch.turn_off
+        target:
+          entity_id:
+            - switch.irrigation_zone1_valve
+            # - switch.irrigation_zone3_valve
+      - delay: "02:00:00"
+      - condition: state
+        entity_id: switch.irrigation_zone2_valve
+        state: "on"
+      - action: switch.turn_off
+        target:
+          entity_id: switch.irrigation_zone2_valve
+
+  # - id: irrigation_failsafe_valve_3_on
+  #   alias: Irrigation - Failsafe Valve 3 On
+  #   mode: restart
+  #   triggers:
+  #     - trigger: state
+  #       entity_id: switch.irrigation_zone3_valve
+  #       to: "on"
+  #   actions:
+  #     - action: switch.turn_off
+  #       target:
+  #         entity_id:
+  #           - switch.irrigation_zone1_valve
+  #           - switch.irrigation_zone2_valve
+  #     - delay: "02:00:00"
+  #     - condition: state
+  #       entity_id: switch.irrigation_zone3_valve
+  #       state: "on"
+  #     - action: switch.turn_off
+  #       target:
+  #         entity_id: switch.irrigation_zone3_valve
+
+  # =========================================================================
+  # [N] TELEGRAM CALLBACKS — Buttons "Stopp" / "Verlängern"
+  # =========================================================================
+  - id: irrigation_telegram_abort
+    alias: Irrigation - Telegram Abbrechen
+    description: "Reagiert auf den Telegram-Button 'Stopp'."
+    mode: restart
+    triggers:
+      - trigger: event
+        event_type: telegram_callback
+        event_data:
+          data: "/irrigation_abort"
+    actions:
+      - action: script.irrigation_abort
+      - action: telegram_bot.answer_callback_query
+        data:
+          callback_query_id: "{{ trigger.event.data.id }}"
+          message: "⏹️ Bewässerung abgebrochen"
+
+  - id: irrigation_telegram_extend
+    alias: Irrigation - Telegram Verlängern
+    description: "Reagiert auf den Telegram-Button 'Verlängern'."
+    mode: restart
+    triggers:
+      - trigger: event
+        event_type: telegram_callback
+        event_data:
+          data: "/irrigation_extend"
+    actions:
+      - action: script.irrigation_extend_zone
+      - action: telegram_bot.answer_callback_query
+        data:
+          callback_query_id: "{{ trigger.event.data.id }}"
+          message: "▶️ Bewässerung verlängert"
+
+# ===========================================================================
+# SKRIPTE
+# ===========================================================================
+script:
+  # -------------------------------------------------------------------------
+  # [W][S] Sensordaten + Wettervorhersage prüfen, dann Zyklus starten
+  # -------------------------------------------------------------------------
+  irrigation_check_sensor_data:
+    alias: Irrigation - Sensorenprüfung
+    icon: mdi:thermometer-check
+    mode: single
+    fields:
+      cycle:
+        description: "Zyklusnummer (1 = Morgen, 2 = Abend)"
+        example: "1"
+    variables:
+      use_sensors: "{{ is_state('input_boolean.irrigation_cycle' ~ cycle ~ '_use_sensor_data', 'on') }}"
+      use_forecast: "{{ is_state('input_boolean.irrigation_use_weather_forecast', 'on') }}"
+      weather_entity: "{{ states('input_text.irrigation_weather_entity') }}"
+      fc_hours: "{{ states('input_number.irrigation_forecast_hours') | int(12) }}"
+      rain_thr: "{{ states('input_number.irrigation_forecast_rain_threshold') | float(60) }}"
+    sequence:
+      # [W] Vorhersage laden und max. Regenwahrscheinlichkeit bestimmen
+      - if:
+          - condition: template
+            value_template: "{{ use_forecast }}"
+        then:
+          - action: weather.get_forecasts
+            data:
+              type: hourly
+            target:
+              entity_id: "{{ weather_entity }}"
+            response_variable: fc
+          - variables:
+              rain_expected: >
+                {% set entries = fc.get(weather_entity, {}).get('forecast', [])[: fc_hours | int(12)] %}
+                {% set ns = namespace(p=0) %}
+                {% for e in entries %}
+                  {% set ns.p = [ns.p, e.precipitation_probability | default(0) | float(0)] | max %}
+                {% endfor %}
+                {{ ns.p >= rain_thr }}
+      # Temperatur hoch genug?
+      - condition: template
+        value_template: >
+          {{ not use_sensors or (states('sensor.rasen_temperature') | float(0)
+            >= states('input_number.irrigation_cycle' ~ cycle ~ '_temperature_threshold') | float(0)) }}
+      # Kein Regen (Regensensor)?
+      - condition: template
+        value_template: "{{ not use_sensors or is_state('binary_sensor.mower_rain_sensor', 'off') }}"
+      # [W] Kein Regen in der Vorhersage erwartet?
+      - condition: template
+        value_template: "{{ not use_forecast or not (rain_expected | default(false) | bool) }}"
+      - action: script.irrigation_run_a_cycle
+        data:
+          cycle: "{{ cycle }}"
+
+  # -------------------------------------------------------------------------
+  # Einen Zyklus ausführen — Zonen data-driven via repeat.for_each
+  # -------------------------------------------------------------------------
+  irrigation_run_a_cycle:
+    alias: Irrigation - Ein Zyklus starten
+    icon: mdi:run-fast
+    mode: single
+    fields:
+      cycle:
+        description: "Zyklusnummer (1 = Morgen, 2 = Abend)"
+        example: "1"
+    variables:
+      # Zonen dieses Zyklus. Für den Hahn (Zone 3) einfach [1, 2, 3] setzen.
+      zones: [1, 2]
+    sequence:
+      - condition: template
+        value_template: >
+          {{ not is_state('input_boolean.irrigation_cycle1_running', 'on')
+            and not is_state('input_boolean.irrigation_cycle2_running', 'on') }}
+      - action: input_boolean.turn_on
+        target:
+          entity_id: "input_boolean.irrigation_cycle{{ cycle }}_running"
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.irrigation_current_zone
+        data:
+          value: "Starte Zyklus {{ cycle }} …"
+      - repeat:
+          for_each: "{{ zones }}"
+          sequence:
+            - action: script.irrigation_irrigate_a_zone
+              data:
+                cycle: "{{ cycle }}"
+                zone: "{{ repeat.item }}"
+      - action: switch.turn_off
+        target:
+          entity_id: switch.irrigation_valves
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.irrigation_current_zone
+        data:
+          value: "-"
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.irrigation_active_run
+        data:
+          value: "-"
+      - action: input_boolean.turn_off
+        target:
+          entity_id: "input_boolean.irrigation_cycle{{ cycle }}_running"
+      # Bei "Einmal" den Zeitplan danach deaktivieren
+      - condition: template
+        value_template: "{{ states('input_select.irrigation_cycle' ~ cycle ~ '_watering_days') == 'Einmal' }}"
+      - action: input_boolean.turn_off
+        target:
+          entity_id: "input_boolean.irrigation_cycle{{ cycle }}_enable"
+
+  # -------------------------------------------------------------------------
+  # [S][A][N] Eine einzelne Zone bewässern
+  #   * Feuchtesensor je Zone (input_text.irrigation_zoneX_moisture_sensor)
+  #   * adaptive Dauer (ET-Heuristik)
+  #   * Timer als massgebliche Zeit (für Verlängern), Tasmota als HW-Failsafe
+  #   * Start-Benachrichtigung mit optionalen Telegram-Buttons
+  # -------------------------------------------------------------------------
+  irrigation_irrigate_a_zone:
+    alias: Irrigation - Bewässerung einer Zone starten
+    icon: mdi:sprinkler-variant
+    mode: single
+    fields:
+      cycle:
+        description: "Zyklusnummer"
+        example: "1"
+      zone:
+        description: "Zonennummer"
+        example: "1"
+    variables:
+      use_sensors: "{{ is_state('input_boolean.irrigation_cycle' ~ cycle ~ '_use_sensor_data', 'on') }}"
+      moisture_sensor: "{{ states('input_text.irrigation_zone' ~ zone ~ '_moisture_sensor') }}"
+      moisture_thr: "{{ states('input_number.irrigation_zone' ~ zone ~ '_moisture_threshold') | float(0) }}"
+      temp_thr: "{{ states('input_number.irrigation_cycle' ~ cycle ~ '_temperature_threshold') | float(0) }}"
+      base_min: "{{ states('input_number.irrigation_cycle' ~ cycle ~ '_zone' ~ zone ~ '_duration') | float(0) }}"
+      adaptive: "{{ is_state('input_boolean.irrigation_adaptive_duration', 'on') }}"
+      # [A] adaptiver Skalierungsfaktor
+      scale: >
+        {% if adaptive %}
+          {% set temp = states('sensor.rasen_temperature') | float(20) %}
+          {% set moist = states(moisture_sensor) | float(0) %}
+          {% set base_t = states('input_number.irrigation_adaptive_base_temp') | float(20) %}
+          {% set deficit = ((moisture_thr - moist) / moisture_thr) if moisture_thr > 0 else 0 %}
+          {% set f = (temp / base_t) * (1 + 0.5 * deficit) %}
+          {% set fmin = states('input_number.irrigation_adaptive_min_scale') | float(0.5) %}
+          {% set fmax = states('input_number.irrigation_adaptive_max_scale') | float(1.5) %}
+          {{ [[f, fmin] | max, fmax] | min | round(2) }}
+        {% else %}1.0{% endif %}
+      duration_min: "{{ ((base_min | float(0)) * (scale | float(1.0))) | round(1) }}"
+      extend_min: "{{ states('input_number.irrigation_extend_minutes') | int(10) }}"
+    sequence:
+      # Ventil verfügbar?
+      - condition: template
+        value_template: "{{ states('switch.irrigation_zone' ~ zone ~ '_valve') not in ['unavailable', 'unknown'] }}"
+      # Dauer > 0?
+      - condition: template
+        value_template: "{{ duration_min | float(0) > 0 }}"
+      # [S] Bodenfeuchte (Zonensensor) niedrig genug UND Temperatur hoch genug?
+      - condition: template
+        value_template: >
+          {{ not use_sensors or (
+              states(moisture_sensor) | float(0) <= moisture_thr
+              and states('sensor.rasen_temperature') | float(0) >= temp_thr) }}
+      # Kein Regen (auch während des Laufs)?
+      - condition: template
+        value_template: "{{ not use_sensors or is_state('binary_sensor.mower_rain_sensor', 'off') }}"
+      # Tasmota Pulsetime mit der effektiven (adaptiven) Dauer setzen
+      - action: script.irrigation_set_tasmota_pulsetime
+        data:
+          cycle: "{{ cycle }}"
+          zone: "{{ zone }}"
+          minutes: "{{ duration_min }}"
+      - delay: "00:00:02"
+      # UI + [R] Tracking
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.irrigation_current_zone
+        data:
+          value: "Zone {{ zone }} ({{ duration_min }} min{% if adaptive %} · adaptiv{% endif %})"
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.irrigation_active_run
+        data:
+          value: "{{ cycle }}:{{ zone }}"
+      # Ventil öffnen
+      - action: switch.turn_on
+        target:
+          entity_id: "switch.irrigation_zone{{ zone }}_valve"
+      # [N] Start-Benachrichtigung (mit Buttons, wenn aktiviert)
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.irrigation_actionable_notify
+                state: "on"
+            sequence:
+              - action: telegram_bot.send_message
+                data:
+                  chat_id:
+                    - !secret telegram_channel
+                  message: >
+                    💦 Bewässerung gestartet — Zone {{ zone }}, Zyklus {{ cycle }}
+                    ({{ duration_min }} min{% if adaptive %}, adaptiv ×{{ scale }}{% endif %})
+                  inline_keyboard:
+                    - "▶️ +{{ extend_min }} min:/irrigation_extend, ⏹️ Stopp:/irrigation_abort"
+        default:
+          - action: telegram_bot.send_message
+            data:
+              chat_id:
+                - !secret telegram_channel
+              message: >
+                💦 Bewässerung gestartet — Zone {{ zone }}, Zyklus {{ cycle }}
+                ({{ duration_min }} min{% if adaptive %}, adaptiv ×{{ scale }}{% endif %})
+      # Timer starten (massgeblich) und warten, bis er abgelaufen ist
+      - action: timer.start
+        target:
+          entity_id: timer.irrigation_zone_duration
+        data:
+          duration: "{{ (duration_min | float(0) * 60) | int(0) }}"
+      - wait_template: "{{ is_state('timer.irrigation_zone_duration', 'idle') }}"
+        timeout: "02:00:00"
+        continue_on_timeout: true
+      # Ventil schliessen
+      - action: switch.turn_off
+        target:
+          entity_id: "switch.irrigation_zone{{ zone }}_valve"
+      - action: timer.cancel
+        target:
+          entity_id: timer.irrigation_zone_duration
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.irrigation_active_run
+        data:
+          value: "-"
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.irrigation_current_zone
+        data:
+          value: "Zonenwechsel …"
+
+  # -------------------------------------------------------------------------
+  # Tasmota Pulsetime setzen (Hardware-Failsafe).
+  # `minutes` optional — sonst Dauer aus input_number.
+  # Tasmota: Wert >= 112 → (Wert - 100) Sekunden. +30 s Puffer.
+  # -------------------------------------------------------------------------
+  irrigation_set_tasmota_pulsetime:
+    alias: Irrigation - Tasmota Timer einstellen
+    icon: mdi:timer-cog
+    mode: queued
+    fields:
+      cycle:
+        description: "Zyklusnummer"
+        example: "1"
+      zone:
+        description: "Zonennummer"
+        example: "1"
+      minutes:
+        description: "Effektive Dauer in Minuten (optional, sonst input_number)"
+        example: "30"
+    variables:
+      duration_min: "{{ minutes | default(states('input_number.irrigation_cycle' ~ cycle ~ '_zone' ~ zone ~ '_duration') | float(0), true) }}"
+      pulse: "{{ (100 + (duration_min | float(0)) * 60 + 30) | int(0) }}"
+    sequence:
+      - action: mqtt.publish
+        data:
+          topic: "cmnd/sonoff4ch/pulsetime{{ zone }}"
+          payload: "{{ pulse }}"
+      - action: mqtt.publish
+        data:
+          topic: "cmnd/sonoff4ch/pulsetime4"
+          payload: "{{ pulse }}"
+
+  # -------------------------------------------------------------------------
+  # [D] Nächsten Startzeitpunkt berechnen (Intervall ODER Wochentage).
+  #   after_run=false → nächster Termin ab jetzt (bei Aktivierung/Änderung)
+  #   after_run=true  → nächster Termin nach dem gerade beendeten Lauf
+  # -------------------------------------------------------------------------
+  irrigation_update_next_runtime:
+    alias: Irrigation - Zeitplan aktualisieren
+    icon: mdi:calendar-clock
+    mode: queued
+    fields:
+      cycle:
+        description: "Zyklusnummer"
+        example: "1"
+      after_run:
+        description: "true = nach einem Lauf"
+        example: "false"
+    sequence:
+      - action: input_datetime.set_datetime
+        target:
+          entity_id: "input_datetime.irrigation_cycle{{ cycle }}_next_run_time"
+        data:
+          datetime: >
+            {% set t = states('input_datetime.irrigation_cycle' ~ cycle ~ '_start_time').split(':') %}
+            {% set h = t[0] | int(0) %}
+            {% set m = t[1] | int(0) %}
+            {% set mode = states('input_select.irrigation_cycle' ~ cycle ~ '_schedule_mode') %}
+            {% set after = after_run | default(false) | bool %}
+            {% set base = now().replace(hour=h, minute=m, second=0, microsecond=0) %}
+            {% if mode == 'Wochentage' %}
+              {% set daymap = {'mon':0,'tue':1,'wed':2,'thu':3,'fri':4,'sat':5,'sun':6} %}
+              {% set ns = namespace(selected=[]) %}
+              {% for d, wd in daymap.items() %}
+                {% if is_state('input_boolean.irrigation_cycle' ~ cycle ~ '_day_' ~ d, 'on') %}
+                  {% set ns.selected = ns.selected + [wd] %}
+                {% endif %}
+              {% endfor %}
+              {% set start_i = 1 if after else 0 %}
+              {% set ns2 = namespace(result=none) %}
+              {% for i in range(start_i, 15) %}
+                {% set cand = base + timedelta(days=i) %}
+                {% if ns2.result is none and (ns.selected | length > 0)
+                      and cand.weekday() in ns.selected and (i > 0 or cand > now()) %}
+                  {% set ns2.result = cand %}
+                {% endif %}
+              {% endfor %}
+              {{ (ns2.result if ns2.result is not none else base + timedelta(days=7)).strftime('%Y-%m-%d %H:%M:%S') }}
+            {% else %}
+              {% set days = {'Täglich':1, 'Alle 2 Tage':2, 'Alle 3 Tage':3} %}
+              {% if after and mode in days %}
+                {{ (base + timedelta(days=days[mode])).strftime('%Y-%m-%d %H:%M:%S') }}
+              {% else %}
+                {{ (base if base > now() else base + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S') }}
+              {% endif %}
+            {% endif %}
+
+  # -------------------------------------------------------------------------
+  # [N] Aktuelle Zone verlängern (Telegram-Button "Verlängern")
+  #   Restlaufzeit + extend_minutes; Tasmota Pulsetime wird nachgeführt.
+  # -------------------------------------------------------------------------
+  irrigation_extend_zone:
+    alias: Irrigation - Zone verlängern
+    icon: mdi:timer-plus
+    mode: restart
+    variables:
+      active: "{{ states('input_text.irrigation_active_run') }}"
+      cycle: "{{ active.split(':')[0] if ':' in active else '' }}"
+      zone: "{{ active.split(':')[1] if ':' in active else '' }}"
+      extend_min: "{{ states('input_number.irrigation_extend_minutes') | int(10) }}"
+      remaining_s: >
+        {% set rem = state_attr('timer.irrigation_zone_duration', 'remaining') %}
+        {% if rem %}
+          {% set p = rem.split(':') %}
+          {{ (p[0] | int(0)) * 3600 + (p[1] | int(0)) * 60 + (p[2] | int(0)) }}
+        {% else %}0{% endif %}
+      new_s: "{{ (remaining_s | int(0)) + (extend_min | int(0)) * 60 }}"
+    sequence:
+      # nur wenn tatsächlich gerade ein Ventil offen ist
+      - condition: template
+        value_template: "{{ zone != '' and is_state('switch.irrigation_zone' ~ zone ~ '_valve', 'on') }}"
+      # Hardware-Failsafe an die neue Dauer anpassen
+      - action: mqtt.publish
+        data:
+          topic: "cmnd/sonoff4ch/pulsetime{{ zone }}"
+          payload: "{{ 100 + (new_s | int(0)) + 30 }}"
+      - action: mqtt.publish
+        data:
+          topic: "cmnd/sonoff4ch/pulsetime4"
+          payload: "{{ 100 + (new_s | int(0)) + 30 }}"
+      # Timer mit neuer Restdauer neu starten (der wait im Zonen-Skript läuft weiter)
+      - action: timer.start
+        target:
+          entity_id: timer.irrigation_zone_duration
+        data:
+          duration: "{{ new_s | int(0) }}"
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.irrigation_current_zone
+        data:
+          value: "Zone {{ zone }} (+{{ extend_min }} min)"
+
+  # -------------------------------------------------------------------------
+  # [N/R] Bewässerung sofort abbrechen (Telegram-Button "Stopp", Regen, Master)
+  # -------------------------------------------------------------------------
+  irrigation_abort:
+    alias: Irrigation - Bewässerung abbrechen
+    icon: mdi:stop-circle
+    mode: restart
+    sequence:
+      - action: switch.turn_off
+        target:
+          entity_id:
+            - switch.irrigation_valves
+            # - switch.irrigation_zone3_valve
+      - action: script.turn_off
+        target:
+          entity_id:
+            - script.irrigation_run_a_cycle
+            - script.irrigation_irrigate_a_zone
+      - action: timer.cancel
+        target:
+          entity_id: timer.irrigation_zone_duration
+      - action: input_boolean.turn_off
+        target:
+          entity_id:
+            - input_boolean.irrigation_cycle1_running
+            - input_boolean.irrigation_cycle2_running
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.irrigation_active_run
+        data:
+          value: "-"
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.irrigation_current_zone
+        data:
+          value: "Abgebrochen"

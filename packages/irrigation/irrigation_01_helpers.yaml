@@ -1,0 +1,382 @@
+# ============================================================================
+# Irrigation 01 — Helpers (Helfer)  ·  Version 2.1
+# ----------------------------------------------------------------------------
+# Alle input_*-Helfer, Timer und Auswahl-Entitäten der Bewässerung.
+#
+# NEU in 2.1 (sechs Erweiterungen):
+#   [W]  Wettervorhersage  — Bewässerung überspringen, wenn Regen erwartet wird
+#   [D]  Wochentage        — konkrete Tage statt "Alle N Tage"
+#   [S]  Zonen-Feuchtesensoren — eigener Sensor je Zone
+#   [A]  Adaptive Dauer    — Laufzeit nach Temperatur/Feuchte (ET-Heuristik)
+#   [N]  Actionable Notify — Telegram-Buttons "Abbrechen"/"Verlängern"
+#   [R]  Aktiver Lauf      — Tracking von Zyklus:Zone für die Buttons
+# ============================================================================
+
+# ---------------------------------------------------------------------------
+# Input Booleans
+# ---------------------------------------------------------------------------
+input_boolean:
+  # Hauptschalter (Master)
+  irrigation_master_control_switch:
+    name: Irrigation - Bewässerungsautomat
+    icon: mdi:sprinkler-variant
+
+  # Zeitpläne der beiden Zyklen
+  irrigation_cycle1_enable:
+    name: Irrigation - Zeitplan Morgen aktivieren
+    icon: mdi:calendar-multiple-check
+  irrigation_cycle2_enable:
+    name: Irrigation - Zeitplan Abend aktivieren
+    icon: mdi:calendar-multiple-check
+
+  # Sensordaten nutzen
+  irrigation_cycle1_use_sensor_data:
+    name: Irrigation - Sensordaten Morgen verwenden
+    icon: mdi:thermometer-lines
+  irrigation_cycle2_use_sensor_data:
+    name: Irrigation - Sensordaten Abend verwenden
+    icon: mdi:thermometer-lines
+
+  # Manueller Start
+  irrigation_cycle1_manual_run:
+    name: Irrigation - Morgenzyklus starten
+    icon: mdi:weather-sunset-up
+  irrigation_cycle2_manual_run:
+    name: Irrigation - Abendzyklus starten
+    icon: mdi:weather-sunset-down
+
+  # Laufzustand
+  irrigation_cycle1_running:
+    name: Irrigation - Zyklus 1 läuft
+    icon: mdi:run
+  irrigation_cycle2_running:
+    name: Irrigation - Zyklus 2 läuft
+    icon: mdi:run
+
+  # ------------------------------------------------------------------
+  # [W] Wettervorhersage
+  # ------------------------------------------------------------------
+  irrigation_use_weather_forecast:
+    name: Irrigation - Wettervorhersage verwenden
+    icon: mdi:weather-rainy
+
+  # ------------------------------------------------------------------
+  # [A] Adaptive Dauer
+  # ------------------------------------------------------------------
+  irrigation_adaptive_duration:
+    name: Irrigation - Adaptive Dauer
+    icon: mdi:timer-cog
+
+  # ------------------------------------------------------------------
+  # [N] Actionable-Benachrichtigungen
+  # ------------------------------------------------------------------
+  irrigation_actionable_notify:
+    name: Irrigation - Telegram-Buttons
+    icon: mdi:message-flash
+
+  # ------------------------------------------------------------------
+  # [D] Wochentage je Zyklus (Mo–So)
+  # ------------------------------------------------------------------
+  irrigation_cycle1_day_mon:
+    { name: Irrigation - Morgen Mo, icon: mdi:calendar }
+  irrigation_cycle1_day_tue:
+    { name: Irrigation - Morgen Di, icon: mdi:calendar }
+  irrigation_cycle1_day_wed:
+    { name: Irrigation - Morgen Mi, icon: mdi:calendar }
+  irrigation_cycle1_day_thu:
+    { name: Irrigation - Morgen Do, icon: mdi:calendar }
+  irrigation_cycle1_day_fri:
+    { name: Irrigation - Morgen Fr, icon: mdi:calendar }
+  irrigation_cycle1_day_sat:
+    { name: Irrigation - Morgen Sa, icon: mdi:calendar }
+  irrigation_cycle1_day_sun:
+    { name: Irrigation - Morgen So, icon: mdi:calendar }
+
+  irrigation_cycle2_day_mon: { name: Irrigation - Abend Mo, icon: mdi:calendar }
+  irrigation_cycle2_day_tue: { name: Irrigation - Abend Di, icon: mdi:calendar }
+  irrigation_cycle2_day_wed: { name: Irrigation - Abend Mi, icon: mdi:calendar }
+  irrigation_cycle2_day_thu: { name: Irrigation - Abend Do, icon: mdi:calendar }
+  irrigation_cycle2_day_fri: { name: Irrigation - Abend Fr, icon: mdi:calendar }
+  irrigation_cycle2_day_sat: { name: Irrigation - Abend Sa, icon: mdi:calendar }
+  irrigation_cycle2_day_sun: { name: Irrigation - Abend So, icon: mdi:calendar }
+
+  # ------------------------------------------------------------------
+  # Lovelace-View-Umschalter
+  # ------------------------------------------------------------------
+  irrigation_view_cycle1:
+    { name: Irrigation - Morgen, icon: mdi:weather-sunset-up }
+  irrigation_view_cycle2:
+    { name: Irrigation - Abend, icon: mdi:weather-sunset-down }
+  irrigation_view_stat: { name: Irrigation - Verlauf, icon: mdi:history }
+  irrigation_view_consumption:
+    { name: Irrigation - Verbrauch, icon: mdi:chart-donut-variant }
+
+# ---------------------------------------------------------------------------
+# Input Datetimes
+# ---------------------------------------------------------------------------
+input_datetime:
+  irrigation_cycle1_start_time:
+    name: Irrigation - Startzeit Morgen
+    has_date: false
+    has_time: true
+    icon: mdi:alarm
+  irrigation_cycle2_start_time:
+    name: Irrigation - Startzeit Abend
+    has_date: false
+    has_time: true
+    icon: mdi:alarm
+  irrigation_cycle1_next_run_time:
+    name: Irrigation - Geplanter Start am Morgen
+    has_date: true
+    has_time: true
+    icon: mdi:clock-out
+  irrigation_cycle2_next_run_time:
+    name: Irrigation - Geplanter Start am Abend
+    has_date: true
+    has_time: true
+    icon: mdi:clock-out
+
+# ---------------------------------------------------------------------------
+# Input Selects
+# ---------------------------------------------------------------------------
+input_select:
+  # [D] Intervall-Modus (wie bisher)
+  irrigation_cycle1_watering_days:
+    name: Irrigation - Bewässerungstage am Morgen
+    options: ["Täglich", "Alle 2 Tage", "Alle 3 Tage", "Einmal"]
+    icon: mdi:calendar
+  irrigation_cycle2_watering_days:
+    name: Irrigation - Bewässerungstage am Abend
+    options: ["Täglich", "Alle 2 Tage", "Alle 3 Tage", "Einmal"]
+    icon: mdi:calendar
+
+  # [D] NEU: Planungsmodus — Intervall ODER konkrete Wochentage
+  irrigation_cycle1_schedule_mode:
+    name: Irrigation - Planungsmodus Morgen
+    options: ["Intervall", "Wochentage"]
+    icon: mdi:calendar-week
+  irrigation_cycle2_schedule_mode:
+    name: Irrigation - Planungsmodus Abend
+    options: ["Intervall", "Wochentage"]
+    icon: mdi:calendar-week
+
+# ---------------------------------------------------------------------------
+# Input Texts
+# ---------------------------------------------------------------------------
+input_text:
+  irrigation_current_zone:
+    name: Irrigation - Aktuelle Zone
+    icon: mdi:select-marker
+
+  # [R] NEU: aktiver Lauf als "Zyklus:Zone" (z. B. "1:2"), sonst "-"
+  irrigation_active_run:
+    name: Irrigation - Aktiver Lauf
+    icon: mdi:run-fast
+    min: 1
+    max: 8
+
+  # [W] NEU: zu verwendende Wetter-Entität
+  irrigation_weather_entity:
+    name: Irrigation - Wetter-Entität
+    icon: mdi:weather-partly-cloudy
+    # initial: weather.home
+    min: 5
+    max: 60
+
+  # [S] NEU: Feuchtesensor je Zone (Standard: ein MiFlora für alle)
+  irrigation_zone1_moisture_sensor:
+    name: Irrigation - Feuchtesensor Hinten
+    icon: mdi:water-percent
+    min: 5
+    max: 60
+  irrigation_zone2_moisture_sensor:
+    name: Irrigation - Feuchtesensor Vorne
+    icon: mdi:water-percent
+    min: 5
+    max: 60
+  irrigation_zone3_moisture_sensor:
+    name: Irrigation - Feuchtesensor Hahn
+    icon: mdi:water-percent
+    initial: sensor.rasen_moisture
+    min: 5
+    max: 60
+
+# ---------------------------------------------------------------------------
+# Input Numbers — Zonenlaufzeiten (Minuten)
+# ---------------------------------------------------------------------------
+input_number:
+  # Zyklus 1 (Morgen)
+  irrigation_cycle1_zone1_duration:
+    name: Irrigation - Hinten Dauer am Morgen
+    min: 0
+    max: 90
+    step: 1
+    unit_of_measurement: min
+    icon: mdi:camera-timer
+  irrigation_cycle1_zone2_duration:
+    name: Irrigation - Vorne Dauer am Morgen
+    min: 0
+    max: 90
+    step: 1
+    unit_of_measurement: min
+    icon: mdi:camera-timer
+  irrigation_cycle1_zone3_duration:
+    name: Irrigation - Hahn Dauer am Morgen
+    min: 0
+    max: 90
+    step: 1
+    unit_of_measurement: min
+    icon: mdi:camera-timer
+
+  # Zyklus 2 (Abend)
+  irrigation_cycle2_zone1_duration:
+    name: Irrigation - Hinten Dauer am Abend
+    min: 0
+    max: 90
+    step: 1
+    unit_of_measurement: min
+    icon: mdi:camera-timer
+  irrigation_cycle2_zone2_duration:
+    name: Irrigation - Vorne Dauer am Abend
+    min: 0
+    max: 90
+    step: 1
+    unit_of_measurement: min
+    icon: mdi:camera-timer
+  irrigation_cycle2_zone3_duration:
+    name: Irrigation - Hahn Dauer am Abend
+    min: 0
+    max: 90
+    step: 1
+    unit_of_measurement: min
+    icon: mdi:camera-timer
+
+  # Schwellwerte — Temperatur
+  irrigation_cycle1_temperature_threshold:
+    name: Irrigation - Morgentemp. >=
+    min: 10
+    max: 30
+    step: 0.5
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer
+  irrigation_cycle2_temperature_threshold:
+    name: Irrigation - Abendtemp. >=
+    min: 10
+    max: 30
+    step: 0.5
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer
+
+  # Schwellwerte — Bodenfeuchte
+  irrigation_zone1_moisture_threshold:
+    name: Irrigation - Bodenfeuchte hinten
+    min: 5
+    max: 45
+    step: 1
+    unit_of_measurement: "%"
+    icon: mdi:water-percent
+  irrigation_zone2_moisture_threshold:
+    name: Irrigation - Bodenfeuchte vorne
+    min: 5
+    max: 45
+    step: 1
+    unit_of_measurement: "%"
+    icon: mdi:water-percent
+  irrigation_zone3_moisture_threshold:
+    name: Irrigation - Bodenfeuchte Hahn
+    min: 5
+    max: 45
+    step: 1
+    unit_of_measurement: "%"
+    icon: mdi:water-percent
+
+  # ------------------------------------------------------------------
+  # [W] NEU: Wettervorhersage-Parameter
+  # ------------------------------------------------------------------
+  irrigation_forecast_hours:
+    name: Irrigation - Vorhersagefenster
+    min: 1
+    max: 24
+    step: 1
+    unit_of_measurement: h
+    icon: mdi:clock-outline
+  irrigation_forecast_rain_threshold:
+    name: Irrigation - Regenwahrscheinlichkeit >=
+    min: 0
+    max: 100
+    step: 5
+    unit_of_measurement: "%"
+    icon: mdi:weather-pouring
+
+  # ------------------------------------------------------------------
+  # [A] NEU: Adaptive Dauer — Skalierungsfaktoren
+  #   Faktor = (Temp / Basistemp) · (1 + 0.5·Feuchtedefizit/Schwelle)
+  #   wird auf [min_scale, max_scale] begrenzt.
+  # ------------------------------------------------------------------
+  irrigation_adaptive_min_scale:
+    name: Irrigation - Adaptiv min. Faktor
+    min: 0.25
+    max: 1.0
+    step: 0.05
+    unit_of_measurement: "×"
+    icon: mdi:arrow-collapse-down
+  irrigation_adaptive_max_scale:
+    name: Irrigation - Adaptiv max. Faktor
+    min: 1.0
+    max: 2.0
+    step: 0.05
+    unit_of_measurement: "×"
+    icon: mdi:arrow-expand-up
+  irrigation_adaptive_base_temp:
+    name: Irrigation - Adaptiv Basistemperatur
+    min: 10
+    max: 30
+    step: 0.5
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer-lines
+
+  # ------------------------------------------------------------------
+  # [N] NEU: Verlängerungsdauer für den Telegram-Button
+  # ------------------------------------------------------------------
+  irrigation_extend_minutes:
+    name: Irrigation - Verlängern um
+    min: 1
+    max: 30
+    step: 1
+    unit_of_measurement: min
+    icon: mdi:timer-plus
+
+  # ------------------------------------------------------------------
+  # Verbrauchs-/Kostenparameter (Statistik)
+  # HINWEIS: Falls bereits anderswo definiert, diese drei Blöcke entfernen.
+  # ------------------------------------------------------------------
+  # os140_volume:
+  #   name: Irrigation - OS140 Volumen (m³/h je Regner)
+  #   min: 0
+  #   max: 2
+  #   step: 0.01
+  #   unit_of_measurement: m³/h
+  #   icon: mdi:water-outline
+  hahn_volume:
+    name: Irrigation - Hahn Volumen (m³/h)
+    min: 0
+    max: 2
+    step: 0.01
+    unit_of_measurement: m³/h
+    icon: mdi:faucet
+  # water_price:
+  #   name: Irrigation - Wasserpreis (€/m³)
+  #   min: 0
+  #   max: 20
+  #   step: 0.01
+  #   unit_of_measurement: "€/m³"
+  #   icon: mdi:currency-eur
+
+# ---------------------------------------------------------------------------
+# Timer — Countdown-Anzeige UND massgebliche Zonenzeit (für Verlängern)
+# ---------------------------------------------------------------------------
+timer:
+  irrigation_zone_duration:
+    name: Irrigation - Verbleibende Zeit
+    icon: mdi:timer-outline
+    restore: true

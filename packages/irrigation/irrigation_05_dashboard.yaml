@@ -1,0 +1,242 @@
+# ============================================================================
+# Irrigation 05 — Dashboard (Lovelace)  ·  Version 2.1
+# ----------------------------------------------------------------------------
+# * Recorder-/Logbook-Ausschlüsse für die View-Umschalter
+# * Skript zum Umschalten der Tabs (Conditional Cards)
+# * Moderner Dashboard-Vorschlag inkl. der neuen Bereiche
+#   (Wetter, Wochentage, adaptive Dauer, Benachrichtigungen)
+# ============================================================================
+
+# ---------------------------------------------------------------------------
+# Recorder / Logbook — UI-Helfer nicht aufzeichnen
+# ---------------------------------------------------------------------------
+recorder:
+  exclude:
+    entities:
+      - script.irrigation_views_toggle
+      - input_boolean.irrigation_view_cycle1
+      - input_boolean.irrigation_view_cycle2
+      - input_boolean.irrigation_view_stat
+      - input_boolean.irrigation_view_consumption
+
+logbook:
+  exclude:
+    entities:
+      - script.irrigation_views_toggle
+      - input_boolean.irrigation_view_cycle1
+      - input_boolean.irrigation_view_cycle2
+      - input_boolean.irrigation_view_stat
+      - input_boolean.irrigation_view_consumption
+
+# ============================================================================
+# Irrigation 06 — UI-Helfer für das Lovelace-Dashboard  ·  Version 2.1
+# ----------------------------------------------------------------------------
+# Diese Helfer werden vom bestehenden Dashboard (Dashboard.yml) benötigt:
+#   * "_view"-Booleans steuern das Aufklappen von Detail-Kacheln
+#     (Tap auf "Zeitplan"/"Wetterbedingungen" blendet Details ein/aus).
+#   * irrigation_view_settings ist der Umschalter für die NEUE Registerkarte
+#     "Einstellungen" mit allen Erweiterungen aus 2.1 (Wetter, Wochentage,
+#     adaptive Dauer, Benachrichtigungen, Zonensensoren).
+#
+# Das vorhandene Skript script.irrigation_views_toggle schaltet automatisch
+# alle input_boolean.irrigation_view_* gegeneinander um — die neue Registerkarte
+# funktioniert daher ohne weitere Anpassung des Skripts.
+# ============================================================================
+
+input_boolean:
+  # # Detail-Einblendung für den Morgen-Zeitplan
+  # irrigation_cycle1_enable_view:
+  #   name: Irrigation - Morgen Zeitplan Details
+  #   icon: mdi:calendar-expand-horizontal
+  # irrigation_cycle1_use_sensor_data_view:
+  #   name: Irrigation - Morgen Wetterbedingungen Details
+  #   icon: mdi:thermometer-lines
+
+  # # Detail-Einblendung für den Abend-Zeitplan
+  # irrigation_cycle2_enable_view:
+  #   name: Irrigation - Abend Zeitplan Details
+  #   icon: mdi:calendar-expand
+  # irrigation_cycle2_use_sensor_data_view:
+  #   name: Irrigation - Abend Wetterbedingungen Details
+  #   icon: mdi:thermometer-lines
+
+  # NEUE Registerkarte "Einstellungen" (2.1-Erweiterungen)
+  irrigation_view_settings:
+    name: Irrigation - Einstellungen
+    icon: mdi:cog
+
+# ---------------------------------------------------------------------------
+# Tab-Umschalter
+# ---------------------------------------------------------------------------
+script:
+  irrigation_views_toggle:
+    alias: Irrigation - Tabs umschalten
+    icon: mdi:tab
+    fields:
+      entity_id:
+        description: "Zu aktivierender View-Boolean"
+        example: "input_boolean.irrigation_view_cycle1"
+    sequence:
+      - action: input_boolean.turn_off
+        target:
+          entity_id: >
+            {% set ns = namespace(list=[]) %}
+            {% for b in states['input_boolean']
+              if b.object_id.startswith('irrigation_view_') and b.entity_id != entity_id %}
+              {% set ns.list = ns.list + [b.entity_id] %}
+            {% endfor %}
+            {{ ns.list | join(',') }}
+      - action: input_boolean.turn_on
+        target:
+          entity_id: "{{ entity_id }}"
+# ============================================================================
+# DASHBOARD-VORSCHLAG (YAML-Dashboard oder Raw-Editor)
+# ----------------------------------------------------------------------------
+# Standard-Karten (ohne Custom-Cards lauffähig; Mushroom ist optional hübscher).
+# ============================================================================
+#
+# title: Bewässerung
+# views:
+#   - title: Übersicht
+#     icon: mdi:sprinkler-variant
+#     cards:
+#       - type: entities
+#         title: Steuerung
+#         show_header_toggle: false
+#         entities:
+#           - entity: input_boolean.irrigation_master_control_switch
+#           - entity: sensor.irrigation_cycle_running
+#           - entity: sensor.irrigation_zone_being_watered
+#           - entity: timer.irrigation_zone_duration
+#           - entity: input_text.irrigation_active_run
+#           - entity: switch.irrigation_watering
+#           - entity: sensor.irrigation_last_irrigated_time
+#
+#       - type: horizontal-stack
+#         cards:
+#           - type: button
+#             name: Morgen
+#             icon: mdi:weather-sunset-up
+#             tap_action:
+#               action: perform-action
+#               perform_action: input_boolean.turn_on
+#               target: {entity_id: input_boolean.irrigation_cycle1_manual_run}
+#           - type: button
+#             name: Abend
+#             icon: mdi:weather-sunset-down
+#             tap_action:
+#               action: perform-action
+#               perform_action: input_boolean.turn_on
+#               target: {entity_id: input_boolean.irrigation_cycle2_manual_run}
+#
+#       # [W] Wetter
+#       - type: entities
+#         title: Wettervorhersage
+#         entities:
+#           - entity: input_boolean.irrigation_use_weather_forecast
+#           - entity: input_text.irrigation_weather_entity
+#           - entity: input_number.irrigation_forecast_hours
+#           - entity: input_number.irrigation_forecast_rain_threshold
+#           - entity: input_number.irrigation_forecast_rain_now
+#
+#       # [A] Adaptive Dauer + [N] Benachrichtigungen
+#       - type: entities
+#         title: Adaptive Dauer & Benachrichtigungen
+#         entities:
+#           - entity: input_boolean.irrigation_adaptive_duration
+#           - entity: input_number.irrigation_adaptive_min_scale
+#           - entity: input_number.irrigation_adaptive_max_scale
+#           - entity: input_number.irrigation_adaptive_base_temp
+#           - entity: input_boolean.irrigation_actionable_notify
+#           - entity: input_number.irrigation_extend_minutes
+#
+#   - title: Morgen
+#     icon: mdi:weather-sunset-up
+#     cards:
+#       - type: entities
+#         title: Zeitplan Morgen
+#         entities:
+#           - entity: input_boolean.irrigation_cycle1_enable
+#           - entity: input_datetime.irrigation_cycle1_start_time
+#           - entity: input_select.irrigation_cycle1_schedule_mode
+#           - entity: input_select.irrigation_cycle1_watering_days
+#           - entity: sensor.irrigation_cycle1_next_run_time
+#           - entity: input_boolean.irrigation_cycle1_use_sensor_data
+#           - entity: input_number.irrigation_cycle1_zone1_duration
+#           - entity: input_number.irrigation_cycle1_zone2_duration
+#       # [D] Wochentage (nur relevant bei Planungsmodus "Wochentage")
+#       - type: entities
+#         title: Wochentage Morgen
+#         entities:
+#           - entity: input_boolean.irrigation_cycle1_day_mon
+#           - entity: input_boolean.irrigation_cycle1_day_tue
+#           - entity: input_boolean.irrigation_cycle1_day_wed
+#           - entity: input_boolean.irrigation_cycle1_day_thu
+#           - entity: input_boolean.irrigation_cycle1_day_fri
+#           - entity: input_boolean.irrigation_cycle1_day_sat
+#           - entity: input_boolean.irrigation_cycle1_day_sun
+#
+#   - title: Abend
+#     icon: mdi:weather-sunset-down
+#     cards:
+#       - type: entities
+#         title: Zeitplan Abend
+#         entities:
+#           - entity: input_boolean.irrigation_cycle2_enable
+#           - entity: input_datetime.irrigation_cycle2_start_time
+#           - entity: input_select.irrigation_cycle2_schedule_mode
+#           - entity: input_select.irrigation_cycle2_watering_days
+#           - entity: sensor.irrigation_cycle2_next_run_time
+#           - entity: input_boolean.irrigation_cycle2_use_sensor_data
+#           - entity: input_number.irrigation_cycle2_zone1_duration
+#           - entity: input_number.irrigation_cycle2_zone2_duration
+#       - type: entities
+#         title: Wochentage Abend
+#         entities:
+#           - entity: input_boolean.irrigation_cycle2_day_mon
+#           - entity: input_boolean.irrigation_cycle2_day_tue
+#           - entity: input_boolean.irrigation_cycle2_day_wed
+#           - entity: input_boolean.irrigation_cycle2_day_thu
+#           - entity: input_boolean.irrigation_cycle2_day_fri
+#           - entity: input_boolean.irrigation_cycle2_day_sat
+#           - entity: input_boolean.irrigation_cycle2_day_sun
+#
+#   - title: Sensoren
+#     icon: mdi:thermometer-lines
+#     cards:
+#       - type: entities
+#         title: Schwellwerte & Zonensensoren
+#         entities:
+#           - entity: sensor.rasen_temperature
+#           - entity: binary_sensor.mower_rain_sensor
+#           - entity: input_number.irrigation_cycle1_temperature_threshold
+#           # [S] eigener Feuchtesensor je Zone
+#           - entity: input_text.irrigation_zone1_moisture_sensor
+#           - entity: input_number.irrigation_zone1_moisture_threshold
+#           - entity: input_text.irrigation_zone2_moisture_sensor
+#           - entity: input_number.irrigation_zone2_moisture_threshold
+#           - entity: input_number.irrigation_zone3_moisture_threshold
+#
+#   - title: Verbrauch
+#     icon: mdi:chart-donut-variant
+#     cards:
+#       - type: statistics-graph
+#         title: Wasserverbrauch (m³)
+#         stat_types: [sum]
+#         entities:
+#           - sensor.irrigation_water_consumption_zone1
+#           - sensor.irrigation_water_consumption_zone2
+#           - sensor.irrigation_water_consumption_zone3
+#       - type: entities
+#         title: Kosten
+#         entities:
+#           - entity: sensor.irrigation_water_consumption_pump
+#             attribute: cost
+#             name: Gesamtkosten (€)
+#           - entity: input_number.water_price
+#       - type: history-graph
+#         title: Bewässerungsdauer heute
+#         entities:
+#           - sensor.irrigation_watering_duration_zone1_daily
+#           - sensor.irrigation_watering_duration_zone2_daily
+#           - sensor.irrigation_watering_duration_zone3_daily

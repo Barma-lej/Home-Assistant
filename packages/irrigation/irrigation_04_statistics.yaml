@@ -1,0 +1,297 @@
+# ============================================================================
+# Irrigation 04 — Statistics, Consumption & Notifications  ·  Version 2.1
+# ----------------------------------------------------------------------------
+# Erfasst pro Zone (1=Hinten, 2=Vorne, 3=Hahn) und für die Pumpe:
+#   * reale Bewässerungszeit (history_stats, nur wenn Pumpe > 100 W fördert)
+#   * Jahresdauer (utility_meter)
+#   * Wasserverbrauch (m³) und Kosten (€)
+#   * Zeitpunkt der letzten Bewässerung
+#
+# BENACHRICHTIGUNG (2.1):
+#   * START-Meldung kommt jetzt aus dem Engine-Skript (mit optionalen
+#     Telegram-Buttons "Verlängern"/"Stopp").
+#   * Diese Datei meldet nur noch das ENDE einer Zone inkl. Tagesdauer,
+#     damit es keine doppelten Start-Nachrichten gibt.
+#
+# HINWEIS: switch.irrigation_pump_active wird in irrigation_02_devices.yaml
+# definiert (hier nicht doppeln).
+# ============================================================================
+
+# ---------------------------------------------------------------------------
+# Switch-Gruppen (all: true → nur ON wenn Ventil UND Pumpe UND Watering UND
+# Pump Active gleichzeitig ON). Quelle für history_stats.
+# ---------------------------------------------------------------------------
+switch:
+  - platform: group
+    name: Irrigation - Switches Zone1
+    unique_id: irrigation_switches_zone1
+    all: true
+    entities:
+      - switch.irrigation_zone1_valve
+      - switch.irrigation_pump
+      - switch.irrigation_watering
+      - switch.irrigation_pump_active
+
+  - platform: group
+    name: Irrigation - Switches Zone2
+    unique_id: irrigation_switches_zone2
+    all: true
+    entities:
+      - switch.irrigation_zone2_valve
+      - switch.irrigation_pump
+      - switch.irrigation_watering
+      - switch.irrigation_pump_active
+
+  - platform: group
+    name: Irrigation - Switches Zone3
+    unique_id: irrigation_switches_zone3
+    all: true
+    entities:
+      - switch.irrigation_zone3_valve
+      - switch.irrigation_pump
+      - switch.irrigation_watering
+      - switch.irrigation_pump_active
+
+  - platform: group
+    name: Irrigation - Switches Pump
+    unique_id: irrigation_switches_pump
+    all: true
+    entities:
+      - switch.irrigation_pump
+      - switch.irrigation_watering
+      - switch.irrigation_pump_active
+
+# ---------------------------------------------------------------------------
+# Template-Sensoren
+# ---------------------------------------------------------------------------
+template:
+  # Zeitpunkt der letzten beendeten Bewässerung
+  - trigger:
+      - trigger: state
+        entity_id:
+          - switch.irrigation_switches_zone1
+          - switch.irrigation_switches_zone2
+          - switch.irrigation_switches_zone3
+          - switch.irrigation_switches_pump
+        from: "on"
+        to: "off"
+    sensor:
+      - name: Irrigation last irrigated time
+        unique_id: irrigation_last_irrigated_time
+        state: >-
+          {% set wd = ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."] %}
+          {% set ts = as_timestamp(now()) %}
+          {{ wd[ts | timestamp_custom('%w') | int(0)] }} {{ ts | timestamp_custom('%d.%m.%Y %H:%M:%S', true) }}
+        icon: mdi:clock-end
+        attributes:
+          datetime: "{{ now() }}"
+          timestamp: "{{ as_timestamp(now()) }}"
+
+  # ---- Wasserverbrauch & Kosten ------------------------------------------
+  - sensor:
+      # Zone1: 2x Gardena OS 140 (eine ~50 % прикрыт) → Faktor 1.5
+      - name: Irrigation - Water Consumption Zone1
+        unique_id: irrigation_water_consumption_zone1
+        device_class: water
+        state_class: total_increasing
+        unit_of_measurement: m³
+        icon: mdi:water-outline
+        state: >-
+          {{ (states('sensor.irrigation_watering_duration_zone1_yearly') | float(0)
+              * states('input_number.os140_volume') | float(0) * 1.5) | round(3) }}
+        attributes:
+          cost: >-
+            {{ (states('sensor.irrigation_water_consumption_zone1') | float(0)
+                * states('input_number.water_price') | float(0)) | round(2) }}
+
+      # Zone2: 2x Gardena OS 140 (beide voll offen) → Faktor 2
+      - name: Irrigation - Water Consumption Zone2
+        unique_id: irrigation_water_consumption_zone2
+        device_class: water
+        state_class: total_increasing
+        unit_of_measurement: m³
+        icon: mdi:water-outline
+        state: >-
+          {{ (states('sensor.irrigation_watering_duration_zone2_yearly') | float(0)
+              * states('input_number.os140_volume') | float(0) * 2) | round(3) }}
+        attributes:
+          cost: >-
+            {{ (states('sensor.irrigation_water_consumption_zone2') | float(0)
+                * states('input_number.water_price') | float(0)) | round(2) }}
+
+      # Zone3 (Hahn): Verbrauch über input_number.hahn_volume (m³/h)
+      - name: Irrigation - Water Consumption Zone3
+        unique_id: irrigation_water_consumption_zone3
+        device_class: water
+        state_class: total_increasing
+        unit_of_measurement: m³
+        icon: mdi:water-outline
+        state: >-
+          {{ (states('sensor.irrigation_watering_duration_zone3_yearly') | float(0)
+              * states('input_number.hahn_volume') | float(0)) | round(3) }}
+        attributes:
+          cost: >-
+            {{ (states('sensor.irrigation_water_consumption_zone3') | float(0)
+                * states('input_number.water_price') | float(0)) | round(2) }}
+
+      # Summe über alle Zonen
+      - name: Irrigation - Water Consumption Pump
+        unique_id: irrigation_water_consumption_pump
+        device_class: water
+        state_class: total_increasing
+        unit_of_measurement: m³
+        icon: mdi:water
+        state: >-
+          {{ (states('sensor.irrigation_water_consumption_zone1') | float(0)
+              + states('sensor.irrigation_water_consumption_zone2') | float(0)
+              + states('sensor.irrigation_water_consumption_zone3') | float(0)) | round(3) }}
+        attributes:
+          cost: >-
+            {{ (states('sensor.irrigation_water_consumption_pump') | float(0)
+                * states('input_number.water_price') | float(0)) | round(2) }}
+
+# ---------------------------------------------------------------------------
+# History Stats — reale Förderzeit pro Zone/Pumpe (heute)
+# ---------------------------------------------------------------------------
+sensor:
+  - platform: history_stats
+    unique_id: irrigation_watering_duration_zone1_daily
+    name: Irrigation - Watering Duration Zone1 Daily
+    entity_id: switch.irrigation_switches_zone1
+    state: "on"
+    type: time
+    start: "{{ today_at() }}"
+    end: "{{ now() }}"
+
+  - platform: history_stats
+    unique_id: irrigation_watering_duration_zone2_daily
+    name: Irrigation - Watering Duration Zone2 Daily
+    entity_id: switch.irrigation_switches_zone2
+    state: "on"
+    type: time
+    start: "{{ today_at() }}"
+    end: "{{ now() }}"
+
+  - platform: history_stats
+    unique_id: irrigation_watering_duration_zone3_daily
+    name: Irrigation - Watering Duration Zone3 Daily
+    entity_id: switch.irrigation_switches_zone3
+    state: "on"
+    type: time
+    start: "{{ today_at() }}"
+    end: "{{ now() }}"
+
+  - platform: history_stats
+    unique_id: irrigation_watering_duration_pump_daily
+    name: Irrigation - Watering Duration Pump Daily
+    entity_id: switch.irrigation_switches_pump
+    state: "on"
+    type: time
+    start: "{{ today_at() }}"
+    end: "{{ now() }}"
+
+# ---------------------------------------------------------------------------
+# Utility Meters — Jahresdauer pro Zone/Pumpe
+# ---------------------------------------------------------------------------
+utility_meter:
+  irrigation_watering_duration_zone1_yearly:
+    unique_id: irrigation_watering_duration_zone1_yearly
+    source: sensor.irrigation_watering_duration_zone1_daily
+    cycle: yearly
+
+  irrigation_watering_duration_zone2_yearly:
+    unique_id: irrigation_watering_duration_zone2_yearly
+    source: sensor.irrigation_watering_duration_zone2_daily
+    cycle: yearly
+
+  irrigation_watering_duration_zone3_yearly:
+    unique_id: irrigation_watering_duration_zone3_yearly
+    source: sensor.irrigation_watering_duration_zone3_daily
+    cycle: yearly
+
+  irrigation_watering_duration_pump_yearly:
+    unique_id: irrigation_watering_duration_pump_yearly
+    source: sensor.irrigation_watering_duration_pump_daily
+    cycle: yearly
+
+# ---------------------------------------------------------------------------
+# Benachrichtigung — nur ENDE einer Zone (START kommt aus dem Engine-Skript)
+# ---------------------------------------------------------------------------
+automation:
+  - id: irrigation_notify
+    alias: Irrigation - Notify
+    mode: parallel
+    triggers:
+      - trigger: state
+        entity_id:
+          - switch.irrigation_switches_zone1
+          - switch.irrigation_switches_zone2
+          - switch.irrigation_switches_zone3
+        from: "on"
+        to: "off"
+        variables:
+          action: "Ende 🔴"
+    actions:
+      - variables:
+          daily_sensor: >
+            {{ trigger.entity_id | replace('switch.irrigation_switches_', 'sensor.irrigation_watering_duration_') ~ '_daily' }}
+      - action: telegram_bot.send_message
+        data:
+          chat_id:
+            - !secret telegram_channel
+          message: >
+            💦 Bewässerung {{ action }}
+            *{{ trigger.from_state.attributes.friendly_name }}*
+            — Dauer heute: {{ states(daily_sensor) }} h
+
+# ---------------------------------------------------------------------------
+# Customize (Anzeigenamen)
+# ---------------------------------------------------------------------------
+homeassistant:
+  customize:
+    switch.irrigation_switches_zone1:
+      friendly_name: "Irrigation - Hinterhofgruppe"
+      icon: mdi:numeric-1-box-multiple
+    switch.irrigation_switches_zone2:
+      friendly_name: "Irrigation - Vorderhofgruppe"
+      icon: mdi:numeric-2-box-multiple
+    switch.irrigation_switches_zone3:
+      friendly_name: "Irrigation - Hahngruppe"
+      icon: mdi:faucet
+    switch.irrigation_switches_pump:
+      friendly_name: "Irrigation - Pumpengruppe"
+      icon: mdi:pump
+
+    sensor.irrigation_last_irrigated_time:
+      friendly_name: "Irrigation - Bewässerung beendet"
+
+    sensor.irrigation_water_consumption_zone1:
+      friendly_name: "Irrigation - Wasserverbrauch Hinterhof"
+    sensor.irrigation_water_consumption_zone2:
+      friendly_name: "Irrigation - Wasserverbrauch Vorderhof"
+    sensor.irrigation_water_consumption_zone3:
+      friendly_name: "Irrigation - Wasserverbrauch Hahn"
+    sensor.irrigation_water_consumption_pump:
+      friendly_name: "Irrigation - Wasserverbrauch Pumpe"
+
+    sensor.irrigation_watering_duration_zone1_daily:
+      friendly_name: "Irrigation - Dauer Hinterhof Täglich"
+      icon: mdi:clock-outline
+    sensor.irrigation_watering_duration_zone2_daily:
+      friendly_name: "Irrigation - Dauer Vorderhof Täglich"
+      icon: mdi:clock-outline
+    sensor.irrigation_watering_duration_zone3_daily:
+      friendly_name: "Irrigation - Dauer Hahn Täglich"
+      icon: mdi:clock-outline
+    sensor.irrigation_watering_duration_pump_daily:
+      friendly_name: "Irrigation - Dauer Pumpe Täglich"
+      icon: mdi:clock-outline
+
+    sensor.irrigation_watering_duration_zone1_yearly:
+      friendly_name: "Irrigation - Dauer Hinterhof Jährlich"
+    sensor.irrigation_watering_duration_zone2_yearly:
+      friendly_name: "Irrigation - Dauer Vorderhof Jährlich"
+    sensor.irrigation_watering_duration_zone3_yearly:
+      friendly_name: "Irrigation - Dauer Hahn Jährlich"
+    sensor.irrigation_watering_duration_pump_yearly:
+      friendly_name: "Irrigation - Dauer Pumpe Jährlich"

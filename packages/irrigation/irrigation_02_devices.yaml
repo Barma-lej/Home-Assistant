@@ -1,0 +1,155 @@
+# ============================================================================
+# Irrigation 02 — Devices & Template Entities
+# ----------------------------------------------------------------------------
+# Hardware-nahe Template-Entitäten und Gruppen:
+#   * WLAN-Stärke des Sonoff 4CH
+#   * switch.irrigation_watering  — Master-Leistungsschalter (Sonoff POW R2)
+#   * switch.irrigation_pump_active — "Pumpe fördert wirklich" (> 100 W)
+#   * switch.irrigation_valves    — Gruppe aller Bewässerungsventile
+#   * Anzeige-Sensoren (nächster Start, laufender Zyklus, aktuelle Zone)
+#   * switch.irrigation           — manueller Ein/Aus-Schalter
+#
+# Die entity_ids entsprechen dem Original, damit Dashboard, Statistik und
+# Historie unverändert weiterlaufen.
+# ============================================================================
+
+# ---------------------------------------------------------------------------
+# Template-Entitäten
+# ---------------------------------------------------------------------------
+template:
+  # ---- Sensoren -----------------------------------------------------------
+  - sensor:
+      # WLAN-Stärke des Sonoff 4CH
+      # - name: Irrigation WiFi
+      #   unique_id: irrigation_wifi
+      #   state: "{{ states('sensor.sonoff4ch1_rssi') | float(0) }}"
+      #   unit_of_measurement: "%"
+      #   device_class: signal_strength
+      #   icon: >-
+      #     {% set r = states('sensor.sonoff4ch1_rssi') | float(0) %}
+      #     {% if r > 80 %}mdi:wifi-strength-4
+      #     {% elif r > 60 %}mdi:wifi-strength-3
+      #     {% elif r > 40 %}mdi:wifi-strength-2
+      #     {% elif r > 20 %}mdi:wifi-strength-1
+      #     {% else %}mdi:wifi-strength-outline{% endif %}
+
+      # Nächster Start Morgen (lesbar formatiert)
+      - default_entity_id: sensor.irrigation_cycle1_next_run_time
+        name: "Irrigation - Geplanter Start am Morgen"
+        unique_id: irrigation_cycle1_next_run_time
+        state: >-
+          {% if is_state('input_boolean.irrigation_cycle1_enable', 'on') %}
+            {% set ts = state_attr('input_datetime.irrigation_cycle1_next_run_time', 'timestamp') %}
+            {% set wd = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] %}
+            {{ wd[ts | timestamp_custom('%w') | int(0)] }} {{ ts | timestamp_custom('%d.%m.%Y %H:%M', true) }}
+          {% else %}-{% endif %}
+        icon: mdi:clock-start
+
+      # Nächster Start Abend (lesbar formatiert)
+      - default_entity_id: sensor.irrigation_cycle2_next_run_time
+        name: "Irrigation - Geplanter Start am Abend"
+        unique_id: irrigation_cycle2_next_run_time
+        state: >-
+          {% if is_state('input_boolean.irrigation_cycle2_enable', 'on') %}
+            {% set ts = state_attr('input_datetime.irrigation_cycle2_next_run_time', 'timestamp') %}
+            {% set wd = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"] %}
+            {{ wd[ts | timestamp_custom('%w') | int(0)] }} {{ ts | timestamp_custom('%d.%m.%Y %H:%M', true) }}
+          {% else %}-{% endif %}
+        icon: mdi:clock-start
+
+      # Welcher Zyklus läuft gerade
+      - default_entity_id: sensor.irrigation_cycle_running
+        name: "Irrigation - Aktueller Zyklus"
+        unique_id: irrigation_cycle_running
+        state: >-
+          {% if is_state('input_boolean.irrigation_cycle1_running', 'on') %}Morgen
+          {% elif is_state('input_boolean.irrigation_cycle2_running', 'on') %}Abend
+          {% else %}-{% endif %}
+        icon: >-
+          {{ 'mdi:water-pump' if is_state('input_boolean.irrigation_cycle1_running', 'on')
+            or is_state('input_boolean.irrigation_cycle2_running', 'on')
+            else 'mdi:water-pump-off' }}
+
+      # Welche Zone wird gerade bewässert
+      - default_entity_id: sensor.irrigation_zone_being_watered
+        name: "Irrigation - Bewässerte Zone"
+        unique_id: irrigation_zone_being_watered
+        state: "{{ states('input_text.irrigation_current_zone') }}"
+        icon: mdi:fountain
+
+  # ---- Schalter -----------------------------------------------------------
+  - switch:
+      # Master-Leistungsschalter: spiegelt die reale Leistungsaufnahme der
+      # Pumpe (> 100 W = an) und schaltet den Sonoff POW R2.
+      - default_entity_id: switch.irrigation_watering
+        name: "Irrigation - Bewässerungschalter"
+        unique_id: irrigation_watering
+        state: "{{ states('sensor.sonoffpow_02_energy_power') | float(0) > 100 }}"
+        icon: "{{ 'mdi:water-pump' if is_state('switch.irrigation_watering', 'on') else 'mdi:water-pump-off' }}"
+        turn_on:
+          - action: switch.turn_on
+            target:
+              entity_id: switch.sonoffpow_02
+        turn_off:
+          - action: switch.turn_off
+            target:
+              entity_id: switch.sonoffpow_02
+
+      # Read-only: Pumpe fördert tatsächlich Wasser (Leistung > 100 W).
+      # Wird in den Statistik-Gruppen verwendet, damit nur echte
+      # Förderzeit gezählt wird (bei geschlossenem Hahn: 2–10 W → off).
+      - name: Irrigation - Pump Active
+        unique_id: irrigation_pump_active
+        icon: mdi:lightning-bolt
+        state: "{{ states('sensor.sonoffpow_02_energy_power') | float(0) > 100 }}"
+        turn_on: [] # nur lesend
+        turn_off: [] # nur lesend
+
+      # Manueller Ein/Aus-Schalter (startet/stoppt den Morgenzyklus)
+      # - default_entity_id: switch.irrigation
+      #   name: "Irrigation - Bewässerungsautomat"
+      #   unique_id: irrigation_manual_switch
+      #   state: "{{ is_state('input_boolean.irrigation_cycle1_manual_run', 'on') }}"
+      #   icon: "{{ 'mdi:fountain' if is_state('input_boolean.irrigation_cycle1_manual_run', 'on') else 'mdi:water-pump-off' }}"
+      #   turn_on:
+      #     - action: input_boolean.turn_on
+      #       target:
+      #         entity_id: input_boolean.irrigation_cycle1_manual_run
+      #   turn_off:
+      #     - action: input_boolean.turn_off
+      #       target:
+      #         entity_id: input_boolean.irrigation_cycle1_manual_run
+
+# ---------------------------------------------------------------------------
+# Ventil-Gruppe (an = mindestens ein Ventil offen)
+# ---------------------------------------------------------------------------
+switch:
+  - platform: group
+    name: Irrigation - Valves
+    unique_id: irrigation_valves
+    entities:
+      - switch.irrigation_zone1_valve
+      - switch.irrigation_zone2_valve
+
+# ---------------------------------------------------------------------------
+# Customize (Anzeigenamen/Icons)
+# ---------------------------------------------------------------------------
+homeassistant:
+  customize:
+    # sensor.irrigation_wifi:
+    #   friendly_name: Irrigation - WLAN Stärke
+    switch.irrigation_valves:
+      friendly_name: "Irrigation - Ventile"
+
+    switch.irrigation_zone1_valve:
+      friendly_name: Irrigation - Hinten Ventil
+      icon: mdi:sprinkler-variant
+    switch.irrigation_zone2_valve:
+      friendly_name: Irrigation - Vorne Ventil
+      icon: mdi:sprinkler-variant
+    switch.irrigation_zone3_valve:
+      friendly_name: Irrigation - Hahn
+      icon: mdi:faucet
+    switch.irrigation_zone4_valve:
+      friendly_name: Irrigation - Pumpe
+      icon: mdi:engine
