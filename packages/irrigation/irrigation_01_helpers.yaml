@@ -194,12 +194,12 @@ input_text:
     icon: mdi:water-percent
     min: 5
     max: 60
-  irrigation_zone3_moisture_sensor:
-    name: Irrigation - Feuchtesensor Hahn
-    icon: mdi:water-percent
-    initial: sensor.rasen_moisture
-    min: 5
-    max: 60
+  # irrigation_zone3_moisture_sensor:
+  #   name: Irrigation - Feuchtesensor Hahn
+  #   icon: mdi:water-percent
+  #   initial: sensor.rasen_moisture
+  #   min: 5
+  #   max: 60
 
 # ---------------------------------------------------------------------------
 # Input Numbers — Zonenlaufzeiten (Minuten)
