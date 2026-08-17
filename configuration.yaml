@@ -45,21 +45,21 @@ frontend:
   themes: !include_dir_merge_named themes
 
 # HTTP ################################
-http:
-  # ssl_certificate: /ssl/fullchain.pem
-  # ssl_key: /ssl/privkey.pem
-  ip_ban_enabled: true
-  login_attempts_threshold: 15
-  use_x_forwarded_for: true
-  trusted_proxies:
-    - ::1
-    - 127.0.0.1
-    - 172.30.32.0/23
-    - 172.30.33.3
-    - 192.168.8.0/23
-  cors_allowed_origins:
-    - !secret ha_external_url
-    - !secret ha_internal_url
+# http:
+#   # ssl_certificate: /ssl/fullchain.pem
+#   # ssl_key: /ssl/privkey.pem
+#   ip_ban_enabled: true
+#   login_attempts_threshold: 15
+#   use_x_forwarded_for: true
+#   trusted_proxies:
+#     - ::1
+#     - 127.0.0.1
+#     - 172.30.32.0/23
+#     - 172.30.33.3
+#     - 192.168.8.0/23
+#   cors_allowed_origins:
+#     - !secret ha_external_url
+#     - !secret ha_internal_url
 
 logger:
   # default: critical
@@ -75,12 +75,10 @@ logger:
     homeassistant.components.onvif: warning
     homeassistant.components.recorder.core: warning
     homeassistant.components.recorder.util: warning
-    # homeassistant.components.rfxtrx: warning
-    # homeassistant.components.syncthru: debug
     homeassistant.components.websocket_api: error
     # homeassistant.core: debug
 
-    fritzconnection: warning
+    # fritzconnection: warning
     miio.miioprotocol: fatal
     custom_components.landroid_cloud: error
     custom_components.localtuya.common: critical
@@ -88,9 +86,6 @@ logger:
 
 # Recorder ############################
 recorder:
-  # db_url: sqlite:////media/cams/home-assistant_v2.db
-  # db_url: sqlite:////media/cams/1/home-assistant_v2_1.db
-  # db_url: !secret mariadb_url
   purge_keep_days: 90
   commit_interval: 30
   auto_purge: true
@@ -181,23 +176,13 @@ tts:
     # contour: (0, 0) (100, 100)
     region: germanywestcentral
 
-# FFMPEG ##############################
 ffmpeg:
-  # ffmpeg_bin: /usr/bin/ffmpeg
-
 stream:
-
-# Google ##############################
-# google:
-#   client_id: !secret google_client_id
-#   client_secret: !secret google_client_secret
-#   track_new_calendar: true
 
 # Device Tracker ######################
 device_tracker:
   - platform: google_maps
     username: !secret my_email
-    # password: !secret google_pass
 
 # Includes ############################
 automation: !include automations.yaml
