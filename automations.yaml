@@ -43,7 +43,7 @@
     ist
   triggers:
   - type: value
-    device_id: c5cde2f638bb2d714e26ec65441e181d
+    device_id: 6ddf19cc1a787657580d961f50080027
     entity_id: 20cc22d784de80f84b097c3d27e581c0
     domain: sensor
     trigger: device
@@ -63,8 +63,8 @@
       after_offset: -00:15:00
   actions:
   - type: turn_on
-    device_id: 63713a671de1472e84d5832bcb399f0e
-    entity_id: light.sonoffbnsz01
+    device_id: 4b1578c6fd94735c6c345727b01fb728
+    entity_id: 66b97286ee001bdf42aaea6980506a63
     domain: light
     brightness_pct: 95
   - delay:
@@ -73,8 +73,8 @@
       seconds: 0
       milliseconds: 0
   - type: turn_off
-    device_id: 63713a671de1472e84d5832bcb399f0e
-    entity_id: light.sonoffbnsz01
+    device_id: 4b1578c6fd94735c6c345727b01fb728
+    entity_id: 66b97286ee001bdf42aaea6980506a63
     domain: light
   mode: restart
 - id: garagenlicht_ausschalten
@@ -102,8 +102,8 @@
   conditions: []
   actions:
   - type: turn_off
-    device_id: 63713a671de1472e84d5832bcb399f0e
-    entity_id: light.sonoffbnsz01
+    device_id: 4b1578c6fd94735c6c345727b01fb728
+    entity_id: 66b97286ee001bdf42aaea6980506a63
     domain: light
   mode: restart
 - id: camera_garage_richtung
@@ -111,7 +111,7 @@
   description: Направление камеры в зависимости от положения гаражных ворот
   triggers:
   - type: value
-    device_id: c5cde2f638bb2d714e26ec65441e181d
+    device_id: 6ddf19cc1a787657580d961f50080027
     entity_id: 20cc22d784de80f84b097c3d27e581c0
     domain: sensor
     trigger: device
@@ -121,7 +121,7 @@
       minutes: 0
       seconds: 5
   - type: value
-    device_id: c5cde2f638bb2d714e26ec65441e181d
+    device_id: 6ddf19cc1a787657580d961f50080027
     entity_id: 20cc22d784de80f84b097c3d27e581c0
     domain: sensor
     trigger: device
@@ -154,7 +154,7 @@
     - conditions:
       - type: is_value
         condition: device
-        device_id: c5cde2f638bb2d714e26ec65441e181d
+        device_id: 6ddf19cc1a787657580d961f50080027
         entity_id: 20cc22d784de80f84b097c3d27e581c0
         domain: sensor
         above: 30
@@ -167,7 +167,7 @@
     - conditions:
       - type: is_value
         condition: device
-        device_id: c5cde2f638bb2d714e26ec65441e181d
+        device_id: 6ddf19cc1a787657580d961f50080027
         entity_id: 20cc22d784de80f84b097c3d27e581c0
         domain: sensor
         below: 20
@@ -1347,6 +1347,7 @@
   - trigger: state
     entity_id: binary_sensor.mower_rain_sensor
     to: 'on'
+    id: rain
   actions:
   - repeat:
       for_each: '{{ COVERS_TO_MANAGE }}'
@@ -1378,9 +1379,21 @@
               entity_id: '{{ cover_entity_id }}'
         - conditions:
           - condition: template
-            value_template: "{{ (is_state(RAIN_SENSOR, 'on') or\n   sun_elevation
-              < repeat.item.elevation_threshold_retract) and\n   current_pos != repeat.item.pos_retracted\n}}\n"
-          alias: Если солнце уже не мешает или дождь
+            value_template: "{{ sun_elevation < repeat.item.elevation_threshold_retract
+              and\n   current_pos != repeat.item.pos_retracted and\n   ((as_timestamp(now())
+              - cover_last_changed_timestamp) / 60) > repeat.item.cooldown_minutes\n}}\n"
+          alias: Если солнце уже не мешает
+          sequence:
+          - action: cover.set_cover_position
+            data:
+              position: '{{ repeat.item.pos_retracted }}'
+            target:
+              entity_id: '{{ cover_entity_id }}'
+        - conditions:
+          - condition: trigger
+            id:
+            - rain
+          alias: Если дождь
           sequence:
           - action: cover.set_cover_position
             data:
@@ -1396,28 +1409,32 @@
     - entity: cover.markise
       azimuth_min_deploy: 180
       elevation_min_deploy: 15
-      elevation_threshold_retract: 11
+      elevation_threshold_retract: 9
       pos_sun_protection: 100
       pos_retracted: 0
       cooldown_minutes: 60
+      note: 'elevation_threshold_retract: 9-11'
     - entity: cover.seitenmarkise
       azimuth_min_deploy: 180
       elevation_min_deploy: 12
-      elevation_threshold_retract: 9
+      elevation_threshold_retract: 6
       pos_sun_protection: 2
       pos_retracted: 100
       cooldown_minutes: 60
+      note: 'elevation_threshold_retract: 6-9'
     - entity: cover.markise_links
       azimuth_min_deploy: 240
       elevation_min_deploy: 12
-      elevation_threshold_retract: 9
+      elevation_threshold_retract: 6
       pos_sun_protection: 10
       pos_retracted: 100
       cooldown_minutes: 60
+      note: 'elevation_threshold_retract: 6-9'
     - entity: cover.markise_rechts
       azimuth_min_deploy: 240
       elevation_min_deploy: 90
-      elevation_threshold_retract: 9
+      elevation_threshold_retract: 6
       pos_sun_protection: 10
       pos_retracted: 100
       cooldown_minutes: 60
+      note: 'elevation_threshold_retract: 6-9'
