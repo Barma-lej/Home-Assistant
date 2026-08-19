@@ -40,6 +40,9 @@ notify:
 system_health: # System Health integration data can be viewed in Developer Tools on the “Info” tab.
 websocket_api:
 
+ffmpeg:
+stream:
+
 # Enables the frontend ################
 frontend:
   themes: !include_dir_merge_named themes
@@ -176,9 +179,6 @@ tts:
     # contour: (0, 0) (100, 100)
     region: germanywestcentral
 
-ffmpeg:
-stream:
-
 # Device Tracker ######################
 device_tracker:
   - platform: google_maps
@@ -188,10 +188,5 @@ device_tracker:
 automation: !include automations.yaml
 google_assistant: !include google_assistant.yaml
 group: !include groups.yaml
-# panel_iframe: !include panel_iframe.yaml
-# scene: !include scenes.yaml
 script: !include scripts.yaml
-template: !include template.yaml
-sensor: !include sensors.yaml
 shell_command: !include shell_commands.yaml
-# zone: !include zones.yaml

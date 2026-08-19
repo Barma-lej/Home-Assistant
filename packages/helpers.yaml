@@ -60,22 +60,36 @@ template:
             mdi:lightbulb-on-outline
           {% endif %}
 
-#   - sensor:
-#       # Подсчёт абонентской платы за электричество
-#       - name: "Placeholder energy subscription price"
-#         unique_id: placeholder_energy_subscription_price
-#         state: 0
-#         unit_of_measurement: kWh
-#         device_class: energy
-#         state_class: total
+  - sensor:
+      - name: "Only Text"
+        unique_id: only_text
+        state: ""
+        icon: mdi:format-text
 
-#       - name: "Energy Subscription Costs"
-#         unique_id: energy_subscription_costs
-#         state: "{{ input_number.energy_subscription_price | float(0) / 365 }}"
-#         unit_of_measurement: EUR
-#         device_class: monetary
-#         state_class: total_increasing
+    #   # Подсчёт абонентской платы за электричество
+    # - name: "Placeholder energy subscription price"
+    #   unique_id: placeholder_energy_subscription_price
+    #   state: 0
+    #   unit_of_measurement: kWh
+    #   device_class: energy
+    #   state_class: total
 
+    # - name: "Energy Subscription Costs"
+    #   unique_id: energy_subscription_costs
+    #   state: "{{ input_number.energy_subscription_price | float(0) / 365 }}"
+    #   unit_of_measurement: EUR
+    #   device_class: monetary
+    #   state_class: total_increasing
+
+sensor:
+  # Date Time
+  - platform: time_date
+    display_options:
+      - "time"
+      - "date"
+      # - 'time_date'
+      - "date_time"
+#
 # homeassistant:
 #   customize:
 #     sensor.placeholder_energy_subscription_price:
