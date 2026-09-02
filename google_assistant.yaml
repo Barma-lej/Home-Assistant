@@ -106,7 +106,7 @@ entity_config:
     room: Kristina
     expose: true
 
-  light.esplight6f:
+  light.sonoffbnsz01:
     name: LED
     room: Garage
     expose: true
