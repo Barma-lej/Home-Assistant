@@ -150,6 +150,6 @@ homeassistant:
     switch.irrigation_zone3_valve:
       friendly_name: Irrigation - Hahn
       icon: mdi:faucet
-    switch.irrigation_zone4_valve:
+    switch.irrigation_pump:
       friendly_name: Irrigation - Pumpe
       icon: mdi:engine
