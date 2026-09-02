@@ -253,7 +253,7 @@ automation:
   # [W] Wettervorhersage stündlich laden → max. Regenwahrscheinlichkeit
   # -------------------------------------------------------------------------
   - id: irrigation_update_forecast
-    alias: Irrigation - Update Forecast
+    alias: "Irrigation - Update Forecast"
     description: "Lädt die Stundenvorhersage und speichert die max. Regenwahrscheinlichkeit."
     mode: restart
     triggers:
@@ -282,7 +282,14 @@ automation:
             {% set entries = fc.get(weather_entity, {}).get('forecast', [])[: fc_hours | int(12)] %}
             {% set ns = namespace(p=0) %}
             {% for e in entries %}
-              {% set ns.p = [ns.p, e.precipitation_probability | default(0) | float(0)] | max %}
+              {% set prob = e.precipitation_probability | default(none) %}
+              {% set mm = e.precipitation | default(none) %}
+              {% if prob is not none %}
+                {% set ns.p = [ns.p, prob | float(0)] | max %}
+              {% elif mm is not none and (mm | float(0)) > 0 %}
+                {# Для провайдеров вроде Met.no без %: при наличии осадков выставляем 100% #}
+                {% set ns.p = 100 %}
+              {% endif %}
             {% endfor %}
             {{ ns.p | round(0) }}
       - action: input_number.set_value
