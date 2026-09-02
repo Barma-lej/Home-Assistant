@@ -21,8 +21,8 @@ logbook:
 homeassistant:
   customize:
     # Sensors
-    sensor.robi_battery:
-      friendly_name: "Robi - Akku"
+    # sensor.robi_battery:
+    #   friendly_name: "Robi - Akku"
     sensor.robi_main_brush_pct:
       friendly_name: "Robi - Hauptbürste (percent)"
     sensor.robi_side_brush_pct:
@@ -31,8 +31,6 @@ homeassistant:
       friendly_name: "Robi - Filter (percent)"
     sensor.robi_sensor_pct:
       friendly_name: "Robi - Sensoren (percent)"
-    sensor.robi_total_cleaned_time:
-      friendly_name: "Dauer (insg.)"
 
 # Camera
 # camera:
