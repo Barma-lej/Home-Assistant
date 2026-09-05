@@ -3,12 +3,12 @@ scene:
     name: Relax
     icon: mdi:seat-recline-extra
     entities:
-      light.tuyaplug3: "on"
+      light.ambiente_wz_t3: "on"
       light.sonoffpow_04: "on"
       light.sonoffpow_01: "off"
-      light.shelly1pmminig3_34b7da8db254_switch_0: "off"
-      light.shellyswitch25_10a36d_channel_1: "off"
-      light.shellyswitch25_10a36d_channel_2: "off"
+      light.wohnlicht_2: "off"
+      light.kuche: "off"
+      light.erker: "off"
 
 script:
   scene_relax:
