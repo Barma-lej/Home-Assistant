@@ -1,22 +1,6 @@
 # Sonoff POW R2
 # Tasmota integration
 
-# Sensor ####################
-utility_meter:
-  #  sonoffpow_03_energy_d:
-  #    source: sensor.sonoffpow_03_energy_total
-  #    cycle: daily
-
-  sonoffpow_03_energy_m:
-    unique_id: sonoffpow_03_energy_m
-    source: sensor.sonoffpow_03_energy_total
-    cycle: monthly
-
-  sonoffpow_03_energy_y:
-    unique_id: sonoffpow_03_energy_y
-    source: sensor.sonoffpow_03_energy_total
-    cycle: yearly
-
 # Automation ################
 automation:
   - id: telegram_sonoffpow_03
@@ -66,12 +50,3 @@ homeassistant:
       friendly_name: Leistung (Terrassenlicht)
       icon: hass:gauge
       device_class: power
-    sensor.sonoffpow_03_energy_today:
-      friendly_name: Verbrauch Heute (Terrassenlicht)
-      icon: mdi:lightning-bolt
-    sensor.sonoffpow_03_energy_m:
-      friendly_name: Verbrauch im Monat (Terrassenlicht)
-      icon: mdi:lightning-bolt
-    sensor.sonoffpow_03_energy_y:
-      friendly_name: Verbrauch im Jahr (Terrassenlicht)
-      icon: mdi:lightning-bolt

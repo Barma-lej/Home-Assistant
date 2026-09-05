@@ -1,55 +1,6 @@
 # Sonoff POW R2
 # Tasmota Integration
 
-# Sensor ####################
-utility_meter:
-  #  sonoffpow_02_energy_d:
-  #    source: sensor.sonoffpow_02_energy_total
-  #    cycle: daily
-
-  sonoffpow_02_energy_m:
-    unique_id: sonoffpow_02_energy_m
-    source: sensor.sonoffpow_02_energy_total
-    cycle: monthly
-
-  sonoffpow_02_energy_y:
-    unique_id: sonoffpow_02_energy_y
-    source: sensor.sonoffpow_02_energy_total
-    cycle: yearly
-
-# Automation ################
-# automation:
-#   - id: telegram_sonoffpow_02
-#     alias: "Telegram - Sonoffpow_02"
-#     mode: parallel
-#     triggers:
-#       - trigger: event
-#         event_type: telegram_command
-#         event_data:
-#           command: "/ambiente_wohnen"
-
-#       - trigger: event
-#         event_type: telegram_callback
-#         event_data:
-#           command: "/ambiente_wohnen"
-
-#     actions:
-#       - action: light.toggle
-#         data:
-#           entity_id: light.sonoffpow_02
-
-#       - wait_for_trigger:
-#           - trigger: state
-#             entity_id: light.sonoffpow_02
-#         timeout: "00:00:05"
-#         continue_on_timeout: true
-
-#       - action: script.telegram_callback
-#         data:
-#           target: "{{ trigger.event.data.chat_id }}"
-#           message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
-#           message: "💡 {{ state_attr('light.sonoffpow_02', 'friendly_name') }} - {{ states('light.sonoffpow_02') }}"
-
 # Customize #################
 homeassistant:
   customize:
@@ -57,8 +8,6 @@ homeassistant:
       friendly_name: Irrigation
       icon: mdi:power
 
-    sensor.sonoffpow_02_energy_totalstarttime:
-      friendly_name: Seit (Irrigation)
     sensor.sonoffpow_02_energy_power:
       friendly_name: Leistung (Irrigation)
       # icon: mdi:gauge
@@ -67,12 +16,3 @@ homeassistant:
     sensor.sonoffpow_02_energy_total:
       friendly_name: Verbrauch (Irrigation)
       icon: mdi:counter
-    sensor.sonoffpow_02_energy_today:
-      friendly_name: Verbrauch Täglich (Irrigation)
-      icon: mdi:counter
-    sensor.sonoffpow_02_energy_m:
-      friendly_name: Verbrauch Monatlich (Irrigation)
-      # icon: mdi:lightning-bolt
-    sensor.sonoffpow_02_energy_y:
-      friendly_name: Verbrauch Jahrlich (Irrigation)
-      # icon: mdi:lightning-bolt

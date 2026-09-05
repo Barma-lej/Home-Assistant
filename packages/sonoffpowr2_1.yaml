@@ -1,22 +1,6 @@
 # Sonoff POW R2
 # Tasmota integration
 
-# Sensor ####################
-utility_meter:
-  #  sonoffpow_01_energy_d:
-  #    source: sensor.sonoffpow_01_energy_total
-  #    cycle: daily
-
-  sonoffpow_01_energy_m:
-    unique_id: sonoffpow_01_energy_m
-    source: sensor.sonoffpow_01_energy_total
-    cycle: monthly
-
-  sonoffpow_01_energy_y:
-    unique_id: sonoffpow_01_energy_y
-    source: sensor.sonoffpow_01_energy_total
-    cycle: yearly
-
 # Automation ################
 automation:
   - id: telegram_sonoffpow_01
@@ -59,8 +43,6 @@ homeassistant:
       friendly_name: Wandlicht
       icon: hass:wall-sconce-flat
 
-    sensor.sonoffpow_01_energy_totalstarttime:
-      friendly_name: Seit (Wandlicht)
     sensor.sonoffpow_01_energy_power:
       friendly_name: Leistung (Wandlicht)
       icon: hass:gauge
@@ -68,12 +50,4 @@ homeassistant:
     sensor.sonoffpow_01_energy_total:
       friendly_name: Verbrauch (Wandlicht)
       # icon: mdi:chart-histogram
-    sensor.sonoffpow_01_energy_today:
-      friendly_name: Verbrauch Täglich (Wandlicht)
-      # icon: mdi:
-    sensor.sonoffpow_01_energy_m:
-      friendly_name: Verbrauch Monatlich (Wandlicht)
-      # icon: mdi:lightning-bolt
-    sensor.sonoffpow_01_energy_y:
-      friendly_name: Verbrauch Jahrlich (Wandlicht)
-      # icon: mdi:lightning-bolt
+
