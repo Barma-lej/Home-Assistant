@@ -13,8 +13,8 @@ homeassistant:
     - /share/nuc/media/cams
 
   media_dirs:
-    # local: /media
     nuc: /share/nuc/media
+    # local: /media
 
 zone:
   - name: Home
