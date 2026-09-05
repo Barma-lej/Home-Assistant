@@ -1,5 +1,5 @@
-- id: rolladen_auf
-  alias: Rolladen - Auf
+- id: rollladen_auf
+  alias: Rollladen - Auf
   description: ''
   triggers:
   - event: sunrise
@@ -11,14 +11,14 @@
       position: 100
     action: cover.set_cover_position
     target:
-      entity_id: cover.rolladen
+      entity_id: cover.rollladen
   - action: telegram_bot.send_message
     metadata: {}
     data:
-      message: "\U0001F53C Rolladen geöffnet"
+      message: "\U0001F53C Rollladen geöffnet"
   mode: single
-- id: rolladen_zu
-  alias: Rolladen - Zu
+- id: rollladen_zu
+  alias: Rollladen - Zu
   description: ''
   triggers:
   - event: sunset
@@ -31,11 +31,11 @@
     action: cover.set_cover_position
     target:
       entity_id:
-      - cover.rolladen
+      - cover.rollladen
   - action: telegram_bot.send_message
     metadata: {}
     data:
-      message: \U0001F53D Rolladen geschlossen
+      message: \U0001F53D Rollladen geschlossen
   mode: single
 - id: garagenlicht_einschalten
   alias: Garage - Licht einschalten
@@ -378,7 +378,7 @@
     - action: switch.turn_off
       data: {}
       target:
-        entity_id: switch.tuyaplug1
+        entity_id: switch.3d_printer_t1
     - action: telegram_bot.send_message
       metadata: {}
       data:
@@ -417,65 +417,66 @@
   alias: Aktualisierung
   description: Aktualisierungsbenachrichtigung
   use_blueprint:
-    path: mdegat01/update_notifications.yaml
+    path: auanasgheps/ha_update_notification.yaml
     input:
+      mobile_app_device: d65b64c785a29ffed795c6d22780bb9f
+      send_to_ha: true
       update_entities:
-      - update.esphome_update
-      - update.fritz_box_5590_fiber_fritz_os
-      - update.ftp_update
       - update.home_assistant_core_update
-      - update.home_assistant_supervisor_update
-      - update.mosquitto_broker_update
+      - update.pi_hole_web_update_available
       - update.pi_hole_core_update_available
       - update.pi_hole_ftl_update_available
+      - update.innen_firmware
+      - update.garage_firmware
+      - update.einfahrt_firmware
+      - update.terrasse_firmware
+      - update.wohnlicht_firmware
+      - update.advanced_ssh_web_terminal_update
+      - update.esphome_update
+      - update.ftp_update
+      - update.go2rtc_update
+      - update.home_assistant_operating_system_update
+      - update.home_assistant_supervisor_update
+      - update.matter_server_update
+      - update.mosquitto_broker_update
+      - update.music_assistant_server_update
+      - update.nginx_proxy_manager_update
+      - update.piper_update
       - update.samba_share_update
       - update.sqlite_web_update
       - update.studio_code_server_update
       - update.tasmoadmin_update
-      - update.advanced_ssh_web_terminal_update
-      - update.matter_server_update
       - update.vlc_update
-      - update.music_assistant_server_update
-      - update.shelly1pmminig3_34b7da8db254_firmware_update
+      - update.whisper_update
+      - update.mower_firmware
+      - update.fritz_box_5590_fiber_fritz_os
+      - update.frigate_card_update
       - update.aha_region_update
       - update.comfortable_environment_card_update
+      - update.extended_openai_conversation_update
       - update.fold_entity_row_update
-      - update.go2rtc_update
       - update.hacs_update
       - update.landroid_card_update
       - update.landroid_cloud_update
-      - update.local_tuya_update
       - update.mini_media_player_update
-      - update.frigate_card_update
       - update.moonraker_update
       - update.passive_ble_monitor_integration_update
       - update.restriction_card_update
       - update.spook_your_homie_update
-      - update.thermal_comfort_icons_update
       - update.thermal_comfort_update
+      - update.thermal_comfort_icons_update
+      - update.tuya_local_update
       - update.vacuum_card_update
       - update.weather_chart_card_update
       - update.webrtc_camera_update
+      - update.worx_landroid_vision_plus_update
       - update.xiaomi_smartmi_fan_card_update
       - update.yandex_smart_home_update
-      - update.yandex_station_intents_update
       - update.yandex_station_update
-      - update.pi_hole_web_update_available
-      - update.tuya_local_update
-      - update.home_assistant_operating_system_update
-      - update.home_power_meter_firmware
-      - update.tor_firmware
-      - update.innen_firmware
-      - update.einfahrt_firmware
-      - update.garage_firmware
-      - update.terrasse_firmware
-      - update.nginx_proxy_manager_update
-      - update.mower_firmware
-      mobile_app_device: d65b64c785a29ffed795c6d22780bb9f
-      reminder_hours: '6'
-      run_config_check: true
-      send_to_ha: true
-      mobile_app_device_2: d65b64c785a29ffed795c6d22780bb9f
+      - update.yandex_station_intents_update
+      - update.blueprints_garbage_reminder
+      - update.blueprints_update_notifications_v2_2_1
+      reminder_hours: '12'
 - id: camera_manage_status_led
   alias: Camera Manage status LED
   description: ''
@@ -537,37 +538,37 @@
     choose:
     - conditions:
       - condition: template
-        value_template: '{{ is_state(''switch.tuyaplug2'', ''on'') and (is_state(''group.family'',
+        value_template: '{{ is_state(''switch.tv_board_t2'', ''on'') and (is_state(''group.family'',
           ''not_home'') or now().hour < 12 or now().hour > 22) }}'
       sequence:
       - action: switch.turn_off
         target:
-          entity_id: switch.tuyaplug2
+          entity_id: switch.tv_board_t2
         data: {}
     - conditions:
       - condition: template
-        value_template: '{{ is_state(''switch.tuyaplug2'', ''off'') and is_state(''group.family'',
+        value_template: '{{ is_state(''switch.tv_board_t2'', ''off'') and is_state(''group.family'',
           ''home'') and (now().hour > 11 and now().hour < 23) }}'
       sequence:
       - action: switch.turn_on
         target:
-          entity_id: switch.tuyaplug2
+          entity_id: switch.tv_board_t2
         data: {}
   - if:
     - condition: template
-      value_template: '{{ is_state(''switch.tuyaplug2'', ''on'') and (is_state(''group.family'',
+      value_template: '{{ is_state(''switch.tv_board_t2'', ''on'') and (is_state(''group.family'',
         ''not_home'') or now().hour < 12 or now().hour > 22) }}'
     then:
     - action: switch.turn_off
       target:
-        entity_id: switch.tuyaplug2
+        entity_id: switch.tv_board_t2
       data: {}
   mode: single
-- id: rolladen_close_if_its_hot
-  alias: Rolladen - Automatisch schließen bei Hitze und Sonne
+- id: rollladen_close_if_its_hot
+  alias: Rollladen - Automatisch schließen bei Hitze und Sonne
   description: Schließt bestimmte Rolläden, wenn es heiß ist und die Sonne entsprechend
     steht, um die Räume kühl zu halten. Berücksichtigt individuelle Azimut-Schwellenwerte
-    pro Rolladen.
+    pro Rollladen.
   triggers:
   - minutes: /5
     trigger: time_pattern
@@ -605,83 +606,22 @@
     CLOUD_COVERAGE_MAX: 150
     COOLDOWN_MINUTES: 240
     COVERS_TO_MANAGE:
-    - entity: cover.rollade_1
+    - entity: cover.rollladen_1
       azimuth_close_trigger: 150
       current_pos_above: 40
       target_pos: 0
-    - entity: cover.rollade_2
+    - entity: cover.rollladen_2
       azimuth_close_trigger: 180
       current_pos_above: 40
       target_pos: 0
-    - entity: cover.rollade_3
+    - entity: cover.rollladen_3
       azimuth_close_trigger: 220
       current_pos_above: 40
       target_pos: 0
-    - entity: cover.rollade_4
+    - entity: cover.rollladen_4
       azimuth_close_trigger: 240
       current_pos_above: 75
       target_pos: 80
-- id: markise_control
-  alias: Markise Verwaltung
-  description: Markise automatisch steuern basierend auf Sonne, Temperatur, Wolken
-    und Regen.
-  triggers:
-  - trigger: time_pattern
-    minutes: /5
-  - trigger: template
-    value_template: '{{ is_state(RAIN_SENSOR, ''on'') or (state_attr(''sun.sun'',
-      ''elevation'') | float(999) < SUN_ELEVATION_THRESHOLD_CLOSE) }}'
-  actions:
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: "{% set sun_azimuth = state_attr('sun.sun', 'azimuth') | float(0)
-          %} {% set sun_elevation = state_attr('sun.sun', 'elevation') | float(0)
-          %} {% set current_temp = states(TEMP_SENSOR) | float(-100) %} {% set cloud_coverage
-          = state_attr(WEATHER_SENSOR, 'cloud_coverage') | float(101) %} {% set current_pos
-          = state_attr(COVER_ENTITY_ID, 'current_position') | int(-1) %} {% set cover_last_changed_timestamp
-          = as_timestamp(states[COVER_ENTITY_ID].last_changed, 0) %}\n{{ sun_azimuth
-          > SUN_AZIMUTH_MIN_OPEN and\n  sun_elevation >= SUN_ELEVATION_MIN_OPEN and\n
-          \ current_temp > TEMP_THRESHOLD_OPEN and\n  cloud_coverage < CLOUD_COVERAGE_THRESHOLD_OPEN
-          and\n  is_state(RAIN_SENSOR, 'off') and\n  current_pos != POSITION_SUN_PROTECTION
-          and\n  ((as_timestamp(now()) - cover_last_changed_timestamp) / 60) > COOLDOWN_MINUTES\n}}\n"
-        alias: Если солнце мешает, жарко, нет облаков и дождя
-      sequence:
-      - delay: 3
-      - action: cover.set_cover_position
-        data:
-          position: '{{ POSITION_SUN_PROTECTION }}'
-        target:
-          entity_id: '{{ COVER_ENTITY_ID }}'
-    - conditions:
-      - condition: template
-        value_template: "{% set sun_elevation = state_attr('sun.sun', 'elevation')
-          | float(999) %} {% set current_pos = state_attr(COVER_ENTITY_ID, 'current_position')
-          | int(-1) %}\n{{ (is_state(RAIN_SENSOR, 'on') or\n  sun_elevation < SUN_ELEVATION_THRESHOLD_CLOSE)
-          and\n  current_pos != POSITION_RETRACTED\n}}\n"
-      alias: Если солнце уже не мешает или дождь
-      sequence:
-      - delay: 3
-      - action: cover.set_cover_position
-        data:
-          position: '{{ POSITION_RETRACTED }}'
-        target:
-          entity_id: '{{ COVER_ENTITY_ID }}'
-  trigger_variables:
-    SUN_ELEVATION_THRESHOLD_CLOSE: 11
-    RAIN_SENSOR: binary_sensor.mower_rainsensor_triggered
-  variables:
-    COVER_ENTITY_ID: cover.markise
-    TEMP_SENSOR: sensor.ble_temperature_temperatur_gt
-    WEATHER_SENSOR: weather.openweathermap
-    TEMP_THRESHOLD_OPEN: 22
-    CLOUD_COVERAGE_THRESHOLD_OPEN: 40
-    SUN_AZIMUTH_MIN_OPEN: 180
-    SUN_ELEVATION_MIN_OPEN: 15
-    POSITION_SUN_PROTECTION: 100
-    POSITION_RETRACTED: 0
-    COOLDOWN_MINUTES: 60
-  mode: single
 - id: vacuum_when_nobody_home
   alias: Robi - Niemand zu Hause ist
   description: Wenn Niemand Zuhause ist, dann staubsaugen.
@@ -882,65 +822,6 @@
       text: Убери туалет
   actions:
   - action: script.robi_wc
-  mode: single
-- id: seitenmarkise_control
-  alias: Seitenmarkise Verwaltung
-  description: Seitenmarkise automatisch steuern basierend auf Sonne, Temperatur,
-    Wolken und Regen.
-  triggers:
-  - trigger: time_pattern
-    minutes: /5
-  - trigger: template
-    value_template: '{{ is_state(RAIN_SENSOR, ''on'') or (state_attr(''sun.sun'',
-      ''elevation'') | float(999) < SUN_ELEVATION_THRESHOLD_RETRACT) }}'
-  actions:
-  - choose:
-    - conditions:
-      - condition: template
-        value_template: "{% set sun_azimuth = state_attr('sun.sun', 'azimuth') | float(0)
-          %} {% set sun_elevation = state_attr('sun.sun', 'elevation') | float(0)
-          %} {% set current_temp = states(TEMP_SENSOR) | float(-100) %} {% set cloud_coverage
-          = state_attr(WEATHER_SENSOR, 'cloud_coverage') | float(101) %} {% set current_pos
-          = state_attr(COVER_ENTITY_ID, 'current_position') | int(-1) %} {% set cover_last_changed_timestamp
-          = as_timestamp(states[COVER_ENTITY_ID].last_changed, 0) %}\n{{ sun_azimuth
-          > SUN_AZIMUTH_MIN_DEPLOY and\n  sun_elevation >= SUN_ELEVATION_MIN_DEPLOY
-          and\n  current_temp > TEMP_THRESHOLD_DEPLOY and\n  cloud_coverage < CLOUD_COVERAGE_THRESHOLD_DEPLOY
-          and\n  is_state(RAIN_SENSOR, 'off') and\n  current_pos > POSITION_SUN_PROTECTION
-          and\n  ((as_timestamp(now()) - cover_last_changed_timestamp) / 60) > COOLDOWN_MINUTES\n}}\n"
-        alias: Если солнце мешает, жарко, нет облаков и дождя
-      sequence:
-      - action: cover.set_cover_position
-        data:
-          position: '{{ POSITION_SUN_PROTECTION }}'
-        target:
-          entity_id: '{{ COVER_ENTITY_ID }}'
-    - conditions:
-      - condition: template
-        value_template: "{% set sun_elevation = state_attr('sun.sun', 'elevation')
-          | float(999) %} {% set current_pos = state_attr(COVER_ENTITY_ID, 'current_position')
-          | int(-1) %}\n{{ (is_state(RAIN_SENSOR, 'on') or\n  sun_elevation < SUN_ELEVATION_THRESHOLD_RETRACT)
-          and\n  current_pos != POSITION_RETRACTED\n}}\n"
-      alias: Если солнце уже не мешает или дождь
-      sequence:
-      - action: cover.set_cover_position
-        data:
-          position: '{{ POSITION_RETRACTED }}'
-        target:
-          entity_id: '{{ COVER_ENTITY_ID }}'
-  trigger_variables:
-    SUN_ELEVATION_THRESHOLD_RETRACT: 8.5
-    RAIN_SENSOR: binary_sensor.mower_rainsensor_triggered
-  variables:
-    COVER_ENTITY_ID: cover.seitenmarkise
-    TEMP_SENSOR: sensor.ble_temperature_temperatur_gt
-    WEATHER_SENSOR: weather.openweathermap
-    TEMP_THRESHOLD_DEPLOY: 22
-    CLOUD_COVERAGE_THRESHOLD_DEPLOY: 40
-    SUN_AZIMUTH_MIN_DEPLOY: 180
-    SUN_ELEVATION_MIN_DEPLOY: 12
-    POSITION_SUN_PROTECTION: 15
-    POSITION_RETRACTED: 100
-    COOLDOWN_MINUTES: 120
   mode: single
 - id: garage_smartthing_sync
   alias: Garage - Smarttagsverwaltung
@@ -1438,3 +1319,26 @@
       pos_retracted: 100
       cooldown_minutes: 60
       note: 'elevation_threshold_retract: 6-9'
+- id: mower_notify_error
+  alias: Mower error notification
+  description: ''
+  triggers:
+  - trigger: template
+    value_template: '{{ states(''sensor.mower_error'') }}'
+    enabled: false
+  - trigger: state
+    entity_id: sensor.mower_error
+  conditions:
+  - condition: template
+    value_template: '{{ trigger.to_state.state != trigger.from_state.state }}'
+    enabled: true
+  actions:
+  - action: telegram_bot.send_message
+    data:
+      message: '{{ states(''sensor.mower_error'') }}* <- {{ trigger.from_state.state
+        }}: {{ states(''sensor.mower_error'') }}'
+      title: "\U0001F3CE️ Lanroid M500 Error - *{{ trigger.to_state.state }}"
+      entity_id:
+      - notify.telegram_bot_1080925742_1001311115555
+  mode: single
+  initial_state: true
