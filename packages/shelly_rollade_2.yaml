@@ -1,47 +1,30 @@
-# Shelly Rollade 2
+# Shelly Rollladen 2
 # https://www.home-assistant.io/integrations/shelly/
-
-# Sensor ############################################################
-utility_meter:
-  shelly_rollade_2_d:
-    unique_id: shelly_rollade_2_d
-    source: sensor.rollade_2_energy
-    cycle: daily
-
-  shelly_rollade_2_m:
-    unique_id: shelly_rollade_2_m
-    source: sensor.rollade_2_energy
-    cycle: monthly
-
-  shelly_rollade_2_y:
-    unique_id: shelly_rollade_2_y
-    source: sensor.rollade_2_energy
-    cycle: yearly
 
 # Automation ########################################################
 automation:
-  - id: telegram_rollade_2
-    alias: "Telegram - Rollade 2"
+  - id: telegram_rollladen_2
+    alias: "Telegram - Rollladen 2"
     mode: restart
     triggers:
       - trigger: event
         event_type: telegram_command
         event_data:
-          command: "/rollade_2"
+          command: "/rollladen_2"
 
       - trigger: event
         event_type: telegram_callback
         event_data:
-          command: "/rollade_2"
+          command: "/rollladen_2"
 
     actions:
       - action: script.cover_one_button
         data:
-          entity_id: rollade_2
+          entity_id: rollladen_2
 
       - wait_for_trigger:
           - trigger: state
-            entity_id: cover.rollade_2
+            entity_id: cover.rollladen_2
         timeout: "00:00:02"
         continue_on_timeout: true
 
@@ -49,18 +32,4 @@ automation:
         data:
           target: "{{ trigger.event.data.chat_id }}"
           message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
-          message: "🏡 {{ state_attr('cover.rollade_2', 'friendly_name') }} - {{ states('cover.rollade_2') }}"
-
-# Customize #########################################################
-homeassistant:
-  customize:
-    cover.rollade_2:
-      friendly_name: Rollade 2
-    sensor.rollade_2_power:
-      friendly_name: Leistung (Rollade 2)
-      icon: mdi:gauge
-    sensor.rollade_2_energy:
-      friendly_name: Verbrauch (Rollade 2)
-    binary_sensor.rollade_2_overheating:
-      friendly_name: Überhitzen (Rollade 2)
-      icon: mdi:thermometer-alert
+          message: "🏡 {{ state_attr('cover.rollladen_2', 'friendly_name') }} - {{ states('cover.rollladen_2') }}"

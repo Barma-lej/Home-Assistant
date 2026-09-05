@@ -1,23 +1,6 @@
 # Shelly Wohnlicht
 # https://www.home-assistant.io/integrations/shelly/
 
-# Sensor ############################################################
-utility_meter:
-  shelly_wohnlicht_d:
-    unique_id: shelly_wohnlicht_d
-    source: sensor.shelly1pmminig3_34b7da8db254_switch_0_energy
-    cycle: daily
-
-  shelly_wohnlicht_m:
-    unique_id: shelly_wohnlicht_m
-    source: sensor.shelly1pmminig3_34b7da8db254_switch_0_energy
-    cycle: monthly
-
-  shelly_wohnlicht_y:
-    unique_id: shelly_wohnlicht_y
-    source: sensor.shelly1pmminig3_34b7da8db254_switch_0_energy
-    cycle: yearly
-
 # Automation ########################################################
 automation:
   - id: telegram_wohnlicht
@@ -37,11 +20,11 @@ automation:
     actions:
       - action: light.toggle
         data:
-          entity_id: light.shelly1pmminig3_34b7da8db254_switch_0
+          entity_id: light.wohnlicht_2
 
       - wait_for_trigger:
           - trigger: state
-            entity_id: light.shelly1pmminig3_34b7da8db254_switch_0
+            entity_id: light.wohnlicht_2
         timeout: 1
         continue_on_timeout: true
 
@@ -49,33 +32,4 @@ automation:
         data:
           target: "{{ trigger.event.data.chat_id }}"
           message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
-          message: "💡 {{ state_attr('light.shelly1pmminig3_34b7da8db254_switch_0', 'friendly_name') }} ist {{ states('light.shelly1pmminig3_34b7da8db254_switch_0') }}"
-
-# Customize #########################################################
-homeassistant:
-  customize:
-    light.shelly1pmminig3_34b7da8db254_switch_0:
-      friendly_name: Wohnlicht
-      icon: mdi:vanity-light
-
-    sensor.shelly1pmminig3_34b7da8db254_switch_0_power:
-      friendly_name: Leistung (Wohnlicht)
-      icon: mdi:gauge
-    sensor.shelly1pmminig3_34b7da8db254_switch_0_energy:
-      friendly_name: Verbrauch (Wohnlicht)
-    sensor.shelly_wohnlicht_d:
-      friendly_name: Verbrauch Täglich (Wohnlicht)
-      icon: mdi:lightning-bolt
-    sensor.shelly_wohnlicht_m:
-      friendly_name: Verbrauch Monatlich (Wohnlicht)
-      icon: mdi:lightning-bolt
-    sensor.shelly_wohnlicht_y:
-      friendly_name: Verbrauch Jahrlich (Wohnlicht)
-      icon: mdi:lightning-bolt
-
-    binary_sensor.shelly1pmminig3_34b7da8db254_switch_0_overpowering:
-      friendly_name: Überspannung (Wohnlicht)
-      icon: mdi:flash-alert
-    binary_sensor.shelly1pmminig3_34b7da8db254_switch_0_overheating:
-      friendly_name: Überhitzen (Wohnlicht)
-      icon: mdi:thermometer-alert
+          message: "💡 {{ state_attr('light.wohnlicht_2', 'friendly_name') }} ist {{ states('light.wohnlicht_2') }}"

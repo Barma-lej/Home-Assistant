@@ -1,47 +1,30 @@
-# Shelly Rollade 4
+# Shelly Rollladen 4
 # https://www.home-assistant.io/integrations/shelly/
-
-# Sensor ############################################################
-utility_meter:
-  shelly_rollade_4_d:
-    unique_id: shelly_rollade_4_d
-    source: sensor.rollade_4_energy
-    cycle: daily
-
-  shelly_rollade_4_m:
-    unique_id: shelly_rollade_4_m
-    source: sensor.rollade_4_energy
-    cycle: monthly
-
-  shelly_rollade_4_y:
-    unique_id: shelly_rollade_4_y
-    source: sensor.rollade_4_energy
-    cycle: yearly
 
 # Automation ########################################################
 automation:
-  - id: telegram_rollade_4
-    alias: "Telegram - Rollade 4"
+  - id: telegram_rollladen_4
+    alias: "Telegram - Rollladen 4"
     mode: restart
     triggers:
       - trigger: event
         event_type: telegram_command
         event_data:
-          command: "/rollade_4"
+          command: "/rollladen_4"
 
       - trigger: event
         event_type: telegram_callback
         event_data:
-          command: "/rollade_4"
+          command: "/rollladen_4"
 
     actions:
       - action: script.cover_one_button
         data:
-          entity_id: rollade_4
+          entity_id: rollladen_4
 
       - wait_for_trigger:
           - trigger: state
-            entity_id: cover.rollade_4
+            entity_id: cover.rollladen_4
         timeout: "00:00:02"
         continue_on_timeout: true
 
@@ -49,18 +32,5 @@ automation:
         data:
           target: "{{ trigger.event.data.chat_id }}"
           message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
-          message: "🏡 {{ state_attr('cover.rollade_4', 'friendly_name') }} - {{ states('cover.rollade_4') }}"
+          message: "🏡 {{ state_attr('cover.rollladen_4', 'friendly_name') }} - {{ states('cover.rollladen_4') }}"
 
-# Customize #########################################################
-homeassistant:
-  customize:
-    cover.rollade_4:
-      friendly_name: Rollade 4
-    sensor.rollade_4_power:
-      friendly_name: Leistung (Rollade 4)
-      icon: mdi:gauge
-    sensor.rollade_4_energy:
-      friendly_name: Verbrauch (Rollade 4)
-    binary_sensor.rollade_4_overheating:
-      friendly_name: Überhitzen (Rollade 4)
-      icon: mdi:thermometer-alert

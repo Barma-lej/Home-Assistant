@@ -1,167 +1,30 @@
-# Shelly Rollade 1
+# Shelly Rollladen 1
 # https://www.home-assistant.io/integrations/shelly/
-
-# Sensor ############################################################
-utility_meter:
-  shelly_rollade_1_d:
-    unique_id: shelly_rollade_1_d
-    source: sensor.rollade_1_energy
-    cycle: daily
-
-  shelly_rollade_1_m:
-    unique_id: shelly_rollade_1_m
-    source: sensor.rollade_1_energy
-    cycle: monthly
-
-  shelly_rollade_1_y:
-    unique_id: shelly_rollade_1_y
-    source: sensor.rollade_1_energy
-    cycle: yearly
 
 # Automation ########################################################
 automation:
-  # - id: rolladen_close_if_its_hot
-  #   alias: Rolladen - schliessen wehh es heiss ist
-  #   mode: single
-  #   triggers:
-  #     - trigger: numeric_state
-  #       entity_id: sun.sun
-  #       attribute: azimuth
-  #       above: 165
-  #       for:
-  #         minutes: 1
-
-  #     - trigger: numeric_state
-  #       entity_id: sun.sun
-  #       attribute: azimuth
-  #       above: 185
-  #       for:
-  #         minutes: 1
-
-  #     - trigger: numeric_state
-  #       entity_id: sun.sun
-  #       attribute: azimuth
-  #       above: 225
-  #       for:
-  #         minutes: 1
-
-  #     - trigger: numeric_state
-  #       entity_id: sun.sun
-  #       attribute: azimuth
-  #       above: 265
-  #       for:
-  #         minutes: 1
-
-  #   conditions:
-  #     alias: "Жарче чем 24° и облачность ниже 40%"
-  #     and:
-  #       - condition: numeric_state
-  #         entity_id: "sensor.rasen_temperature"
-  #         above: 22
-  #       - condition: numeric_state
-  #         entity_id: "sensor.wetter_openweather_d_cloud_coverage"
-  #         below: 20
-
-  #   actions:
-  #     - choose:
-  #         - conditions:
-  #             - and:
-  #                 - condition: numeric_state
-  #                   entity_id: sun.sun
-  #                   attribute: azimuth
-  #                   below: 185
-  #                 - condition: numeric_state
-  #                   entity_id: cover.rollade_1
-  #                   attribute: current_position
-  #                   above: 40
-  #           sequence:
-  #             - action: cover.set_cover_position
-  #               target:
-  #                 entity_id: cover.rollade_1
-  #               data:
-  #                 position: 33
-
-  #         - conditions:
-  #             - and:
-  #                 - condition: numeric_state
-  #                   entity_id: sun.sun
-  #                   attribute: azimuth
-  #                   above: 184
-  #                 - condition: numeric_state
-  #                   entity_id: sun.sun
-  #                   attribute: azimuth
-  #                   below: 225
-  #                 - condition: numeric_state
-  #                   entity_id: cover.shellyswitch25_f37b28
-  #                   attribute: current_position
-  #                   above: 40
-  #           sequence:
-  #             - action: cover.set_cover_position
-  #               target:
-  #                 entity_id: cover.shellyswitch25_f37b28
-  #               data:
-  #                 position: 29
-
-  #         - conditions:
-  #             - and:
-  #                 - condition: numeric_state
-  #                   entity_id: sun.sun
-  #                   attribute: azimuth
-  #                   above: 224
-  #                 - condition: numeric_state
-  #                   entity_id: sun.sun
-  #                   attribute: azimuth
-  #                   below: 265
-  #                 - condition: numeric_state
-  #                   entity_id: cover.shellyswitch25_10eaa4
-  #                   attribute: current_position
-  #                   above: 40
-  #           sequence:
-  #             - action: cover.set_cover_position
-  #               target:
-  #                 entity_id: cover.shellyswitch25_10eaa4
-  #               data:
-  #                 position: 29
-
-  #         - conditions:
-  #             - and:
-  #                 - condition: numeric_state
-  #                   entity_id: sun.sun
-  #                   attribute: azimuth
-  #                   above: 264
-  #                 - condition: numeric_state
-  #                   entity_id: cover.shellyswitch25_10d315
-  #                   attribute: current_position
-  #                   above: 75
-  #           sequence:
-  #             - action: cover.set_cover_position
-  #               target:
-  #                 entity_id: cover.shellyswitch25_10d315
-  #               data:
-  #                 position: 60
-
-  - id: telegram_rollade_1
-    alias: "Telegram - Rollade 1"
+  - id: telegram_rollladen_1
+    alias: "Telegram - Rollladen 1"
     mode: restart
     triggers:
       - trigger: event
         event_type: telegram_command
         event_data:
-          command: "/rollade_1"
+          command: "/rollladen_1"
 
       - trigger: event
         event_type: telegram_callback
         event_data:
-          command: "/rollade_1"
+          command: "/rollladen_1"
 
     actions:
       - action: script.cover_one_button
         data:
-          entity_id: rollade_1
+          entity_id: rollladen_1
 
       - wait_for_trigger:
           - trigger: state
-            entity_id: cover.rollade_1
+            entity_id: cover.rollladen_1
         timeout: "00:00:02"
         continue_on_timeout: true
 
@@ -169,18 +32,4 @@ automation:
         data:
           target: "{{ trigger.event.data.chat_id }}"
           message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
-          message: "🏡 {{ state_attr('cover.rollade_1', 'friendly_name') }} - {{ states('cover.rollade_1') }}"
-
-# Customize #########################################################
-homeassistant:
-  customize:
-    cover.rollade_1:
-      friendly_name: Rollade 1
-    sensor.rollade_1_power:
-      friendly_name: Leistung (Rollade 1)
-      icon: mdi:gauge
-    sensor.rollade_1_energy:
-      friendly_name: Verbrauch (Rollade 1)
-    binary_sensor.rollade_1_overheating:
-      friendly_name: Überhitzen (Rollade 1)
-      icon: mdi:thermometer-alert
+          message: "🏡 {{ state_attr('cover.rollladen_1', 'friendly_name') }} - {{ states('cover.rollladen_1') }}"
