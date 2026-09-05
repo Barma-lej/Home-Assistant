@@ -111,17 +111,17 @@ entity_config:
     room: Garage
     expose: true
 
-  switch.tuyaplug2:
+  switch.tv_board_t2:
     name: TV-Board
     room: Wohnzimmer
     expose: true
 
-  light.tuyaplug3:
+  light.ambiente_wz_t3:
     name: Wohnzimmerambient
     room: Ambiente
     expose: true
 
-  switch.irrigation:
+  input_boolean.irrigation_cycle1_manual_run:
     name: Bewässerung
     aliases:
       - bewässerung
