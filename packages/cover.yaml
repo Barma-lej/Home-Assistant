@@ -41,34 +41,34 @@ template:
 # Cover #############################################################
 cover:
   - platform: group
-    unique_id: rolladen
-    name: rolladen
+    unique_id: rollladen
+    name: Rollladen
     entities:
-      - cover.rollade_1
-      - cover.rollade_2
-      - cover.rollade_3
-      - cover.rollade_4
+      - cover.rollladen_1
+      - cover.rollladen_2
+      - cover.rollladen_3
+      - cover.rollladen_4
 
 # Input Text ########################################################
 input_text:
-  rolladen_last_action:
-    name: Rolladen - Last action
+  rollladen_last_action:
+    name: Rollladen - Last action
     initial: opening
     icon: mdi:window-shutter-open
-  rollade_1_last_action:
-    name: Rolladen 1 - Last action
+  rollladen_1_last_action:
+    name: Rollladen 1 - Last action
     initial: opening
     icon: mdi:window-shutter-open
-  rollade_2_last_action:
-    name: Rolladen 2 - Last action
+  rollladen_2_last_action:
+    name: Rollladen 2 - Last action
     initial: opening
     icon: mdi:window-shutter-open
-  rollade_3_last_action:
-    name: Rolladen 3 - Last action
+  rollladen_3_last_action:
+    name: Rollladen 3 - Last action
     initial: opening
     icon: mdi:window-shutter-open
-  rollade_4_last_action:
-    name: Rolladen 4 - Last action
+  rollladen_4_last_action:
+    name: Rollladen 4 - Last action
     initial: opening
     icon: mdi:window-shutter-open
 
@@ -95,18 +95,18 @@ input_text:
 
 # Automation ########################################################
 automation:
-  # Rolladen group last action
-  - id: set_rolladen_last_action
-    alias: Rolladen - Set last action
+  # Rollladen group last action
+  - id: set_rollladen_last_action
+    alias: Rollladen - Set last action
     mode: parallel
     triggers:
       - trigger: state
         entity_id:
-          - cover.rolladen
-          - cover.rollade_4
-          - cover.rollade_3
-          - cover.rollade_1
-          - cover.rollade_2
+          - cover.rollladen
+          - cover.rollladen_4
+          - cover.rollladen_3
+          - cover.rollladen_1
+          - cover.rollladen_2
           - cover.terrasse
           - cover.markise
           - cover.seitenmarkise
@@ -140,7 +140,7 @@ script:
     fields:
       entity_id:
         description: Full cover entity ID with 'cover.' prefix
-        example: "cover.rolladen"
+        example: "cover.rollladen"
     sequence:
       - variables:
           input_text_entity: >
@@ -172,7 +172,7 @@ script:
     fields:
       entity_id:
         description: Full cover entity ID with 'cover.' prefix
-        example: "cover.rolladen"
+        example: "cover.rollladen"
       mode:
         description: Action to perform
         example: "open"
@@ -195,45 +195,8 @@ script:
         target:
           entity_id: "{{ entity_id }}"
 
-  #######################################
-  # Bulk cover control script
-  # Parameters:
-  #   covers: list of full cover entity IDs
-  #   action: 'open', 'close', or 'stop'
-  #######################################
-  # covers_bulk_control:
-  #   alias: Covers - Bulk Control
-  #   mode: parallel
-  #   fields:
-  #     covers:
-  #       description: List of cover entities with full entity IDs
-  #       example: "cover.rolladen, cover.markise"
-  #     action:
-  #       description: Action to perform
-  #       example: "open"
-  #       selector:
-  #         select:
-  #           options:
-  #             - "open"
-  #             - "close"
-  #             - "stop"
-  #   sequence:
-  #     - repeat:
-  #         for_each: "{{ covers }}"
-  #         sequence:
-  #           - action: >
-  #               {% if action == 'open' %}
-  #                 cover.open_cover
-  #               {% elif action == 'close' %}
-  #                 cover.close_cover
-  #               {% else %}
-  #                 cover.stop_cover
-  #               {% endif %}
-  #             target:
-  #               entity_id: "{{ repeat.item }}"
-
 # Customize #########################################################
 homeassistant:
   customize:
-    cover.rolladen:
-      friendly_name: Rolladen
+    cover.rollladen:
+      friendly_name: Rollladen
