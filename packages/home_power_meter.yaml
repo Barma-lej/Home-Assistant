@@ -1,44 +1,8 @@
 # Glow
 
-# Sensor ####################
-utility_meter:
-  #  haus_energy_d:
-  #    source: sensor.haus_energy_total
-  #    cycle: daily
-
-  haus_energy_m:
-    unique_id: haus_energy_m
-    source: sensor.home_power_meter_total_energy
-    cycle: monthly
-
-  haus_energy_y:
-    unique_id: haus_energy_y
-    source: sensor.home_power_meter_total_energy
-    cron: "0 0 1 5 *"
-
-  haus_energy_t:
-    unique_id: haus_energy_t
-    source: sensor.home_power_meter_total_energy
-
 # Customize #################
 homeassistant:
   customize:
-    sensor.haus_power_consumption:
-      friendly_name: Leistung (Haus)
-      icon: mdi:lightning-bolt
-      device_class: power
     sensor.home_power_meter_total_energy:
       friendly_name: Verbrauch seit Einschaltung (Haus)
-      # icon: mdi:counter
-    sensor.haus_daily_energy:
-      friendly_name: Verbrauch Täglich (Haus)
-      icon: mdi:counter
-    sensor.haus_energy_m:
-      friendly_name: Verbrauch Monatlich (Haus)
-      # icon: mdi:counter
-    sensor.haus_energy_y:
-      friendly_name: Verbrauch Jahrlich (Haus)
-      # icon: mdi:counter
-    sensor.haus_energy_t:
-      friendly_name: Verbrauch (Haus)
       # icon: mdi:counter
