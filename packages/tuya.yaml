@@ -1,0 +1,107 @@
+# Tuya devices
+
+# Sensors ###################
+sensor:
+  - platform: integration
+    unique_id: tuyaplug1_energy
+    source: sensor.3d_printer_t1_moshchnost
+    name: 3D Printer T1 Energy
+    unit_prefix: k
+    round: 2
+
+  - platform: integration
+    unique_id: tuyaplug2_energy
+    source: sensor.tv_board_t2_moshchnost
+    name: TV Board T2 Energy
+    unit_prefix: k
+    round: 2
+
+  - platform: integration
+    unique_id: tuyaplug3_energy
+    source: sensor.ambiente_wz_t3_moshchnost
+    name: Ambiente WZ T3 Energy
+    unit_prefix: k
+    round: 2
+
+  - platform: integration
+    unique_id: tuyaplug4_energy
+    source: sensor.waschmaschine_t4_moshchnost
+    name: Waschmaschine T4 Energy
+    unit_prefix: k
+    round: 2
+
+  - platform: integration
+    unique_id: tuyaplug5_energy
+    source: sensor.heizung_t5_moshchnost
+    name: Heizung T5 Energy
+    unit_prefix: k
+    round: 2
+
+  - platform: integration
+    unique_id: tuyaplug6_energy
+    source: sensor.t6_moshchnost
+    name: T6 Energy
+    unit_prefix: k
+    round: 2
+
+  - platform: integration
+    unique_id: tuyaplug7_energy
+    source: sensor.schick_pc_t7_moshchnost
+    name: Schick-PC T7 Energy
+    unit_prefix: k
+    round: 2
+
+  - platform: integration
+    unique_id: tuyaplug8_energy
+    source: sensor.tor_t8_moshchnost
+    name: Tor T8 Energy
+    unit_prefix: k
+    round: 2
+
+  - platform: integration
+    unique_id: tuyaplug9_energy
+    source: sensor.kamera_t9_moshchnost
+    name: Kamera T9 Energy
+    unit_prefix: k
+    round: 2
+
+  - platform: integration
+    unique_id: tuyaplug10_energy
+    source: sensor.ladegerat_t10_moshchnost
+    name: Ladegerat T10 Energy
+    unit_prefix: k
+    round: 2
+
+# # Automation ###############
+automation:
+  - id: telegram_tuyaplug3
+    alias: "Telegram - Ambiente WZ T3"
+    mode: parallel
+    triggers:
+      - trigger: event
+        event_type: telegram_command
+        event_data:
+          command: "/ambiente_wohnen"
+
+      - trigger: event
+        event_type: telegram_callback
+        event_data:
+          command: "/ambiente_wohnen"
+
+    actions:
+      - action: light.toggle
+        data:
+          entity_id: light.ambiente_wz_t3
+
+      - wait_for_trigger:
+          - trigger: state
+            entity_id: light.ambiente_wz_t3
+        timeout: "00:00:05"
+        continue_on_timeout: true
+
+      - action: script.telegram_callback
+        data:
+          target: "{{ trigger.event.data.chat_id }}"
+          message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
+          message: "💡 {{ state_attr('light.ambiente_wz_t3', 'friendly_name') }} - {{ states('light.ambiente_wz_t3') }}"
+
