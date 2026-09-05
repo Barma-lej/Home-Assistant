@@ -21,7 +21,7 @@ scene:
       switch.terrasse_push_notifications: "on"
       switch.terrasse_record: "on"
       switch.terrasse_record_audio: "on"
-      switch.tuyaplug9: "on"
+      switch.kamera_t9: "on"
 
 # Automations
 automation:
