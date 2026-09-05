@@ -39,36 +39,36 @@ automation:
     #      title: 🏎️ Lanroid M500
     #      message: "{{ trigger.from_state.state }} -> {{ trigger.to_state.state }} - {{ states('sensor.date_time') }}"
 
-  - id: mower_notify_error
-    alias: Mower error notification
-    initial_state: true
-    triggers:
-      #   - trigger: state
-      #     entity_id: vacuum.mower
-      #     attribute: error
-      - trigger: template
-        value_template: "{{ states('sensor.mower_error') }}"
-        # value_template: "{{ state_attr('vacuum.mower','error')['id'] }}"
+  # - id: mower_notify_error
+  #   alias: Mower error notification
+  #   initial_state: true
+  #   triggers:
+  #     #   - trigger: state
+  #     #     entity_id: vacuum.mower
+  #     #     attribute: error
+  #     - trigger: template
+  #       value_template: "{{ states('sensor.mower_error') }}"
+  #       # value_template: "{{ state_attr('vacuum.mower','error')['id'] }}"
 
-    conditions:
-      - condition: template
-        value_template: "{{ trigger.to_state.state != trigger.from_state.state }}"
+  #   conditions:
+  #     - condition: template
+  #       value_template: "{{ trigger.to_state.state != trigger.from_state.state }}"
 
-    actions:
-      - action: telegram_bot.send_message
-        data:
-          target: !secret telegram_channel
-          message: >-
-            🏎️ Lanroid M500 Error -
-            *{{ trigger.to_state.state }}: {{ states('sensor.mower_error') }}*
-            <- {{ trigger.from_state.state }}: {{ states('sensor.mower_error') }}
-          # *{{ trigger.to_state.state }}: {{ state_attr('vacuum.mower','error')['description'] }}*
-          # <- {{ trigger.from_state.state }}: {{ state_attr('vacuum.mower','error')['description'] }}
+  #   actions:
+  #     - action: telegram_bot.send_message
+  #       data:
+  #         target: !secret telegram_channel
+  #         message: >-
+  #           🏎️ Lanroid M500 Error -
+  #           *{{ trigger.to_state.state }}: {{ states('sensor.mower_error') }}*
+  #           <- {{ trigger.from_state.state }}: {{ states('sensor.mower_error') }}
+  #         # *{{ trigger.to_state.state }}: {{ state_attr('vacuum.mower','error')['description'] }}*
+  #         # <- {{ trigger.from_state.state }}: {{ state_attr('vacuum.mower','error')['description'] }}
 
-    #  - action: persistent_notification.create
-    #    data:
-    #      title: 🏎️ Lanroid M500
-    #      message: "{{ trigger.from_state.state }} -> {{ trigger.to_state.state }} - {{ states('sensor.date_time') }}"
+  #   #  - action: persistent_notification.create
+  #   #    data:
+  #   #      title: 🏎️ Lanroid M500
+  #   #      message: "{{ trigger.from_state.state }} -> {{ trigger.to_state.state }} - {{ states('sensor.date_time') }}"
 
 # Customize #########################################################
 homeassistant:
