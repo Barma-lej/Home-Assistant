@@ -64,7 +64,7 @@ automation:
                   keyboard:
                     # - "/wandlicht, /wohnlicht, /kuechenlicht"
                     # - "/essecke, /ambiente_wohnen, /ambiente_kueche"
-                    # - "/rollade_1, /rollade_2, /rollade_3, /rollade_4"
+                    # - "/rollladen_1, /rollladen_2, /rollladen_3, /rollladen_4"
                     - "/alarm, /tor, /start, /help"
 
               - action: script.telegram_callback
@@ -97,11 +97,11 @@ automation:
                     - /ambiente\_wohnen - Ambiente Wohnzimmer
                     - /ambiente\_kueche - Ambiente Küche
 
-                    *Rollade öffnen/schliessen:*
-                    - /rollade\_1 - Rollade 1
-                    - /rollade\_2 - Rollade 2
-                    - /rollade\_3 - Rollade 3
-                    - /rollade\_4 - Rollade Terrasse
+                    *Rollladen öffnen/schliessen:*
+                    - /rollladen\_1 - Rollladen 1
+                    - /rollladen\_2 - Rollladen 2
+                    - /rollladen\_3 - Rollladen 3
+                    - /rollladen\_4 - Rollladen Terrasse
 
                     *Allgemein:*
                     - /start - Zeigt die Begrüßungsnachricht
@@ -121,18 +121,18 @@ script:
           inline_keyboard:
             - "{{ (states('light.sonoffpow_01') == 'on') | iif('🟢', '🔴') }} Wandlicht:/wandlicht,
               {{ (states('light.shellyswitch25_10c7c3_channel_1') == 'on') | iif('🟢', '🔴') }} Wohnen:/wohnlicht,
-              {{ (states('light.shellyswitch25_10a36d_channel_1') == 'on') | iif('🟢', '🔴') }} Küche:/kuechenlicht"
-            - "{{ (states('light.shellyswitch25_10a36d_channel_2') == 'on') | iif('🟢', '🔴') }} Essecke:/essecke,
+              {{ (states('light.kuche') == 'on') | iif('🟢', '🔴') }} Küche:/kuechenlicht"
+            - "{{ (states('light.erker') == 'on') | iif('🟢', '🔴') }} Essecke:/essecke,
               {{ (states('light.sonoffpow_02') == 'on') | iif('🟢', '🔴') }} Ambiwohnen:/ambiente_wohnen,
               {{ (states('light.sonoffpow_04') == 'on') | iif('🟢', '🔴') }} Ambiküche:/ambiente_kueche"
-            - "{% set r1 = state_attr('cover.rollade_1', 'current_position') | int %}
-              {% set r2 = state_attr('cover.rollade_2', 'current_position') | int %}
-              {% set r3 = state_attr('cover.rollade_3', 'current_position') | int %}
-              {{ (r1 < 95) | iif((r1 < 20) | iif('🔒', '🪟'~r1~'%'), '🪟') }} Rollade 1:/rollade_1,
-              {{ (r2 < 95) | iif((r2 < 20) | iif('🔒', '🪟'~r2~'%'), '🪟') }} Rollade 2:/rollade_2,
-              {{ (r3 < 95) | iif((r3 < 20) | iif('🔒', '🪟'~r3~'%'), '🪟') }} Rollade 3:/rollade_3"
-            - "{% set r4 = state_attr('cover.rollade_4', 'current_position') | int %}
-              {{ (r4 < 95) | iif((r4 < 20) | iif('🔒', '🪟'~r4~'%'), '🪟') }} Terrasse:/rollade_4,
+            - "{% set r1 = state_attr('cover.rollladen_1', 'current_position') | int %}
+              {% set r2 = state_attr('cover.rollladen_2', 'current_position') | int %}
+              {% set r3 = state_attr('cover.rollladen_3', 'current_position') | int %}
+              {{ (r1 < 95) | iif((r1 < 20) | iif('🔒', '🪟'~r1~'%'), '🪟') }} Rollladen 1:/rollladen_1,
+              {{ (r2 < 95) | iif((r2 < 20) | iif('🔒', '🪟'~r2~'%'), '🪟') }} Rollladen 2:/rollladen_2,
+              {{ (r3 < 95) | iif((r3 < 20) | iif('🔒', '🪟'~r3~'%'), '🪟') }} Rollladen 3:/rollladen_3"
+            - "{% set r4 = state_attr('cover.rollladen_4', 'current_position') | int %}
+              {{ (r4 < 95) | iif((r4 < 20) | iif('🔒', '🪟'~r4~'%'), '🪟') }} Terrasse:/rollladen_4,
               {{ ( states('sensor.torposition') | int > 0 ) | iif( '🚗' ~ states('sensor.torposition') | round(0) ~ '%' , '🔒' ) }} Tor:/tor,
               {{ ( states('sensor.torposition') | int > 0 ) | iif( '🚗', '🔒' ) }} Tortel:/torteil"
             - "{{ (states('input_boolean.alarm_indoor') == 'on') | iif('🚨', '🔒') }} Alarm:/alarm,
@@ -154,10 +154,10 @@ script:
 # essecke - Esseckenlicht ein/aus
 # ambiente_wohnen - Ambiente Wohnzimmer ein/aus
 # ambiente_kueche - Ambiente Küche ein/aus
-# rollade_1 - Rollade 1 öffnen/schliessen
-# rollade_2 - Rollade 2 öffnen/schliessen
-# rollade_3 - Rollade 3 öffnen/schliessen
-# rollade_4 - Rollade Hinten öffnen/schliessen
+# rollladen_1 - Rollladen 1 öffnen/schliessen
+# rollladen_2 - Rollladen 2 öffnen/schliessen
+# rollladen_3 - Rollladen 3 öffnen/schliessen
+# rollladen_4 - Rollladen Hinten öffnen/schliessen
 # tor - Garage öffnen/schliessen
 # torteil - Garage teilweise öffnen/schliessen
 # start - Zeigt die Begrüßungsnachricht
