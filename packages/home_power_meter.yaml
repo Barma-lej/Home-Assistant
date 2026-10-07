@@ -1,8 +1,17 @@
 # Glow
 
+# Sensor ####################
+utility_meter:
+  haus_energy_t:
+    unique_id: haus_energy_t
+    source: sensor.home_power_meter_total_energy
+
 # Customize #################
 homeassistant:
   customize:
     sensor.home_power_meter_total_energy:
       friendly_name: Verbrauch seit Einschaltung (Haus)
+      # icon: mdi:counter
+    sensor.haus_energy_t:
+      friendly_name: Verbrauch (Haus)
       # icon: mdi:counter
