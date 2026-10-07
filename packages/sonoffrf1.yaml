@@ -5,9 +5,9 @@
 homeassistant:
   customize:
     # Switch ##########
-    switch.sonoffrf1:
-      friendly_name: Kristinas Leiste
-      icon: mdi:led-strip-variant
+    # switch.sonoffrf1:
+    #   friendly_name: Kristinas Leiste
+    #   icon: mdi:led-strip-variant
     # Light ###########
     light.sonoffrf1:
       friendly_name: Kristinas Leiste
