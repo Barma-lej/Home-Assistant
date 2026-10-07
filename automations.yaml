@@ -469,13 +469,15 @@
       - update.vacuum_card_update
       - update.weather_chart_card_update
       - update.webrtc_camera_update
-      - update.worx_landroid_vision_plus_update
       - update.xiaomi_smartmi_fan_card_update
       - update.yandex_smart_home_update
       - update.yandex_station_update
       - update.yandex_station_intents_update
       - update.blueprints_garbage_reminder
       - update.blueprints_update_notifications_v2_2_1
+      - update.sankey_chart_card_update
+      - update.tor_firmware
+      - update.home_power_meter_firmware
       reminder_hours: '12'
 - id: camera_manage_status_led
   alias: Camera Manage status LED
@@ -1342,3 +1344,242 @@
       - notify.telegram_bot_1080925742_1001311115555
   mode: single
   initial_state: true
+- id: '1790506912768'
+  alias: Robi - Charging error
+  description: Повторная попытка возврата vacuum.robi на базу при ошибке зарядки (до
+    3 раз с интервалом в 1 минуту)
+  triggers:
+  - trigger: state
+    entity_id: vacuum.robi
+    to: error
+  - trigger: state
+    entity_id:
+    - vacuum.robi
+    enabled: false
+  - trigger: state
+    entity_id: vacuum.robi
+    attribute: status
+    enabled: false
+  - trigger: vacuum.errored
+    target:
+      device_id: 1a3b05d6afefd9d1e6e5c5d26b61eb4b
+    options:
+      behavior: each
+      for: 00:00:00
+  conditions:
+  - condition: template
+    value_template: "{{ ('charging error' in state_attr('vacuum.robi', 'status') |
+      string | lower) or\n   ('charging_error' in state_attr('vacuum.robi', 'status')
+      | string | lower) or\n   ('charging problem' in state_attr('vacuum.robi', 'status')
+      | string | lower) or\n   ('13' in state_attr('vacuum.robi', 'status') | string)
+      }}"
+    note: 'Основные коды ошибок Roborock S5
+
+      Ошибка 1: Проблемы с лазерным дальномером (LDS) — проверьте, не заблокирован
+      ли или не застрял ли поворотный механизм.
+
+      Ошибка 2: Застрял бампер — протрите и слегка нажмите на него, чтобы удалить
+      мусор.
+
+      Ошибка 3: Ведущее колесо подвешено — переместите робота в другое место.
+
+      Ошибка 4: Загрязнены или заблокированы датчики падения (высоты) — протрите их.
+
+      Ошибка 5: Заблокирована главная щетка — извлеките и очистите её вместе с подшипниками.
+
+      Ошибка 6: Заблокирована боковая щётка — снимите и очистите её.
+
+      Ошибка 7: Застряли ведущие колеса — проверьте на наличие намотанных волос или
+      мусора.
+
+      Ошибка 8: Пылесос застрял или заблокирован окружающими предметами.
+
+      Ошибка 9: Не установлен пылесборник или фильтр.
+
+      Ошибка 10: Фильтр влажный или заблокирован — просушите его перед установкой.
+
+      Ошибка 12: Слишком низкий уровень заряда батареи.
+
+      Ошибка 13: Ошибка зарядки — протрите контакты на базе и пылесосе.
+
+      Ошибка 14: Неисправность батареи.
+
+      Ошибка 15: Загрязнены датчики расстояния до стены — протрите их.
+
+      Ошибка 18: Ошибка вентилятора (всасывания) — перезагрузите систему или очистите
+      воздуховод.'
+    enabled: false
+  actions:
+  - action: telegram_bot.send_message
+    metadata: {}
+    data:
+      message: "1 \U0001F401 Robi - {{ state_attr('vacuum.robi','status') }}"
+  - repeat:
+      count: 3
+      sequence:
+      - if:
+        - condition: template
+          value_template: '{{ (''charging error'' in state_attr(''vacuum.robi'', ''status'')
+            | string | lower) or (''charging_error'' in state_attr(''vacuum.robi'',
+            ''status'') | string | lower) or (''charging problem'' in state_attr(''vacuum.robi'',
+            ''status'') | string | lower) or (''13'' in state_attr(''vacuum.robi'',
+            ''status'') | string) }}'
+          note: 'Основные коды ошибок Roborock S5
+
+            Ошибка 1: Проблемы с лазерным дальномером (LDS) — проверьте, не заблокирован
+            ли или не застрял ли поворотный механизм.
+
+            Ошибка 2: Застрял бампер — протрите и слегка нажмите на него, чтобы удалить
+            мусор.
+
+            Ошибка 3: Ведущее колесо подвешено — переместите робота в другое место.
+
+            Ошибка 4: Загрязнены или заблокированы датчики падения (высоты) — протрите
+            их.
+
+            Ошибка 5: Заблокирована главная щетка — извлеките и очистите её вместе
+            с подшипниками.
+
+            Ошибка 6: Заблокирована боковая щётка — снимите и очистите её.
+
+            Ошибка 7: Застряли ведущие колеса — проверьте на наличие намотанных волос
+            или мусора.
+
+            Ошибка 8: Пылесос застрял или заблокирован окружающими предметами.
+
+            Ошибка 9: Не установлен пылесборник или фильтр.
+
+            Ошибка 10: Фильтр влажный или заблокирован — просушите его перед установкой.
+
+            Ошибка 12: Слишком низкий уровень заряда батареи.
+
+            Ошибка 13: Ошибка зарядки — протрите контакты на базе и пылесосе.
+
+            Ошибка 14: Неисправность батареи.
+
+            Ошибка 15: Загрязнены датчики расстояния до стены — протрите их.
+
+            Ошибка 18: Ошибка вентилятора (всасывания) — перезагрузите систему или
+            очистите воздуховод.'
+        then:
+        - action: vacuum.return_to_base
+          target:
+            entity_id: vacuum.robi
+          data: {}
+        - delay:
+            minutes: 1
+        else:
+        - stop: Зарядка успешно возобновлена
+  - if:
+    - condition: template
+      value_template: '{{ is_state(''vacuum.robi'', ''error'') }}'
+    then:
+    - action: persistent_notification.create
+      data:
+        title: 'Robi: сбой зарядки'
+        message: Робот-пылесос не смог начать зарядку после 3 попыток. Проверьте контакты
+          базы.
+  mode: single
+  max_exceeded: silent
+- id: '1790509611092'
+  alias: Robi - Error
+  description: Уведомление при любых ошибках vacuum.robi и 3 попытки возврата на базу
+    при сбое зарядки (код 9)
+  triggers:
+  - trigger: state
+    entity_id: vacuum.robi
+    to: error
+  - trigger: state
+    entity_id: vacuum.robi
+    attribute: status
+    to: Charging problem
+  actions:
+  - action: persistent_notification.create
+    data:
+      title: ⚠️ Ошибка пылесоса Robi
+      message: 'Зафиксирована ошибка: {{ state_attr(''vacuum.robi'', ''error'') |
+        default(state_attr(''vacuum.robi'', ''status''), true) | default(''Неизвестная
+        ошибка'', true) }} (Код состояния: {{ state_attr(''vacuum.robi'', ''state_code'')
+        | default(''—'', true) }})'
+      notification_id: vacuum_robi_error
+  - action: notify.mobile_app_as25
+    data:
+      title: 'Robi: сбой в работе'
+      message: 'Ошибка: {{ state_attr(''vacuum.robi'', ''error'') | default(state_attr(''vacuum.robi'',
+        ''status''), true) | default(''Неизвестная ошибка'', true) }}'
+  - if:
+    - condition: template
+      value_template: "{{ state_attr('vacuum.robi', 'state_code') == 9 or\n   state_attr('vacuum.robi',
+        'status') in ['Charging problem', 'charging_problem'] or\n   'charging' in
+        state_attr('vacuum.robi', 'error') | string | lower or\n   'charging' in state_attr('vacuum.robi',
+        'status') | string | lower }}"
+    then:
+    - repeat:
+        sequence:
+        - action: vacuum.return_to_base
+          target:
+            entity_id: vacuum.robi
+          data: {}
+        - delay:
+            minutes: 1
+        until:
+        - condition: or
+          conditions:
+          - condition: state
+            entity_id: vacuum.robi
+            state: docked
+          - condition: template
+            value_template: "{{ not is_state('vacuum.robi', 'error') and\n   state_attr('vacuum.robi',
+              'status') != 'Charging problem' }}"
+          - condition: template
+            value_template: '{{ repeat.index >= 3 }}'
+    - choose:
+      - conditions:
+        - condition: state
+          entity_id: vacuum.robi
+          state: docked
+        sequence:
+        - action: notify.mobile_app_as25
+          data:
+            title: 'Robi: зарядка восстановлена'
+            message: Робот успешно пристыковался к док-станции.
+        - action: persistent_notification.dismiss
+          data:
+            notification_id: vacuum_robi_error
+      - conditions:
+        - condition: template
+          value_template: '{{ is_state(''vacuum.robi'', ''error'') or state_attr(''vacuum.robi'',
+            ''status'') == ''Charging problem'' }}'
+        sequence:
+        - action: persistent_notification.create
+          data:
+            title: '⛔ Robi: критический сбой зарядки'
+            message: После 3 попыток робот не смог начать зарядку. Проверьте контакты
+              базы.
+            notification_id: vacuum_robi_error
+        - action: notify.mobile_app_as25
+          data:
+            title: 'Robi: зарядка не удалась'
+            message: 3 попытки исчерпаны. Требуется ручная установка на базу.
+  mode: single
+  max_exceeded: silent
+- id: '1791364426478'
+  alias: 'Tuya: Reload Stuck Devices on Startup'
+  description: Перезагружает сущности Tuya Local после стабилизации сети
+  triggers:
+  - event: start
+    trigger: homeassistant
+  conditions: []
+  actions:
+  - delay: 00:02:00
+  - target:
+      device_id:
+      - 7586355aff720aea0903bed684e66180
+      - e8b8b60a0de5daf12198c83163703920
+      - d75399ac730b30c24af5033b55c452c2
+      - d62771ba5f1a2c4c17319da4bfd3c70e
+      - e2c640d670328f5eabcbab0970906007
+      - 6742cbf4d177b01d84ea7557d8f10afb
+    action: homeassistant.reload_config_entry
+    data: {}
+  mode: single
