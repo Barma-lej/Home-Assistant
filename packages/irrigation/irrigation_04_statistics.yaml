@@ -232,6 +232,8 @@ automation:
         variables:
           action: "Ende 🔴"
     actions:
+      - delay:
+          milliseconds: 500
       - variables:
           daily_sensor: >
             {{ trigger.entity_id | replace('switch.irrigation_switches_', 'sensor.irrigation_watering_duration_') ~ '_daily' }}
@@ -242,7 +244,7 @@ automation:
           message: >
             💦 Bewässerung {{ action }}
             *{{ trigger.from_state.attributes.friendly_name }}*
-            — Dauer heute: {{ states(daily_sensor) }} h
+            — Dauer heute: {{ ((states(daily_sensor) | float(0) * 3600) | round | int(0)) | timestamp_custom('%-H:%M:%S', false) }}
 
 # ---------------------------------------------------------------------------
 # Customize (Anzeigenamen)
