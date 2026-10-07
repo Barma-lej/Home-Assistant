@@ -179,7 +179,7 @@ script:
               'Garten':'media_player.garten',
               'Überall':'media_player.home_group',
               'Erdgeschoss':'media_player.erdgeschoss',
-              'Yandex Station':'media_player.yandex_station_lb0000000000002397130000767dab00',
+              'Yandex Station':'media_player.yandex_station_r10dy8j00zec5k',
               }
             %}
             {% set state = states('input_select.radio_player') %}
