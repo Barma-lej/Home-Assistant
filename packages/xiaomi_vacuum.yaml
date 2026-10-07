@@ -81,28 +81,6 @@ template:
         icon: mdi:eye-outline
         unit_of_measurement: "%"
 
-      # Statistik
-      - name: Robi - Total duration fmt
-        unique_id: robi_total_duration_fmt
-        state: >-
-          {%- set time = states('sensor.robi_total_duration') | int(0) -%}
-          {%- set seconds = (time % 60) | int(0) -%}
-          {%- set minutes = ((time % 3600) / 60) | int(0) -%}
-          {%- set hours = ((time % 86400) / 3600) | int(0) -%}
-          {%- set days = (time / 86400) | int(0) -%}
-          {{ days }} Tagen {{ '{:02}:{:02}:{:02}'.format(hours, minutes, seconds) }}
-        icon: mdi:clock-fast
-
-      - name: Robi - Last clean duration fmt
-        unique_id: robi_last_clean_duration_fmt
-        state: >-
-          {%- set time = states('sensor.robi_last_clean_duration') | int(0) -%}
-          {%- set seconds = (time % 60) | int(0) -%}
-          {%- set minutes = ((time % 3600) / 60) | int(0) -%}
-          {%- set hours = ((time % 86400) / 3600) | int(0) -%}
-          {{ '{:02}:{:02}:{:02}'.format(hours, minutes, seconds) }}
-        icon: mdi:clock-fast
-
   # - switch:
   #     - name: Vacuum
   #       unique_id: robi_switch
@@ -159,10 +137,10 @@ input_boolean:
     initial: false
     icon: mdi:vector-selection
 
-  robi_info_toggle:
-    name: Robi - Informationen anzeigen
-    initial: false
-    icon: mdi:information
+  # robi_info_toggle:
+  #   name: Robi - Informationen anzeigen
+  #   initial: false
+  #   icon: mdi:information
 
   robi_filter_usage_toggle:
     name: Robi - Filternutzung anzeigen
