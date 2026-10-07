@@ -116,14 +116,14 @@ script:
     sequence:
       - action: telegram_bot.send_message
         data:
-          target: "{{ target }}"
+          chat_id: "{{ target }}"
           message: "{{ message }}"
           inline_keyboard:
             - "{{ (states('light.sonoffpow_01') == 'on') | iif('🟢', '🔴') }} Wandlicht:/wandlicht,
-              {{ (states('light.shellyswitch25_10c7c3_channel_1') == 'on') | iif('🟢', '🔴') }} Wohnen:/wohnlicht,
+              {{ (states('light.wohnlicht_2') == 'on') | iif('🟢', '🔴') }} Wohnen:/wohnlicht,
               {{ (states('light.kuche') == 'on') | iif('🟢', '🔴') }} Küche:/kuechenlicht"
-            - "{{ (states('light.erker') == 'on') | iif('🟢', '🔴') }} Essecke:/essecke,
-              {{ (states('light.sonoffpow_02') == 'on') | iif('🟢', '🔴') }} Ambiwohnen:/ambiente_wohnen,
+            - "{{ (states('light.erker_2') == 'on') | iif('🟢', '🔴') }} Essecke:/essecke,
+              {{ (states('light.ambiente_wz_t3') == 'on') | iif('🟢', '🔴') }} Ambiwohnen:/ambiente_wohnen,
               {{ (states('light.sonoffpow_04') == 'on') | iif('🟢', '🔴') }} Ambiküche:/ambiente_kueche"
             - "{% set r1 = state_attr('cover.rollladen_1', 'current_position') | int %}
               {% set r2 = state_attr('cover.rollladen_2', 'current_position') | int %}
@@ -133,8 +133,8 @@ script:
               {{ (r3 < 95) | iif((r3 < 20) | iif('🔒', '🪟'~r3~'%'), '🪟') }} Rollladen 3:/rollladen_3"
             - "{% set r4 = state_attr('cover.rollladen_4', 'current_position') | int %}
               {{ (r4 < 95) | iif((r4 < 20) | iif('🔒', '🪟'~r4~'%'), '🪟') }} Terrasse:/rollladen_4,
-              {{ ( states('sensor.torposition') | int > 0 ) | iif( '🚗' ~ states('sensor.torposition') | round(0) ~ '%' , '🔒' ) }} Tor:/tor,
-              {{ ( states('sensor.torposition') | int > 0 ) | iif( '🚗', '🔒' ) }} Tortel:/torteil"
+              {{ ( state_attr('cover.tor_tor','current_position') | int(0) > 0 ) | iif( '🚗' ~ state_attr('cover.tor_tor','current_position') | round(0) ~ '%' , '🔒' ) }} Tor:/tor,
+              {{ ( state_attr('cover.tor_tor','current_position') | int(0) > 0 ) | iif( '🚗', '🔒' ) }} Tortel:/torteil"
             - "{{ (states('input_boolean.alarm_indoor') == 'on') | iif('🚨', '🔒') }} Alarm:/alarm,
               Home:/start,
               Hilfe:/help"
@@ -147,7 +147,7 @@ script:
           message_id: "{{ message_id }}"
           chat_id: "{{ target }}"
 
-      # 🔴🟢🔓🔒⚪
+# 🔴🟢🔓🔒⚪
 # wandlicht - Wandlicht ein/aus
 # wohnlicht - Wohnlicht ein/aus
 # kuechenlicht - Küchenlicht ein/aus
