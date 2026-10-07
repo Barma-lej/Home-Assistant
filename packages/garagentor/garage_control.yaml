@@ -46,7 +46,6 @@ automation:
               - action: button.press
                 target:
                   entity_id: button.tor_tor
-
               - wait_for_trigger:
                   - trigger: state
                     entity_id: cover.tor_tor
