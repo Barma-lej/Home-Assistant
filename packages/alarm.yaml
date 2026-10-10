@@ -106,37 +106,6 @@ automation:
                 message: "🚨👮🆘 Alarm ausgelöst!!!\n\nEtwas passiert!!!"
             - delay: 00:00:05
 
-  - id: telegram_alarm
-    alias: "Telegram - Alarm toggle"
-    mode: parallel
-    triggers:
-      - trigger: event
-        event_type: telegram_command
-        event_data:
-          command: "/alarm"
-
-      - trigger: event
-        event_type: telegram_callback
-        event_data:
-          command: "/alarm"
-
-    actions:
-      - action: switch.toggle
-        data:
-          entity_id: switch.alarm_play
-
-      - wait_for_trigger:
-          - trigger: state
-            entity_id: switch.alarm_play
-        timeout: 5
-        continue_on_timeout: true
-
-      - action: script.telegram_callback
-        data:
-          target: "{{ trigger.event.data.user_id }}"
-          message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
-          message: "🚨 {{ state_attr('switch.alarm_play', 'friendly_name') }} - {{ states('switch.alarm_play') }}"
-
 script:
   alarm_play:
     alias: Alarm - Play

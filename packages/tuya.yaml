@@ -71,37 +71,3 @@ sensor:
     name: Ladegerat T10 Energy
     unit_prefix: k
     round: 2
-
-# # Automation ###############
-automation:
-  - id: telegram_tuyaplug3
-    alias: "Telegram - Ambiente WZ T3"
-    mode: parallel
-    triggers:
-      - trigger: event
-        event_type: telegram_command
-        event_data:
-          command: "/ambiente_wohnen"
-
-      - trigger: event
-        event_type: telegram_callback
-        event_data:
-          command: "/ambiente_wohnen"
-
-    actions:
-      - action: light.toggle
-        data:
-          entity_id: light.ambiente_wz_t3
-
-      - wait_for_trigger:
-          - trigger: state
-            entity_id: light.ambiente_wz_t3
-        timeout: "00:00:05"
-        continue_on_timeout: true
-
-      - action: script.telegram_callback
-        data:
-          target: "{{ trigger.event.data.chat_id }}"
-          message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
-          message: "💡 {{ state_attr('light.ambiente_wz_t3', 'friendly_name') }} - {{ states('light.ambiente_wz_t3') }}"
-

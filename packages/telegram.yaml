@@ -1,151 +1,194 @@
 # Telegram Bot configuration
-# telegram_bot:
-#   - platform: polling
-#     # - platform: broadcast
-#     api_key: !secret telegram_api_key
-#     allowed_chat_ids:
-#       - !secret telegram_channel
-#       - !secret telegram_bot_familie
-#       - !secret telegram_bot_anatolij
-#       - !secret telegram_bot_natalja
-#       - !secret telegram_bot_kristina
-#       - !secret telegram_bot_veronika
 
-# Notify ############################################################
-# notify:
-#   - name: telegram_schick_home
-#     platform: telegram
-#     chat_id: !secret telegram_channel
+homeassistant:
+  customize:
+    package.node_anchors:
+      registry: &tg_registry
+        r1:
+          - {name: "Wandlicht", cmd: "/wandlicht", ent: "light.sonoffpow_01"}
+          - {name: "Wohnen", cmd: "/wohnlicht", ent: "light.wohnlicht_2"}
+          - {name: "Küche", cmd: "/kuechenlicht", ent: "light.kuche"}
+        r2:
+          - {name: "Essecke", cmd: "/essecke", ent: "light.erker_2"}
+          - {name: "Ambiwohnen", cmd: "/ambiente_wohnen", ent: "light.ambiente_wz_t3"}
+          - {name: "Ambiküche", cmd: "/ambiente_kueche", ent: "light.sonoffpow_04"}
+        r3:
+          - {name: "Rollladen 1", cmd: "/rollladen_1", ent: "cover.rollladen_1"}
+          - {name: "Rollladen 2", cmd: "/rollladen_2", ent: "cover.rollladen_2"}
+          - {name: "Rollladen 3", cmd: "/rollladen_3", ent: "cover.rollladen_3"}
+        r4:
+          - {name: "Terrasse", cmd: "/rollladen_4", ent: "cover.rollladen_4"}
+          - {name: "Tor", cmd: "/tor", ent: "cover.tor_tor"}
+          - {name: "Tortel", cmd: "/torteil", ent: "button.tor_luftung"}
+        r5:
+          - {name: "Alarm", cmd: "/alarm", ent: "input_boolean.alarm_indoor"}
+          - {name: "Home", cmd: "/start"}
+          - {name: "Hilfe", cmd: "/help"}
 
-#   - name: telegram_bot_familie
-#     platform: telegram
-#     chat_id: !secret telegram_bot_familie
+shell_command:
+  telegram_api_post: >-
+    curl -s -X POST "https://api.telegram.org/bot{{ bot_token }}/{{ endpoint }}" -H "Content-Type: application/json" -d '{{ payload }}'
 
-#   - name: telegram_bot_anatolij
-#     platform: telegram
-#     chat_id: !secret telegram_bot_anatolij
+script:
+  telegram_render_menu:
+    alias: "Telegram - Render Menu"
+    mode: restart
+    fields:
+      chat_id:
+        description: "Chat ID"
+      message_id:
+        description: "Message ID for editing (optional)"
+    variables:
+      cfg: *tg_registry
+    sequence:
+      - variables:
+          is_edit: "{{ message_id is defined and message_id not in ['', None, 'None', 'none'] }}"
+          endpoint: "{{ 'editMessageReplyMarkup' if is_edit else 'sendMessage' }}"
+          buttons: >-
+            [
+              [{"text": "🚀 Открыть WebApp Дашборд", "web_app": {"url": "https://barma.partia.de/lovelace/main?kiosk"}}],
+              {%- for row_key in ['r1', 'r2', 'r3', 'r4', 'r5'] %}
+              [
+                {%- for item in cfg[row_key] -%}
+                  {%- set icon = '' -%}
+                  {%- if item.ent is defined -%}
+                    {%- if item.ent.startswith('cover.') -%}
+                      {%- set p = state_attr(item.ent, 'current_position') | int(0) -%}
+                      {%- if item.ent == 'cover.tor_tor' -%}
+                        {%- set icon = ('🚗 ' ~ p ~ '% ') if p > 0 else '🔒 ' -%}
+                      {%- else -%}
+                        {%- set icon = '🔒 ' if p < 20 else (('🪟 ' ~ p ~ '% ') if p < 95 else '🪟 ') -%}
+                      {%- endif -%}
+                    {%- elif item.ent.startswith('input_boolean.') -%}
+                      {%- set icon = '🚨 ' if is_state(item.ent, 'on') else '🔒 ' -%}
+                    {%- elif item.ent.startswith('button.') -%}
+                      {%- set icon = '🚗 ' -%}
+                    {%- else -%}
+                      {%- set icon = '🟢 ' if is_state(item.ent, 'on') else '🔴 ' -%}
+                    {%- endif -%}
+                  {%- endif -%}
+                  {"text": "{{ icon ~ item.name }}", "callback_data": "{{ item.cmd }}"}{{ ',' if not loop.last else '' }}
+                {%- endfor %}
+              ]{{ ',' if not loop.last else '' }}
+              {%- endfor %}
+            ]
+      - action: shell_command.telegram_api_post
+        continue_on_error: true
+        data:
+          bot_token: !secret telegram_api_key
+          endpoint: "{{ endpoint }}"
+          payload: >-
+            {
+              "chat_id": "{{ chat_id }}",
+              {% if is_edit %}
+                "message_id": {{ message_id }},
+              {% else %}
+                "text": "🏡 *Управление домом*",
+                "parse_mode": "Markdown",
+              {% endif %}
+              "reply_markup": {
+                "inline_keyboard": {{ buttons }}
+              }
+            }
 
-#   - name: telegram_bot_natalja
-#     platform: telegram
-#     chat_id: !secret telegram_bot_natalja
-
-#   - name: telegram_bot_kristina
-#     platform: telegram
-#     chat_id: !secret telegram_bot_kristina
-
-#   - name: telegram_bot_veronika
-#     platform: telegram
-#     chat_id: !secret telegram_bot_veronika
-
-# Automation ########################################################
 automation:
-  # Manage queries of telegram
-  - id: telegram_control
-    alias: "Telegram - Control"
+  # 1. Отправка начального меню
+  - id: telegram_send_menu
+    alias: "Telegram - Send Menu"
+    mode: restart
     triggers:
       - trigger: event
+        event_type: telegram_command
+        event_data:
+          command: "/start"
+      - trigger: event
         event_type: telegram_callback
-        event_data: {}
+        event_data:
+          command: "/start"
+    actions:
+      - action: script.telegram_render_menu
+        data:
+          chat_id: "{{ trigger.event.data.chat_id }}"
+
+  # 2. Справка
+  - id: telegram_handle_help
+    alias: "Telegram - Handle Help"
+    mode: restart
+    triggers:
       - trigger: event
         event_type: telegram_command
-        event_data: {}
-
+        event_data:
+          command: "/help"
+      - trigger: event
+        event_type: telegram_callback
+        event_data:
+          command: "/help"
     actions:
-      - choose:
-          # Start
-          - conditions:
-              - condition: template
-                value_template: "{{ trigger.event.data.command == '/start' }}"
-            sequence:
-              - action: telegram_bot.send_message
-                data:
-                  target: "{{ trigger.event.data.chat_id }}"
-                  message: "Tastatur aktiviert"
-                  keyboard:
-                    # - "/wandlicht, /wohnlicht, /kuechenlicht"
-                    # - "/essecke, /ambiente_wohnen, /ambiente_kueche"
-                    # - "/rollladen_1, /rollladen_2, /rollladen_3, /rollladen_4"
-                    - "/alarm, /tor, /start, /help"
+      - if:
+          - condition: template
+            value_template: "{{ trigger.event.event_type == 'telegram_callback' }}"
+        then:
+          - action: telegram_bot.answer_callback_query
+            data:
+              callback_query_id: "{{ trigger.event.data.id }}"
+              message: "Управляйте светом, роллетами и воротами кнопками ниже."
+              show_alert: true
+        else:
+          - action: telegram_bot.send_message
+            data:
+              target: "{{ trigger.event.data.chat_id }}"
+              message: "ℹ️ Нажимайте кнопки на клавиатуре или отправьте `/start`."
 
-              - action: script.telegram_callback
-                data:
-                  target: "{{ trigger.event.data.chat_id }}"
-                  message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
-                  message: |
-                    Wähle das Symbol [/] unten und dann eine Aktion aus.
-                    /start - Zeigt diese Nachricht
-                    /help - Zeigt eine Nachricht mit Befehlen an
-          # Help
-          - conditions:
-              - condition: template
-                value_template: "{{ trigger.event.data.command == '/help' }}"
-            sequence:
-              - action: script.telegram_callback
-                data:
-                  target: "{{ trigger.event.data.chat_id }}"
-                  message_id: "{{ trigger.event.data.message.message_id if trigger.event.event_type == 'telegram_callback' else 1000 }}"
-                  message: |
-                    *Tor öffnen/schliessen:*
-                    - /tor - Garage öffnen/schliessen
-                    - /torteil - Garage teilweise öffnen/schliessen
-
-                    *Licht ein/aus:*
-                    - /wandlicht - Wandlicht
-                    - /wohnlicht - Wohnlicht
-                    - /kuechenlicht - Küchenlicht
-                    - /essecke - Esseckenlicht
-                    - /ambiente\_wohnen - Ambiente Wohnzimmer
-                    - /ambiente\_kueche - Ambiente Küche
-
-                    *Rollladen öffnen/schliessen:*
-                    - /rollladen\_1 - Rollladen 1
-                    - /rollladen\_2 - Rollladen 2
-                    - /rollladen\_3 - Rollladen 3
-                    - /rollladen\_4 - Rollladen Terrasse
-
-                    *Allgemein:*
-                    - /start - Zeigt die Begrüßungsnachricht
-                    - /help - Zeigt eine Nachricht mit Befehlen an
-
-# Scripts ###########################################################
-script:
-  telegram_callback:
-    alias: Telegram - Callback
-    icon: mdi:send
+  # 3. Единый быстрый роутер команд
+  - id: telegram_universal_router
+    alias: "Telegram - Universal Router"
     mode: parallel
-    sequence:
-      - action: telegram_bot.send_message
-        data:
-          chat_id: "{{ target }}"
-          message: "{{ message }}"
-          inline_keyboard:
-            - "{{ (states('light.sonoffpow_01') == 'on') | iif('🟢', '🔴') }} Wandlicht:/wandlicht,
-              {{ (states('light.wohnlicht_2') == 'on') | iif('🟢', '🔴') }} Wohnen:/wohnlicht,
-              {{ (states('light.kuche') == 'on') | iif('🟢', '🔴') }} Küche:/kuechenlicht"
-            - "{{ (states('light.erker_2') == 'on') | iif('🟢', '🔴') }} Essecke:/essecke,
-              {{ (states('light.ambiente_wz_t3') == 'on') | iif('🟢', '🔴') }} Ambiwohnen:/ambiente_wohnen,
-              {{ (states('light.sonoffpow_04') == 'on') | iif('🟢', '🔴') }} Ambiküche:/ambiente_kueche"
-            - "{% set r1 = state_attr('cover.rollladen_1', 'current_position') | int %}
-              {% set r2 = state_attr('cover.rollladen_2', 'current_position') | int %}
-              {% set r3 = state_attr('cover.rollladen_3', 'current_position') | int %}
-              {{ (r1 < 95) | iif((r1 < 20) | iif('🔒', '🪟'~r1~'%'), '🪟') }} Rollladen 1:/rollladen_1,
-              {{ (r2 < 95) | iif((r2 < 20) | iif('🔒', '🪟'~r2~'%'), '🪟') }} Rollladen 2:/rollladen_2,
-              {{ (r3 < 95) | iif((r3 < 20) | iif('🔒', '🪟'~r3~'%'), '🪟') }} Rollladen 3:/rollladen_3"
-            - "{% set r4 = state_attr('cover.rollladen_4', 'current_position') | int %}
-              {{ (r4 < 95) | iif((r4 < 20) | iif('🔒', '🪟'~r4~'%'), '🪟') }} Terrasse:/rollladen_4,
-              {{ ( state_attr('cover.tor_tor','current_position') | int(0) > 0 ) | iif( '🚗' ~ state_attr('cover.tor_tor','current_position') | round(0) ~ '%' , '🔒' ) }} Tor:/tor,
-              {{ ( state_attr('cover.tor_tor','current_position') | int(0) > 0 ) | iif( '🚗', '🔒' ) }} Tortel:/torteil"
-            - "{{ (states('input_boolean.alarm_indoor') == 'on') | iif('🚨', '🔒') }} Alarm:/alarm,
-              Home:/start,
-              Hilfe:/help"
-
+    max: 10
+    triggers:
+      - trigger: event
+        event_type:
+          - telegram_command
+          - telegram_callback
+    variables:
+      cfg: *tg_registry
+      cmd: "{{ trigger.event.data.command }}"
+      ent: >-
+        {%- set ns = namespace(ent='') -%}
+        {%- for row_key, row in cfg.items() -%}
+          {%- for item in row -%}
+            {%- if item.cmd == cmd and item.ent is defined -%}
+              {%- set ns.ent = item.ent -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endfor -%}
+        {{ ns.ent }}
+    conditions:
       - condition: template
-        value_template: "{{ (message_id is defined) and (message_id != 1000) }}"
+        value_template: "{{ ent | trim != '' }}"
+    actions:
+      # Моментальное действие
+      - action: "{{ 'button.press' if ent.startswith('button.') else ent.split('.')[0] ~ '.toggle' }}"
+        target:
+          entity_id: "{{ ent }}"
 
-      - action: telegram_bot.delete_message
-        data:
-          message_id: "{{ message_id }}"
-          chat_id: "{{ target }}"
+      # Toast и однократное обновление клавиатуры
+      - if:
+          - condition: template
+            value_template: "{{ trigger.event.event_type == 'telegram_callback' }}"
+        then:
+          - action: telegram_bot.answer_callback_query
+            data:
+              callback_query_id: "{{ trigger.event.data.id }}"
+              message: "✅ {{ state_attr(ent, 'friendly_name') | default(ent) }}"
+              show_alert: false
+
+          - delay:
+              milliseconds: 600
+
+          - action: script.telegram_render_menu
+            data:
+              chat_id: "{{ trigger.event.data.chat_id }}"
+              message_id: "{{ trigger.event.data.message.message_id }}"
 
 # 🔴🟢🔓🔒⚪
 # wandlicht - Wandlicht ein/aus
